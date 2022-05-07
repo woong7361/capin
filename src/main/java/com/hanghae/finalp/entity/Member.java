@@ -18,34 +18,35 @@ public class Member extends TimeStamped {
     @Column(name = "member_id")
     private Long id;
 
-    private String username;
     private String kakaoId;
+    private String username;
+    private String imageUrl;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Board> boards = new ArrayList<>();
-
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Comment> comments = new ArrayList<>();
+    private List<MemberGroup> memberGroups = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Love> loves = new ArrayList<>();
+    private List<ChatMember> chatMembers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Color> colors = new ArrayList<>();
 
 
     //========================================생성자=============================================//
-    private Member(String username, String kakaoId) {
-        this.username = username;
-        this.kakaoId = kakaoId;
-    }
 
+    private Member(String kakaoId, String username, String imageUrl) {
+        this.kakaoId = kakaoId;
+        this.username = username;
+        this.imageUrl = imageUrl;
+    }
 
     //========================================생성 편의자=============================================//
-    public static Member createMember(String username, String kakaoId) {
-        return new Member(username, kakaoId);
+
+    public static Member createMember(String kakaoId, String username, String imageUrl) {
+        return new Member(kakaoId, username, imageUrl);
     }
 
-
+    //========================================비즈니스 로직==============================================//
+    public void patchMember(String username, String imageUrl) {
+        this.username = username;
+        this.imageUrl = imageUrl;
+    }
 }
