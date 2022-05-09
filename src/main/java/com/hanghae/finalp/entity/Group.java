@@ -27,6 +27,8 @@ public class Group {
     private String roughAddress;
     private String imageUrl;
 
+    private String imageFullUrl;
+
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<MemberGroup> memberGroups = new ArrayList<>();
 
@@ -36,23 +38,24 @@ public class Group {
 
     //========================================생성자=============================================//
 
-    private Group(String groupTitle, String description, int maxMemberCount, String roughAddress, String imageUrl) {
+    private Group(String groupTitle, String description, int maxMemberCount, String roughAddress, String imageUrl, String imageFullUrl) {
         this.groupTitle = groupTitle;
         this.description = description;
         this.memberCount = 1;
         this.maxMemberCount = maxMemberCount;
         this.roughAddress = roughAddress;
         this.imageUrl = imageUrl;
+        this.imageFullUrl = imageFullUrl;
     }
 
     //========================================생성 편의자=============================================//
 
     public static Group createGroup(
-            String groupTitle, String description, int maxMemberCount, String roughAddress, String imageUrl, Member member) {
-        Group group = new Group(groupTitle, description, maxMemberCount, roughAddress, imageUrl);
-        MemberGroup memberGroup = MemberGroup.createMemberGroup(Authority.OWNER, member, group);
-        group.getMemberGroups().add(memberGroup);
-        Chatroom.createChatroomByGroup(groupTitle, memberGroup);
+            String groupTitle, String description, int maxMemberCount, String roughAddress, String imageUrl, String imageFullUrl, Member member) {
+        Group group = new Group(groupTitle, description, maxMemberCount, roughAddress, imageUrl, imageFullUrl); //group을 만들고
+        MemberGroup memberGroup = MemberGroup.createMemberGroup(Authority.OWNER, member, group); //memberGroup을 만들고
+        group.getMemberGroups().add(memberGroup); //group안에 memberGroup을 넣어준다
+        Chatroom.createChatroomByGroup(groupTitle, memberGroup); //group을 만들때 chatroom도 만들어줘야 하므로
 
         return group;
     }
