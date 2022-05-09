@@ -1,19 +1,19 @@
 package com.hanghae.finalp.entity;
 
-import com.hanghae.finalp.entity.mappedsuperclass.TimeStamped;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Love {
+public class ChatMember {
 
     @Id @GeneratedValue
-    @Column(name = "love_id")
+    @Column(name = "chat_member_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -21,23 +21,23 @@ public class Love {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
-    private Board board;
+    @JoinColumn(name = "chatroom_id")
+    private Chatroom chatroom;
 
+//    @OneToMany(mappedBy = "chatMember")
+//    private List<DmMessage> dmMessage;
 
     //========================================생성자=============================================//
-    private Love(Member member, Board board) {
+
+    private ChatMember(Member member, Chatroom chatroom) {
         this.member = member;
-        this.board = board;
+        this.chatroom = chatroom;
+    }
+
+    public static ChatMember createChatMember(Member member, Chatroom chatroom) {
+        return new ChatMember(member, chatroom);
     }
 
 
     //========================================생성 편의자=============================================//
-    public static Love createLove(Member member, Board board) {
-        Love love = new Love(member, board);
-        love.getMember().getLoves().add(love);
-        love.getBoard().getLoves().add(love);
-
-        return love;
-    }
 }
