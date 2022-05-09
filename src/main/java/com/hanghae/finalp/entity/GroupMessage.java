@@ -30,5 +30,19 @@ public class GroupMessage {
 
     //========================================생성자=============================================//
 
+    private GroupMessage(Long senderId, String content, MessageType messageType) {
+        this.senderId = senderId;
+        this.content = content;
+        this.messageType = messageType;
+    }
+
+
     //========================================생성 편의자=============================================//
+
+    private GroupMessage createGroupMessage(Long senderId, String content, MessageType messageType, MemberGroup memberGroup) {
+        GroupMessage groupMessage = new GroupMessage(senderId, content, messageType);
+        groupMessage.memberGroup = memberGroup;
+
+        return groupMessage;
+    }
 }

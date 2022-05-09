@@ -27,7 +27,7 @@ public class Cafe {
 
     //========================================생성자=============================================//
 
-    public Cafe(String locationName, String locationX, String locationY, String address, Group group) {
+    private Cafe(String locationName, String locationX, String locationY, String address, Group group) {
         this.locationName = locationName;
         this.locationX = locationX;
         this.locationY = locationY;
@@ -40,7 +40,6 @@ public class Cafe {
     public static Cafe createCafe(String locationName, String locationX, String locationY, String address, Group group) {
         Cafe cafe = new Cafe(locationName, locationX, locationY, address, group);
         group.setCafe(cafe);
-
         return cafe;
     }
 }

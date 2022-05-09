@@ -33,12 +33,12 @@ public class MemberGroup {
     @JoinColumn(name = "study_group_id")
     private Group group;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "chatroom_id")
     private Chatroom chatroom;
 
-    @OneToMany(mappedBy = "memberGroup", cascade = CascadeType.ALL)
-    private List<GroupMessage> groupMessages;
+//    @OneToMany(mappedBy = "memberGroup", cascade = CascadeType.ALL)
+//    private List<GroupMessage> groupMessages;
 
 
     //========================================생성자=============================================//
@@ -53,7 +53,11 @@ public class MemberGroup {
     //========================================생성 편의자=============================================//
 
     public static MemberGroup createMemberGroup(Authority authority, Member member, Group group) {
-        MemberGroup memberGroup = new MemberGroup(authority, member, group);
-        return memberGroup;
+        return new MemberGroup(authority, member, group);
+    }
+
+
+    public void setChatroom(Chatroom chatroom) {
+        this.chatroom = chatroom;
     }
 }

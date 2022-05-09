@@ -13,7 +13,8 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DmMessage {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     @Column(name = "dm_message_id")
     private Long id;
 
@@ -30,6 +31,21 @@ public class DmMessage {
 
     //========================================생성자=============================================//
 
+    private DmMessage(Long senderId, String content, MessageType messageType) {
+        this.senderId = senderId;
+        this.content = content;
+        this.messageType = messageType;
+    }
+
 
     //========================================생성 편의자=============================================//
+
+    private DmMessage createDmMessage(Long senderId, String content, MessageType messageType, ChatMember chatMember) {
+        DmMessage dmMessage = new DmMessage(senderId, content, messageType);
+        dmMessage.chatMember = chatMember;
+
+        return dmMessage;
+    }
+
+
 }

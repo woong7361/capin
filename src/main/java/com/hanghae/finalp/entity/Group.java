@@ -52,9 +52,9 @@ public class Group {
         Group group = new Group(groupTitle, description, maxMemberCount, roughAddress, imageUrl);
         MemberGroup memberGroup = MemberGroup.createMemberGroup(Authority.OWNER, member, group);
         group.getMemberGroups().add(memberGroup);
+        Chatroom.createChatroomByGroup(groupTitle, memberGroup);
 
         return group;
-
     }
 
     //========================================비즈니스 로직=============================================//
