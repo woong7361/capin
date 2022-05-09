@@ -1,6 +1,7 @@
 package com.hanghae.finalp.entity;
 
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
+import com.hanghae.finalp.entity.mappedsuperclass.TimeStamped;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "study_group")
-public class Group {
+public class Group extends TimeStamped {
 
     @Id
     @GeneratedValue
