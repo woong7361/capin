@@ -79,4 +79,14 @@ class FinalPApplicationTests {
 
     }
 
+    @Test
+    public void test() throws Exception{
+        //given
+        Long a = 3L;
+        System.out.println("a.toString() = " + a.toString());
+        //when
+
+        //then
+    }
+
 }

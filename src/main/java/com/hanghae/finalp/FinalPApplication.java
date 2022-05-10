@@ -15,10 +15,7 @@ public class FinalPApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(FinalPApplication.class, args);
-        log.info("abc");
-        log.warn("warn");
-        log.debug("");
-        System.out.println("args = " + args);
+
     }
 
 
