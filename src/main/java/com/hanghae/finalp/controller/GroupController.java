@@ -8,4 +8,5 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService groupService;
+
 }

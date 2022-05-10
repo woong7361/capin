@@ -2,6 +2,7 @@ package com.hanghae.finalp.entity;
 
 import com.hanghae.finalp.entity.mappedsuperclass.TimeStamped;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,11 +18,10 @@ public class Member extends TimeStamped {
     @Id @GeneratedValue
     @Column(name = "member_id")
     private Long id;
-
     private String kakaoId;
     private String username;
+    @Column(columnDefinition = "TEXT")
     private String imageUrl;
-
     private String imageFullUrl;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -34,7 +34,9 @@ public class Member extends TimeStamped {
 
     //========================================생성자=============================================//
 
+    @Builder
     private Member(String kakaoId, String username, String imageUrl, String imageFullUrl) {
+        //여기를 MemberRequestDto memberRequestDto로 바꿔
         this.kakaoId = kakaoId;
         this.username = username;
         this.imageUrl = imageUrl;
@@ -48,9 +50,8 @@ public class Member extends TimeStamped {
     }
 
     //========================================비즈니스 로직==============================================//
-    public void patchMember(String username, String imageUrl, String imageFullUrl) {
+    public void patchMember(String username, String imageUrl) {
         this.username = username;
         this.imageUrl = imageUrl;
-        this.imageFullUrl = imageFullUrl;
     }
 }

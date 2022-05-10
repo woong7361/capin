@@ -28,8 +28,6 @@ public class AWSConfig {
     @Value("${cloud.aws.region.static}")
     private String region;
 
-    public static final String CLOUD_FRONT_DOMAIN_NAME = "d1ai09q40aghzs.cloudfront.net";
-
 
     @Bean
     public AmazonS3 amazonS3() { //amazonS3가 클라이언트 이다.

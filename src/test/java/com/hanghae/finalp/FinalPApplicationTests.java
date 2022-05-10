@@ -4,6 +4,7 @@ import com.hanghae.finalp.entity.Chatroom;
 import com.hanghae.finalp.entity.Group;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
+import com.hanghae.finalp.service.S3Service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -18,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class FinalPApplicationTests {
 
+    @Autowired private S3Service s3Service;
     @Autowired private EntityManager em;
 
     public void clearContext() {
