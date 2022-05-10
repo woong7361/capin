@@ -37,7 +37,9 @@ public class Chatroom {
 
     //========================================생성 편의자=============================================//
     public static Chatroom createChatroomByGroup(String chatroomTitle, MemberGroup memberGroup) {
+
         Chatroom chatroom = new Chatroom(chatroomTitle, RoomType.GROUP);
+
         memberGroup.setChatroom(chatroom);
         return chatroom;
     }
@@ -45,9 +47,10 @@ public class Chatroom {
     public static Chatroom createChatroomByMember(String chatroomTitle, Member member1, Member member2) {
         Chatroom chatroom = new Chatroom(chatroomTitle, RoomType.DM);
 
-        ChatMember chatMember1 = ChatMember.createChatMember(member1, chatroom);
-        ChatMember chatMember2 = ChatMember.createChatMember(member2, chatroom);
-        chatroom.getChatMembers().add(chatMember1);
+        ChatMember chatMember1 = ChatMember.createChatMember(member1, chatroom); //createChatMember이 그냥 ChatMember생성자와 같다고 보면됨
+        ChatMember chatMember2 = ChatMember.createChatMember(member2, chatroom); //=> chatMember1,2를 만들어준다(chatMember에 member와 chatroom이 들어간(지정된) 상태)
+                                                                                //=> 새 chatroom 생성시 chatMember을 지정해줌
+        chatroom.getChatMembers().add(chatMember1); //chatMember1,2를 chatroom에 넣어서 chatroom 완성
         chatroom.getChatMembers().add(chatMember2);
 
         return chatroom;

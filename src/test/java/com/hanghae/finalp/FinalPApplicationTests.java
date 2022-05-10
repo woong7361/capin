@@ -4,6 +4,7 @@ import com.hanghae.finalp.entity.Chatroom;
 import com.hanghae.finalp.entity.Group;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
+import com.hanghae.finalp.service.S3Service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -18,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class FinalPApplicationTests {
 
+    @Autowired private S3Service s3Service;
     @Autowired private EntityManager em;
 
     public void clearContext() {
@@ -29,7 +31,7 @@ class FinalPApplicationTests {
     @Rollback(value = false)
     public void testMember() throws Exception{
         //given
-        Member member = Member.createMember("kakaoId", "username", null);
+        Member member = Member.createMember("kakaoId", "username", null, null);
         //when
         em.persist(member);
         clearContext();
@@ -44,9 +46,9 @@ class FinalPApplicationTests {
     @Rollback(value = false)
     public void groupTest() throws Exception{
         //given
-        Member member = Member.createMember("kakaoId", "username", null);
+        Member member = Member.createMember("kakaoId", "username", null, null);
         Group group =
-                Group.createGroup("title", "desc", 5, "adrress", null, member);
+                Group.createGroup("title", "desc", 5, "adrress", null, null, member);
         em.persist(member);
         em.persist(group);
         clearContext();
@@ -63,8 +65,8 @@ class FinalPApplicationTests {
     @Rollback(value = false)
     public void chatMember() throws Exception{
         //given
-        Member member1 = Member.createMember("kakaoId1", "username1", null);
-        Member member2 = Member.createMember("kakaoId2", "username2", null);
+        Member member1 = Member.createMember("kakaoId1", "username1", null, null);
+        Member member2 = Member.createMember("kakaoId2", "username2", null, null);
         Chatroom chatroom = Chatroom.createChatroomByMember("titleMember", member1, member2);
         em.persist(member1);
         em.persist(member2);
