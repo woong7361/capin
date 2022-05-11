@@ -31,7 +31,7 @@ class FinalPApplicationTests {
     @Rollback(value = false)
     public void testMember() throws Exception{
         //given
-        Member member = Member.createMember("kakaoId", "username", null, null);
+        Member member = Member.createMember("kakaoId", "username", null);
         //when
         em.persist(member);
         clearContext();
@@ -46,7 +46,7 @@ class FinalPApplicationTests {
     @Rollback(value = false)
     public void groupTest() throws Exception{
         //given
-        Member member = Member.createMember("kakaoId", "username", null, null);
+        Member member = Member.createMember("kakaoId", "username", null);
         Group group =
                 Group.createGroup("title", "desc", 5, "adrress", null, null, member);
         em.persist(member);
@@ -65,8 +65,8 @@ class FinalPApplicationTests {
     @Rollback(value = false)
     public void chatMember() throws Exception{
         //given
-        Member member1 = Member.createMember("kakaoId1", "username1", null, null);
-        Member member2 = Member.createMember("kakaoId2", "username2", null, null);
+        Member member1 = Member.createMember("kakaoId1", "username1", null);
+        Member member2 = Member.createMember("kakaoId2", "username2", null);
         Chatroom chatroom = Chatroom.createChatroomByMember("titleMember", member1, member2);
         em.persist(member1);
         em.persist(member2);

@@ -22,7 +22,6 @@ public class Member extends TimeStamped {
     private String username;
     @Column(columnDefinition = "TEXT")
     private String imageUrl;
-    private String imageFullUrl;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberGroup> memberGroups = new ArrayList<>();
@@ -35,18 +34,17 @@ public class Member extends TimeStamped {
     //========================================생성자=============================================//
 
     @Builder
-    private Member(String kakaoId, String username, String imageUrl, String imageFullUrl) {
+    private Member(String kakaoId, String username, String imageUrl) {
         //여기를 MemberRequestDto memberRequestDto로 바꿔
         this.kakaoId = kakaoId;
         this.username = username;
         this.imageUrl = imageUrl;
-        this.imageFullUrl = imageFullUrl;
     }
 
     //========================================생성 편의자=============================================//
 
-    public static Member createMember(String kakaoId, String username, String imageUrl, String imageFullUrl) {
-        return new Member(kakaoId, username, imageUrl, imageFullUrl);
+    public static Member createMember(String kakaoId, String username, String imageUrl) {
+        return new Member(kakaoId, username, imageUrl);
     }
 
     //========================================비즈니스 로직==============================================//
