@@ -1,6 +1,7 @@
 package com.hanghae.finalp.config.security.filter;
 
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hanghae.finalp.config.security.PrincipalDetails;
@@ -18,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.hanghae.finalp.config.security.jwt.JwtTokenUtils.*;
+import static com.hanghae.finalp.util.JwtTokenUtils.*;
 
 
 //시큐리티 필터중 BasicAuthenticationFilter가 있다
@@ -58,6 +59,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             //강제로 시큐리티의 세션에 접근하여 Authentication 객체를 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        } catch (TokenExpiredException e){
+            request.setAttribute("error", "accessTokenExpire");
         } catch (Exception e) {
             request.setAttribute("error", e);
         } finally { //에러가 발생시 authenticationentrypoint로

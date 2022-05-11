@@ -1,4 +1,4 @@
-package com.hanghae.finalp.config.security.jwt;
+package com.hanghae.finalp.util;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -7,7 +7,6 @@ import com.auth0.jwt.exceptions.InvalidClaimException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.hanghae.finalp.config.security.PrincipalDetails;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,10 +23,10 @@ public final class JwtTokenUtils {
 
     public static final String TOKEN_HEADER_NAME = "Authorization";
     public static final String TOKEN_NAME_WITH_SPACE = "Bearer ";
-    public static final String JWT_SECRET = "jwt_secret_!@#$%";
     public static final String CLAIM_USERNAME = "username";
     public static final String CLAIM_ID = "id";
 
+    public static final String JWT_SECRET = "jwt_secret_!@#$%1234";
 
     public static DecodedJWT verifyToken(String jwtToken) {
         try {
@@ -40,7 +39,7 @@ public final class JwtTokenUtils {
         } catch (SignatureVerificationException signatureVerificationException){
             throw new IllegalArgumentException("signature verifying 에러");
         } catch (TokenExpiredException tokenExpiredException) {
-            throw new IllegalArgumentException("토큰 만료됨");
+            throw new TokenExpiredException("토큰 만료됨");
         } catch (InvalidClaimException invalidClaimException) {
             throw new IllegalArgumentException("토큰 클레임 에러");
         }
@@ -56,17 +55,23 @@ public final class JwtTokenUtils {
         }
     }
 
-    public static String createToken(PrincipalDetails principal) {
+    public static String createAccessToken(Long memberId, String username) {
         String token = JWT.create()
-                .withSubject("sub")
-                .withExpiresAt(new Date(System.currentTimeMillis() + (2 * HOUR) ))
-                .withClaim(CLAIM_ID, principal.getPrincipal().getMemberId())
-                .withClaim(CLAIM_USERNAME, principal.getUsername())
+                .withSubject("accessToken")
+                .withExpiresAt(new Date(System.currentTimeMillis() + (3 * SEC) ))
+                .withClaim(CLAIM_ID, memberId)
+                .withClaim(CLAIM_USERNAME, username)
                 .sign(Algorithm.HMAC512(JWT_SECRET));   //secretkey
-        return TOKEN_NAME_WITH_SPACE + token;
+        return token;
     }
 
-    private static Algorithm generateAlgorithm() {
-        return Algorithm.HMAC512(JWT_SECRET);
+    public static String createRefreshToken(Long memberId) {
+        String token = JWT.create()
+                .withSubject("refreshToken")
+                .withExpiresAt(new Date(System.currentTimeMillis() + (14 * DAY) ))
+                .withClaim(CLAIM_ID, memberId)
+                .sign(Algorithm.HMAC512(JWT_SECRET));   //secretkey
+        return token;
     }
+
 }

@@ -1,15 +1,16 @@
-package com.hanghae.finalp.service;
+package com.hanghae.finalp.service.oauth;
 
-import com.hanghae.finalp.config.exception.dto.ResultMsg;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.config.security.kakao.KakaoProfile;
 import com.hanghae.finalp.config.security.kakao.OAuthToken;
-import com.hanghae.finalp.config.security.jwt.JwtTokenUtils;
+import com.hanghae.finalp.util.JwtTokenUtils;
+import com.hanghae.finalp.dto.LoginDto;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.repository.MemberRepository;
+import com.hanghae.finalp.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,17 +27,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Optional;
 
+import static com.hanghae.finalp.util.JwtTokenUtils.*;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
-public class OauthService {
+public class KakaoOauth {
 
     private final InMemoryClientRegistrationRepository inMemoryRepository;
     private final MemberRepository memberRepository;
+    private final RedisUtils redisUtils;
 
     @Transactional
-    public ResponseEntity<ResultMsg> login(String providerName, String code) {
+    public ResponseEntity<LoginDto.Response> login(String providerName, String code) {
         ClientRegistration provider = inMemoryRepository.findByRegistrationId(providerName);
 
         OAuthToken tokenResponse = getToken(code, provider);
@@ -44,16 +48,35 @@ public class OauthService {
 
         PrincipalDetails principalDetails = saveMember(providerName, kakaoProfile);
 
-        String token = JwtTokenUtils.createToken(principalDetails);
+        String accessToken = JwtTokenUtils.
+                createAccessToken(principalDetails.getPrincipal().getMemberId(), principalDetails.getUsername());
+        String refreshToken = JwtTokenUtils.createRefreshToken(principalDetails.getPrincipal().getMemberId());
 
-        ResponseEntity<ResultMsg> response = makeTokenResponse(token);
+        //hardcoding need refactoring
+        DecodedJWT decodedJWT = verifyToken(refreshToken);
+        redisUtils.setDataExpire(
+                String.valueOf(principalDetails.getPrincipal().getMemberId()),
+                refreshToken, 14 * DAY);
+
+        ResponseEntity<LoginDto.Response> response = makeTokenResponse(accessToken, refreshToken);
 
         return response;
     }
 
 
+    public ResponseEntity<LoginDto.Response> createAccessTokenByRefreshToken(String refreshToken) {
+        refreshToken = refreshToken.replace(TOKEN_NAME_WITH_SPACE, "");
+        DecodedJWT decodedJWT = verifyToken(refreshToken);
+        Long memberId = decodedJWT.getClaim(CLAIM_ID).asLong();
+        String inRedisToken = redisUtils.getData(memberId.toString());
+        if(!refreshToken.equals(inRedisToken)) throw new RuntimeException("not valid refresh token");
 
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("not exist nmember"));
 
+        String accessToken = createAccessToken(memberId, member.getUsername());
+
+        return makeTokenResponse(refreshToken, accessToken);
+    }
     //==============================================================================================//
 
     private OAuthToken getToken(String code, ClientRegistration provider) {
@@ -116,11 +139,9 @@ public class OauthService {
         return principalDetails;
     }
 
-    private ResponseEntity<ResultMsg> makeTokenResponse(String token) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(JwtTokenUtils.TOKEN_HEADER_NAME, token);
+    private ResponseEntity<LoginDto.Response> makeTokenResponse(String accessToken, String refreshToken) {
         return ResponseEntity.ok()
-                .headers(headers)
-                .body(new ResultMsg("success", "추후 삭제 예정 - 편의상"  + token));
+                .body(new LoginDto.Response(TOKEN_NAME_WITH_SPACE + accessToken, TOKEN_NAME_WITH_SPACE + refreshToken));
     }
+
 }
