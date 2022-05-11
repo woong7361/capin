@@ -62,18 +62,11 @@ public class MemberController {
         return "success";
     }
 
-    @GetMapping("/api/get") //해당하는 사용자의 정보 추가해야됨-> 그래서 유저네임 바꾸는 것도 추가하기
-    @ResponseBody
-    public String memberEdit(@AuthenticationPrincipal PrincipalDetails principalDetails)  {
-        Member member = memberRepository.findById(principalDetails.getPrincipal().getMemberId()).get();
-        String imgFullUrl = S3Utils.getImgFullUrl(member.getImageUrl());
-
-        return imgFullUrl;
-    }
-
     //계정 삭제시 s3과 db에 이미지 삭제도 넣어주기
     //controller에서는 아래 2줄 추가
     // MemberService.delete(memberRequestDto); //s3에 있는거 삭제
     //MemberRepository.deleteById(memberRequestDto.getId());  //db에 있는것도 삭제하기
 
 }
+
+

@@ -52,8 +52,4 @@ public class Member extends TimeStamped {
         this.username = username;
         this.imageUrl = imageUrl;
     }
-
-    public void setImageUrl(String fileName) {
-        this.imageUrl = fileName;
-    }
 }

@@ -26,6 +26,10 @@ public class GroupDto {
     }
 
 
-
-
+    public static class CreateReq {
+        String groupTitle;
+        String description;
+        int maxMemberCount;
+        String roughAddress;
+    }
 }

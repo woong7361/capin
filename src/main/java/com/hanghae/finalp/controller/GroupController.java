@@ -1,5 +1,6 @@
 package com.hanghae.finalp.controller;
 
+import com.hanghae.finalp.config.exception.dto.ResultMsg;
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.GroupDto;
 import com.hanghae.finalp.service.GroupService;
@@ -9,7 +10,10 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,4 +24,5 @@ public class GroupController {
     public Slice<GroupDto.SimpleRes> myGroupList(@AuthenticationPrincipal PrincipalDetails principalDetails, Pageable pageable) {
         return groupService.getMyGroupList(principalDetails.getPrincipal().getMemberId(), pageable);
     }
+
 }

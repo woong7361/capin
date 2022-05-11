@@ -98,8 +98,6 @@ public class MemberService {
 
         //dto가 엔티티로 저장됨
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("1"));
-        member.setImageUrl(fileName);
-
         return fileName; //images.png-20223408153403
     }
 /*    public String editFile(MultipartFile file) throws IOException {
