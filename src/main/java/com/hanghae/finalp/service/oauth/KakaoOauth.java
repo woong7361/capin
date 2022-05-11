@@ -1,15 +1,17 @@
-package com.hanghae.finalp.service;
+package com.hanghae.finalp.service.oauth;
 
-import com.hanghae.finalp.config.exception.dto.ResultMsg;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.config.security.kakao.KakaoProfile;
 import com.hanghae.finalp.config.security.kakao.OAuthToken;
-import com.hanghae.finalp.config.security.jwt.JwtTokenUtils;
+import com.hanghae.finalp.util.JwtTokenUtils;
+import com.hanghae.finalp.dto.LoginDto;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.repository.MemberRepository;
+import com.hanghae.finalp.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,17 +28,36 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Optional;
 
+import static com.hanghae.finalp.util.JwtTokenUtils.*;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
-public class OauthService {
+public class KakaoOauth {
 
     private final InMemoryClientRegistrationRepository inMemoryRepository;
     private final MemberRepository memberRepository;
+    private final RedisUtils redisUtils;
+    private final JwtTokenUtils jwtTokenUtils;
+
+    @Value("${spring.security.oauth2.client.registration.Kakao.client-id}")
+    private String clientId;
+    @Value("${spring.security.oauth2.client.registration.Kakao.client-secret}")
+    private String clientSecret;
+    @Value("${spring.security.oauth2.client.registration.Kakao.authorization-grant-type}")
+    private String authorizationGrantType;
+    @Value("${spring.security.oauth2.client.registration.Kakao.redirect-uri}")
+    private String redirectUri;
+    @Value("${spring.security.oauth2.client.provider.Kakao.authorization-uri}")
+    private String authorizationUri;
+    @Value("${spring.security.oauth2.client.provider.Kakao.token-uri}")
+    private String tokenUri;
+    @Value("${spring.security.oauth2.client.provider.Kakao.user-info-uri}")
+    private String userInfoUri;
 
     @Transactional
-    public ResponseEntity<ResultMsg> login(String providerName, String code) {
+    public ResponseEntity<LoginDto.Response> login(String providerName, String code) {
         ClientRegistration provider = inMemoryRepository.findByRegistrationId(providerName);
 
         OAuthToken tokenResponse = getToken(code, provider);
@@ -44,13 +65,20 @@ public class OauthService {
 
         PrincipalDetails principalDetails = saveMember(providerName, kakaoProfile);
 
-        String token = JwtTokenUtils.createToken(principalDetails);
+        String accessToken = jwtTokenUtils.
+                createAccessToken(principalDetails.getPrincipal().getMemberId(), principalDetails.getUsername());
+        String refreshToken = jwtTokenUtils.createRefreshToken(principalDetails.getPrincipal().getMemberId());
 
-        ResponseEntity<ResultMsg> response = makeTokenResponse(token);
+        //hardcoding need refactoring
+        redisUtils.setDataExpire(
+                String.valueOf(principalDetails.getPrincipal().getMemberId()),
+                refreshToken, 14 * DAY
+        );
+
+        ResponseEntity<LoginDto.Response> response = jwtTokenUtils.makeTokenResponse(accessToken, refreshToken);
 
         return response;
     }
-
 
 
 
@@ -116,11 +144,6 @@ public class OauthService {
         return principalDetails;
     }
 
-    private ResponseEntity<ResultMsg> makeTokenResponse(String token) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(JwtTokenUtils.TOKEN_HEADER_NAME, token);
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(new ResultMsg("success", "추후 삭제 예정 - 편의상"  + token));
-    }
+
+
 }

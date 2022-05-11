@@ -15,7 +15,7 @@ import javax.persistence.EntityManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+//@DataJpaTest
 @Transactional
 class FinalPApplicationTests {
 
@@ -27,7 +27,7 @@ class FinalPApplicationTests {
         em.clear();
     }
 
-    @Test
+//    @Test
     @Rollback(value = false)
     public void testMember() throws Exception{
         //given
@@ -42,7 +42,7 @@ class FinalPApplicationTests {
         assertThat(member.getKakaoId()).isEqualTo("kakaoId");
     }
 
-    @Test
+//    @Test
     @Rollback(value = false)
     public void groupTest() throws Exception{
         //given
@@ -61,7 +61,7 @@ class FinalPApplicationTests {
         assertThat(findGroup.getMemberGroups().get(0).getChatroom().getChatroomTitle()).isEqualTo("title");
     }
 
-    @Test
+//    @Test
     @Rollback(value = false)
     public void chatMember() throws Exception{
         //given
@@ -81,7 +81,7 @@ class FinalPApplicationTests {
 
     }
 
-    @Test
+//    @Test
     public void test() throws Exception{
         //given
         Long a = 3L;
