@@ -2,6 +2,7 @@ package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.dto.LoginDto;
+import com.hanghae.finalp.service.LoginService;
 import com.hanghae.finalp.service.oauth.KakaoOauth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class LoginController {
 
     private final KakaoOauth kakaoOauth;
+    private final LoginService longinService;
 
     /**
      * 카카오 로그인 API
@@ -27,7 +29,7 @@ public class LoginController {
     @PostMapping("/login/refresh-token")
     @ResponseBody
     public ResponseEntity<LoginDto.Response> loginOAuth(@RequestHeader("Authorization") String refreshToken) {
-        return kakaoOauth.createAccessTokenByRefreshToken(refreshToken);
+        return longinService.createAccessTokenByRefreshToken(refreshToken);
     }
 
     /**

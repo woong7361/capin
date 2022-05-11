@@ -7,14 +7,21 @@ import com.auth0.jwt.exceptions.InvalidClaimException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.hanghae.finalp.dto.LoginDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 
 @Slf4j
-public final class JwtTokenUtils {
+@Component
+@RequiredArgsConstructor
+public class JwtTokenUtils {
 
     public static final int SEC = 1000;
     public static final int MINUTE = 60 * SEC;
@@ -26,9 +33,10 @@ public final class JwtTokenUtils {
     public static final String CLAIM_USERNAME = "username";
     public static final String CLAIM_ID = "id";
 
-    public static final String JWT_SECRET = "jwt_secret_!@#$%1234";
+    @Value("${jwt.secret}")
+    private String JWT_SECRET;
 
-    public static DecodedJWT verifyToken(String jwtToken) {
+    public DecodedJWT verifyToken(String jwtToken) {
         try {
             return JWT
                     .require(Algorithm.HMAC512(JWT_SECRET))
@@ -45,7 +53,7 @@ public final class JwtTokenUtils {
         }
     }
 
-    public static String getTokenFromHeader(HttpServletRequest request) throws IllegalArgumentException {
+    public String getTokenFromHeader(HttpServletRequest request) throws IllegalArgumentException {
         try {
             return request.
                     getHeader(TOKEN_HEADER_NAME).
@@ -55,23 +63,31 @@ public final class JwtTokenUtils {
         }
     }
 
-    public static String createAccessToken(Long memberId, String username) {
+    public String createAccessToken(Long memberId, String username) {
         String token = JWT.create()
                 .withSubject("accessToken")
-                .withExpiresAt(new Date(System.currentTimeMillis() + (3 * SEC) ))
+                .withExpiresAt(new Date(System.currentTimeMillis() + (30 * MINUTE) ))
                 .withClaim(CLAIM_ID, memberId)
                 .withClaim(CLAIM_USERNAME, username)
                 .sign(Algorithm.HMAC512(JWT_SECRET));   //secretkey
         return token;
     }
 
-    public static String createRefreshToken(Long memberId) {
+    public String createRefreshToken(Long memberId) {
         String token = JWT.create()
                 .withSubject("refreshToken")
                 .withExpiresAt(new Date(System.currentTimeMillis() + (14 * DAY) ))
                 .withClaim(CLAIM_ID, memberId)
                 .sign(Algorithm.HMAC512(JWT_SECRET));   //secretkey
         return token;
+    }
+
+    public ResponseEntity<LoginDto.Response> makeTokenResponse(String accessToken, String refreshToken) {
+        return ResponseEntity.ok()
+                .body(new LoginDto.Response(
+                        TOKEN_NAME_WITH_SPACE + accessToken,
+                        TOKEN_NAME_WITH_SPACE + refreshToken)
+                );
     }
 
 }

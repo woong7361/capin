@@ -11,6 +11,7 @@ import com.hanghae.finalp.repository.MemberRepository;
 import com.hanghae.finalp.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,6 +39,22 @@ public class KakaoOauth {
     private final InMemoryClientRegistrationRepository inMemoryRepository;
     private final MemberRepository memberRepository;
     private final RedisUtils redisUtils;
+    private final JwtTokenUtils jwtTokenUtils;
+
+    @Value("${spring.security.oauth2.client.registration.Kakao.client-id}")
+    private String clientId;
+    @Value("${spring.security.oauth2.client.registration.Kakao.client-secret}")
+    private String clientSecret;
+    @Value("${spring.security.oauth2.client.registration.Kakao.authorization-grant-type}")
+    private String authorizationGrantType;
+    @Value("${spring.security.oauth2.client.registration.Kakao.redirect-uri}")
+    private String redirectUri;
+    @Value("${spring.security.oauth2.client.provider.Kakao.authorization-uri}")
+    private String authorizationUri;
+    @Value("${spring.security.oauth2.client.provider.Kakao.token-uri}")
+    private String tokenUri;
+    @Value("${spring.security.oauth2.client.provider.Kakao.user-info-uri}")
+    private String userInfoUri;
 
     @Transactional
     public ResponseEntity<LoginDto.Response> login(String providerName, String code) {
@@ -48,35 +65,23 @@ public class KakaoOauth {
 
         PrincipalDetails principalDetails = saveMember(providerName, kakaoProfile);
 
-        String accessToken = JwtTokenUtils.
+        String accessToken = jwtTokenUtils.
                 createAccessToken(principalDetails.getPrincipal().getMemberId(), principalDetails.getUsername());
-        String refreshToken = JwtTokenUtils.createRefreshToken(principalDetails.getPrincipal().getMemberId());
+        String refreshToken = jwtTokenUtils.createRefreshToken(principalDetails.getPrincipal().getMemberId());
 
         //hardcoding need refactoring
-        DecodedJWT decodedJWT = verifyToken(refreshToken);
         redisUtils.setDataExpire(
                 String.valueOf(principalDetails.getPrincipal().getMemberId()),
-                refreshToken, 14 * DAY);
+                refreshToken, 14 * DAY
+        );
 
-        ResponseEntity<LoginDto.Response> response = makeTokenResponse(accessToken, refreshToken);
+        ResponseEntity<LoginDto.Response> response = jwtTokenUtils.makeTokenResponse(accessToken, refreshToken);
 
         return response;
     }
 
 
-    public ResponseEntity<LoginDto.Response> createAccessTokenByRefreshToken(String refreshToken) {
-        refreshToken = refreshToken.replace(TOKEN_NAME_WITH_SPACE, "");
-        DecodedJWT decodedJWT = verifyToken(refreshToken);
-        Long memberId = decodedJWT.getClaim(CLAIM_ID).asLong();
-        String inRedisToken = redisUtils.getData(memberId.toString());
-        if(!refreshToken.equals(inRedisToken)) throw new RuntimeException("not valid refresh token");
 
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("not exist nmember"));
-
-        String accessToken = createAccessToken(memberId, member.getUsername());
-
-        return makeTokenResponse(refreshToken, accessToken);
-    }
     //==============================================================================================//
 
     private OAuthToken getToken(String code, ClientRegistration provider) {
@@ -139,9 +144,6 @@ public class KakaoOauth {
         return principalDetails;
     }
 
-    private ResponseEntity<LoginDto.Response> makeTokenResponse(String accessToken, String refreshToken) {
-        return ResponseEntity.ok()
-                .body(new LoginDto.Response(TOKEN_NAME_WITH_SPACE + accessToken, TOKEN_NAME_WITH_SPACE + refreshToken));
-    }
+
 
 }
