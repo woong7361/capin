@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.hanghae.finalp.config.awsconfig.AWSConfig;
 import com.hanghae.finalp.dto.MemberRequestDto;
+import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -71,11 +73,11 @@ public class MemberService {
 
 
     //내 프로필 수정
-    public String editMember(MemberRequestDto memberRequestDto, MultipartFile file) throws IOException {
+    @Transactional
+    public String editMember(MemberRequestDto memberRequestDto, MultipartFile file, Long memberId) throws IOException {
 
         SimpleDateFormat date = new SimpleDateFormat("yyyymmddHHmmss");
         String fileName = file.getOriginalFilename() + "-" + date.format(new Date()); //images.png-20223408153403
-
 
         String currentFilePath = memberRequestDto.getImageUrl();
         // key가 존재하면 기존 파일은 삭제
@@ -86,6 +88,7 @@ public class MemberService {
                 amazonS3.deleteObject(bucket, currentFilePath);
             }
         }
+        memberRequestDto.setImageUrl(fileName);
 
         amazonS3.putObject(new PutObjectRequest(bucket, fileName, file.getInputStream(), null)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
@@ -94,8 +97,8 @@ public class MemberService {
         //memberRequestDto.setUsername(username);
 
         //dto가 엔티티로 저장됨
-        //Member member = new Member(MemberRequestDto memberRequestDto); //username,imageUrl 등등 넣어준다.
-        //memberRepository.save(member); //db에 파일 저장(생성)
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("1"));
+        member.setImageUrl(fileName);
 
         return fileName; //images.png-20223408153403
     }

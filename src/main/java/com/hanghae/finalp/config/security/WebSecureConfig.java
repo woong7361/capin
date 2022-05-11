@@ -26,14 +26,6 @@ public class WebSecureConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
-    //이걸로 안막으면 인증이 필요없는 부분도 필터를 탐 (forbidden으로 막히지는 않음)
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
-                .antMatchers("/api/register");
-//                .antMatchers("/api/login");
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().configurationSource(corsConfigurationSource())

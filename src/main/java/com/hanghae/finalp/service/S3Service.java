@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,15 +21,7 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
     private final AmazonS3 amazonS3;
-    public static final String CLOUD_FRONT_DOMAIN_NAME = "d1ai09q40aghzs.cloudfront.net";
 
-
-
-    //이미지 조회시 imageFullUrl가 필요하다 //url에 member.getImageUrl() 넣어주기
-    private String getImgFullUrl(String imgUrl) {
-        String imageFullUrl= "https://" + CLOUD_FRONT_DOMAIN_NAME + "/" + imgUrl;
-        return imageFullUrl;
-    }
 
 
     public String uploadFile(MultipartFile file) throws IOException {
