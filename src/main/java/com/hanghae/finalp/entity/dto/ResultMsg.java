@@ -1,4 +1,4 @@
-package com.hanghae.finalp.config.exception.dto;
+package com.hanghae.finalp.entity.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResultMsg {
-    private String msg;
+    private String result;
     private String log;
 
-    public ResultMsg(String msg){
-        this.msg = msg;
+    public ResultMsg(String result){
+        this.result = result;
     }
 }

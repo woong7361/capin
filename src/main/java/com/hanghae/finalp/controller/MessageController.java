@@ -1,13 +1,11 @@
 package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.entity.dto.MessageDto;
-import com.hanghae.finalp.socket.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 
 @Controller

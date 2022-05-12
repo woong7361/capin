@@ -8,14 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -26,6 +23,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class WebSecureConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+
+    //이걸로 안막으면 인증이 필요없는 부분도 필터를 탐 (forbidden으로 막히지는 않음)
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring()
+                .antMatchers("/h2-console/**");
+//                .antMatchers("/api/login");
+    }
+
     private final JwtTokenUtils jwtTokenUtils;
 
 
@@ -43,7 +49,7 @@ public class WebSecureConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), authenticationEntryPoint, jwtTokenUtils))
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/api/*").permitAll() //option method 허락
-                .antMatchers("/api/**").authenticated()
+                .antMatchers("/api/**").authenticated() //이 패턴 인증필요하다
                 .anyRequest().permitAll();
     }
 

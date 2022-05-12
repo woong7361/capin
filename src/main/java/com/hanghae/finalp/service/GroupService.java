@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+
 public class GroupService {
     private final MemberGroupRepository memberGroupRepository;
     private final GroupRepository groupRepository;

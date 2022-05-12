@@ -1,5 +1,6 @@
 package com.hanghae.finalp.controller;
 
+
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.dto.LoginDto;
 import com.hanghae.finalp.service.LoginService;
@@ -22,6 +23,7 @@ public class LoginController {
      */
     @GetMapping("/login/oauth2/{provider}")
     @ResponseBody
+
     public ResponseEntity<LoginDto.Response> loginOAuth(@PathVariable("provider") String provider, @RequestParam String code) {
         return kakaoOauth.login(provider, code);
     }
@@ -47,5 +49,6 @@ public class LoginController {
     @ResponseBody
     public String test(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return principalDetails.toString();
+        //com.hanghae.finalp.config.security.PrincipalDetails@252e7b12 나옴
     }
 }
