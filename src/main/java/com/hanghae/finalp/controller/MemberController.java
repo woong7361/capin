@@ -7,7 +7,6 @@ import com.hanghae.finalp.entity.dto.ResultMsg;
 import com.hanghae.finalp.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -24,12 +23,10 @@ public class MemberController {
 
     //내 프로필 조회
     @GetMapping("/api/profile")
-    public ResultMsg memberGet(@AuthenticationPrincipal PrincipalDetails principalDetails, Model model) {
+    public MemberResponseDto memberGet(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         Long memberId = principalDetails.getPrincipal().getMemberId();
         MemberResponseDto memberResponseDto = memberService.getMyProfile(memberId);
-
-        model.addAttribute("memberResponseDto", memberResponseDto);
-        return new ResultMsg("success");
+        return memberResponseDto;
     }
 
 
