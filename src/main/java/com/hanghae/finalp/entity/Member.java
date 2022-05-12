@@ -32,6 +32,7 @@ public class Member extends TimeStamped {
 
     //========================================생성자=============================================//
 
+
     private Member(String kakaoId, String username, String imageUrl) {
         this.kakaoId = kakaoId;
         this.username = username;

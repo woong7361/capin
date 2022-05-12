@@ -35,14 +35,24 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.FORBIDDEN.value());
-        //front가 fail만 요청
-        ResultMsg msg = new ResultMsg("fail", "entrypoint error");
 
-        try (OutputStream os = response.getOutputStream()) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.writeValue(os, msg);
-            os.flush();
+        if (request.getAttribute("error").equals("accessTokenExpire")) {
+            ResultMsg msg = new ResultMsg("accessTokenRequest", "access token expire please throw refresh token");
+
+            try (OutputStream os = response.getOutputStream()) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.writeValue(os, msg);
+                os.flush();
+            }
+        } else {
+            //front가 fail만 요청
+            ResultMsg msg = new ResultMsg("fail", "entrypoint error");
+
+            try (OutputStream os = response.getOutputStream()) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.writeValue(os, msg);
+                os.flush();
+            }
         }
     }
-
 }

@@ -2,6 +2,7 @@ package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.dto.MemberRequestDto;
+
 import com.hanghae.finalp.dto.MemberResponseDto;
 import com.hanghae.finalp.entity.dto.ResultMsg;
 import com.hanghae.finalp.service.MemberService;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -59,5 +61,6 @@ public class MemberController {
         return new ResultMsg("success");
     }
 
-
 }
+
+

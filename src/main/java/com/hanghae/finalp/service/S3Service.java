@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ public class S3Service {
     private String bucket;
     private final AmazonS3 amazonS3;
 
+
     @Value("${cloud.aws.cloudFront.distributionDomain}")
     private String CLOUD_FRONT_DOMAIN_NAME;
 
@@ -33,6 +35,7 @@ public class S3Service {
         String fullFileName= "https://" + CLOUD_FRONT_DOMAIN_NAME + "/" + fileName;
         return fullFileName;
     }
+
 
 
     public String uploadFile(MultipartFile file) throws IOException {

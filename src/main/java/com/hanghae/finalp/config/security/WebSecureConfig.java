@@ -3,6 +3,7 @@ package com.hanghae.finalp.config.security;
 import com.hanghae.finalp.config.security.exceptionhandler.CustomAccessDeniedHandler;
 import com.hanghae.finalp.config.security.exceptionhandler.CustomAuthenticationEntryPoint;
 import com.hanghae.finalp.config.security.filter.JwtAuthorizationFilter;
+import com.hanghae.finalp.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,9 @@ public class WebSecureConfig extends WebSecurityConfigurerAdapter {
 //                .antMatchers("/api/login");
     }
 
+    private final JwtTokenUtils jwtTokenUtils;
+
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().configurationSource(corsConfigurationSource())
@@ -42,7 +46,7 @@ public class WebSecureConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .formLogin().disable() //form으로 로그인 안함
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), authenticationEntryPoint))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), authenticationEntryPoint, jwtTokenUtils))
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/api/*").permitAll() //option method 허락
                 .antMatchers("/api/**").authenticated() //이 패턴 인증필요하다

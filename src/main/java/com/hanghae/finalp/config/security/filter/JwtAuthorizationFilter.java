@@ -1,9 +1,11 @@
 package com.hanghae.finalp.config.security.filter;
 
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hanghae.finalp.config.security.PrincipalDetails;
+import com.hanghae.finalp.util.JwtTokenUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.hanghae.finalp.config.security.jwt.JwtTokenUtils.*;
+import static com.hanghae.finalp.util.JwtTokenUtils.*;
 
 
 //시큐리티 필터중 BasicAuthenticationFilter가 있다
@@ -27,9 +29,13 @@ import static com.hanghae.finalp.config.security.jwt.JwtTokenUtils.*;
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
+    private final JwtTokenUtils jwtTokenUtils;
+
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager,
-                                  AuthenticationEntryPoint authenticationEntryPoint) {
+                                  AuthenticationEntryPoint authenticationEntryPoint,
+                                  JwtTokenUtils jwtTokenUtils) {
         super(authenticationManager, authenticationEntryPoint);
+        this.jwtTokenUtils = jwtTokenUtils;
     }
 
     //인증이나 권한이 필요하면 doFilterInternal 탄다.
@@ -43,9 +49,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             if (jwtHeader == null || !jwtHeader.startsWith(TOKEN_NAME_WITH_SPACE)) {
                 throw new IllegalArgumentException("no header request");
             }
-            String jwtToken = getTokenFromHeader(request);
+            String jwtToken = jwtTokenUtils.getTokenFromHeader(request);
 
-            DecodedJWT decodedJWT = verifyToken(jwtToken);
+            DecodedJWT decodedJWT = jwtTokenUtils.verifyToken(jwtToken);
 
             PrincipalDetails principalDetails = new PrincipalDetails(
                     decodedJWT.getClaim(CLAIM_ID).asLong(),
@@ -58,6 +64,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             //강제로 시큐리티의 세션에 접근하여 Authentication 객체를 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        } catch (TokenExpiredException e) {
+            request.setAttribute("error", "accessTokenExpire");
         } catch (Exception e) {
             request.setAttribute("error", e);
         } finally { //에러가 발생시 authenticationentrypoint로
