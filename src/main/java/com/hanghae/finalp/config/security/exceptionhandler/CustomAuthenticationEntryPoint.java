@@ -37,7 +37,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setStatus(HttpStatus.FORBIDDEN.value());
 
         if (request.getAttribute("error").equals("accessTokenExpire")) {
-            ResultMsg msg = new ResultMsg("accessTokenRequest", "access token expire please throw refresh token");
+            ResultMsg msg = new ResultMsg("refreshTokenRequest", "access token expire please throw refresh token");
 
             try (OutputStream os = response.getOutputStream()) {
                 ObjectMapper objectMapper = new ObjectMapper();

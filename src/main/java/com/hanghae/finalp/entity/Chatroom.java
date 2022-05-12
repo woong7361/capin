@@ -20,6 +20,8 @@ public class Chatroom {
     private Long id;
 
     private String chatroomTitle;
+
+    @Enumerated(EnumType.STRING)
     private RoomType roomType;
 
     @OneToMany(mappedBy = "chatroom", cascade = CascadeType.ALL)
