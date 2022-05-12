@@ -3,6 +3,7 @@ package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.dto.LoginDto;
+import com.hanghae.finalp.entity.dto.ResultMsg;
 import com.hanghae.finalp.service.LoginService;
 import com.hanghae.finalp.service.oauth.KakaoOauth;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,9 @@ public class LoginController {
         return kakaoOauth.login(provider, code);
     }
 
+    /**
+     * 토큰 재발급 API
+     */
     @PostMapping("/login/refresh-token")
     @ResponseBody
     public ResponseEntity<LoginDto.Response> loginOAuth(@RequestHeader("Authorization") String refreshToken) {
@@ -35,10 +39,20 @@ public class LoginController {
     }
 
     /**
+     * 로그아웃 API
+     */
+    @GetMapping("/api/logout")
+    public ResultMsg logout(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        longinService.logout(principalDetails.getMemberId());
+        return new ResultMsg("success");
+    }
+
+    /**
      * form test용
      */
     @GetMapping("/form")
     public String form() {
+
         return "form.html";
     }
 
