@@ -1,8 +1,7 @@
 package com.hanghae.finalp.controller;
 
-import com.hanghae.finalp.config.exception.dto.ResultMsg;
+import com.hanghae.finalp.entity.dto.ResultMsg;
 import com.hanghae.finalp.config.security.PrincipalDetails;
-import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.service.OauthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,7 @@ public class LoginController {
     @GetMapping("/login/oauth2/{provider}")
     @ResponseBody
     public ResponseEntity<ResultMsg> loginOAuth(@PathVariable("provider") String provider, @RequestParam String code) {
-        return oauthService.login(provider, code);
+        return oauthService.login(provider, code); //provider = kakao 가 yml에 적혀있음
     }
 
     /**
@@ -43,5 +42,6 @@ public class LoginController {
     @ResponseBody
     public String test(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return principalDetails.toString();
+        //com.hanghae.finalp.config.security.PrincipalDetails@252e7b12 나옴
     }
 }

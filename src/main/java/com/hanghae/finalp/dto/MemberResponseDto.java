@@ -9,24 +9,11 @@ import lombok.ToString;
 @ToString
 public class MemberResponseDto {
     private String username;
-    private String imageFullUrl;
+    private String imageUrl;
 
-/*    public Member toEntity(){
-        Member build = Member.builder()
-                .username(username)
-                .imageFullUrl(imageFullUrl)
-                .build();
-        return build;
-    }*/
-
-
-    public MemberResponseDto(String username, String imageFullUrl) {
+    public MemberResponseDto(String username, String imageUrl) {
         this.username = username;
-        this.imageFullUrl = imageFullUrl;
+        this.imageUrl = imageUrl;
     }
 
-/*    public MemberResponseDto(Member member){
-        this.username = member.getUsername();
-        this.imageFullUrl = member.getImageFullUrl();
-    }*/
 }
