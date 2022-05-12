@@ -36,4 +36,8 @@ public class LoginService {
 
         return jwtTokenUtils.makeTokenResponse(refreshToken, accessToken);
     }
+
+    public void logout(Long memberId) {
+        redisUtils.deleteData(memberId.toString());
+    }
 }
