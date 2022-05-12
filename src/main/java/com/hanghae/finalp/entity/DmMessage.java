@@ -25,7 +25,7 @@ public class DmMessage extends TimeStamped {
     @Enumerated(EnumType.STRING)
     private MessageType messageType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_member_id")
     private ChatMember chatMember;
 

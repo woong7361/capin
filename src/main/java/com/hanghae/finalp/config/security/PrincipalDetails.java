@@ -20,6 +20,10 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
     }
 
 
+    public Long getMemberId() {
+        return this.principal.getMemberId();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

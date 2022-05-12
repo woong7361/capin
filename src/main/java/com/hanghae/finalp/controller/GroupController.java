@@ -9,10 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -20,9 +17,50 @@ import org.springframework.web.multipart.MultipartFile;
 public class GroupController {
     private final GroupService groupService;
 
+    /**
+     * 내 그룹리스트 받아오기
+     */
     @GetMapping("/api/groups/my")
     public Slice<GroupDto.SimpleRes> myGroupList(@AuthenticationPrincipal PrincipalDetails principalDetails, Pageable pageable) {
         return groupService.getMyGroupList(principalDetails.getPrincipal().getMemberId(), pageable);
+    }
+
+    /**
+     * 스터디 그룹 생성
+     */
+    @PostMapping("/api/groups")
+    public GroupDto.SimpleRes createGroup(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            GroupDto.CreateReq createReq,
+            @RequestPart(value = "image", required = false) MultipartFile multipartFile
+    ) {
+        return groupService.createGroup(principalDetails.getMemberId(), createReq, multipartFile);
+    }
+
+    /**
+     * 스터디 그룹 삭제
+     */
+    @PostMapping("/api/groups/{groupId}/delete")
+    public ResultMsg deleteGroup(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable("groupId") Long groupId
+    ) {
+        groupService.deleteGroup(principalDetails.getMemberId(), groupId);
+        return new ResultMsg("success");
+    }
+
+    /**
+     * 스터디 그룹 수정
+     */
+    @PostMapping("/api/groups/{groupId}/patch")
+    public ResultMsg patchReq(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            GroupDto.CreateReq createReq,
+            @RequestPart(value = "image", required = false) MultipartFile multipartFile,
+            @PathVariable("groupId") Long groupId
+    ) {
+        groupService.patchGroup(principalDetails.getMemberId(), groupId, createReq, multipartFile);
+        return new ResultMsg("success");
     }
 
 }

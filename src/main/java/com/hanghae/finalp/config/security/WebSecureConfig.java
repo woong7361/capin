@@ -28,6 +28,7 @@ public class WebSecureConfig extends WebSecurityConfigurerAdapter {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final JwtTokenUtils jwtTokenUtils;
 
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().configurationSource(corsConfigurationSource())

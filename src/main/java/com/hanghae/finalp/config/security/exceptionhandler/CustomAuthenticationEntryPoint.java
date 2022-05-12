@@ -12,7 +12,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +37,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setStatus(HttpStatus.FORBIDDEN.value());
 
         if (request.getAttribute("error").equals("accessTokenExpire")) {
-            ResultMsg msg = new ResultMsg("accessTokenRequest", "access token expire please throw refresh token");
+            ResultMsg msg = new ResultMsg("refreshTokenRequest", "access token expire please throw refresh token");
 
             try (OutputStream os = response.getOutputStream()) {
                 ObjectMapper objectMapper = new ObjectMapper();

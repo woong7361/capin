@@ -48,7 +48,7 @@ class FinalPApplicationTests {
         //given
         Member member = Member.createMember("kakaoId", "username", null);
         Group group =
-                Group.createGroup("title", "desc", 5, "adrress", null, null, member);
+                Group.createGroup("title", "desc", 5, "adrress", null, member);
         em.persist(member);
         em.persist(group);
         clearContext();
