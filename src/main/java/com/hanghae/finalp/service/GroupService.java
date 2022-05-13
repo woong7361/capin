@@ -125,6 +125,8 @@ public class GroupService {
                 if(yourMemberGroup.getGroup().getMemberCount() < yourMemberGroup.getGroup().getMaxMemberCount()) {
                     yourMemberGroup.setAuthority(Authority.JOIN); //wait일 경우 join으로 바꿔줌
                     yourMemberGroup.getGroup().addMemberCount();
+
+                    //chatMember을 추가해야함
                 }else{
                     throw new RuntimeException("최대인원 초과");
                 }
@@ -182,6 +184,8 @@ public class GroupService {
                         () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다.")
                 );
                 group.getMemberGroups().remove(yourMemberGroup);
+
+                //chatMember을 삭제해야함
 
             }
         }
