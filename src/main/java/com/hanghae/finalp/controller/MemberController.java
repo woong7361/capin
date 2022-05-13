@@ -38,7 +38,7 @@ public class MemberController {
 
     @PostMapping("/api/profile/edit")
     public ResultMsg memberEdit(@RequestPart(required = false) MemberRequestDto memberRequestDto,
-                             @RequestPart(value = "file", required = false) MultipartFile file, //괄호안의 값이 name가 된다 -> 이미지로 바꿔주기
+                             @RequestPart(value = "file", required = false) MultipartFile file,
                              @AuthenticationPrincipal PrincipalDetails principalDetails) throws IOException {
 
         Long memberId = principalDetails.getPrincipal().getMemberId();

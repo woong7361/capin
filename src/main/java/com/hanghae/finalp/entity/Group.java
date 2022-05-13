@@ -6,7 +6,6 @@ import com.hanghae.finalp.entity.mappedsuperclass.TimeStamped;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -80,6 +79,13 @@ public class Group extends TimeStamped {
         this.maxMemberCount = createReq.getMaxMemberCount();
         this.roughAddress = createReq.getRoughAddress();
         this.imageUrl = imageUrl;
+    }
+
+    public void addMemberCount(){
+        this.memberCount += 1;
+    }
+    public void minusMemberCount(){
+        this.memberCount -= 1;
     }
 }
 
