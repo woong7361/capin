@@ -2,6 +2,7 @@ package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.GroupDto;
+import com.hanghae.finalp.entity.dto.ResultMsg;
 import com.hanghae.finalp.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;

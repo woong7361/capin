@@ -1,10 +1,12 @@
 package com.hanghae.finalp.service;
 
+import com.hanghae.finalp.entity.Chatroom;
 import com.hanghae.finalp.entity.Group;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.dto.GroupDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
+import com.hanghae.finalp.repository.ChatRoomRepository;
 import com.hanghae.finalp.repository.GroupRepository;
 import com.hanghae.finalp.repository.MemberGroupRepository;
 import com.hanghae.finalp.repository.MemberRepository;
@@ -24,6 +26,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final MemberRepository memberRepository;
     private final S3Service s3Service;
+    private final ChatRoomRepository chatRoomRepository;
 
     public Slice<GroupDto.SimpleRes> getMyGroupList(Long memberId, Pageable pageable) {
         Slice<MemberGroup> myGroupByMember = memberGroupRepository.findMyGroupByMemberId(memberId, pageable);
@@ -34,8 +37,12 @@ public class GroupService {
     public GroupDto.SimpleRes createGroup(Long memberId, GroupDto.CreateReq createReq, MultipartFile multipartFile) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("not exist member"));
         String imageUrl = s3Service.uploadFile(multipartFile);
-        Group group = Group.createGroup(createReq, imageUrl, member);
+
+        Chatroom groupChatroom = Chatroom.createChatroomByGroup(createReq.getGroupTitle(), member);
+        chatRoomRepository.save(groupChatroom);
+        Group group = Group.createGroup(createReq, imageUrl, member, groupChatroom.getId());
         groupRepository.save(group);
+
         return new GroupDto.SimpleRes(group);
     }
 

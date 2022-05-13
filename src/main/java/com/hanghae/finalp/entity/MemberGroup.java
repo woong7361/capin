@@ -26,6 +26,8 @@ public class MemberGroup extends TimeStamped {
     private String startLocationY;
     private String startAddress;
 
+    private Long chatroomId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -34,31 +36,22 @@ public class MemberGroup extends TimeStamped {
     @JoinColumn(name = "study_group_id")
     private Group group;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "chatroom_id")
-    private Chatroom chatroom;
-
-//    @OneToMany(mappedBy = "memberGroup", cascade = CascadeType.ALL)
-//    private List<GroupMessage> groupMessages;
-
-
     //========================================생성자=============================================//
 
-    private MemberGroup(Authority authority, Member member, Group group) {
+    private MemberGroup(Authority authority, Member member, Group group, Long chatroomId) {
         this.authority = authority;
         this.member = member;
         this.group = group;
+        this.chatroomId = chatroomId;
     }
 
 
     //========================================생성 편의자=============================================//
 
-    public static MemberGroup createMemberGroup(Authority authority, Member member, Group group) {
-        return new MemberGroup(authority, member, group);
+    public static MemberGroup createMemberGroup(Authority authority, Member member, Group group, Long chatroomId) {
+        return new MemberGroup(authority, member, group, chatroomId);
     }
 
 
-    public void setChatroom(Chatroom chatroom) {
-        this.chatroom = chatroom;
-    }
+
 }

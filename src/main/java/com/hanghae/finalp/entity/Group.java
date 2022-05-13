@@ -52,20 +52,18 @@ public class Group extends TimeStamped {
     //========================================생성 편의자=============================================//
 
     public static Group createGroup(
-            String groupTitle, String description, int maxMemberCount, String roughAddress, String imageUrl, Member member) {
+            String groupTitle, String description, int maxMemberCount, String roughAddress, String imageUrl, Member member, Long chatroomId) {
         Group group = new Group(groupTitle, description, maxMemberCount, roughAddress, imageUrl); //group을 만들고
-        MemberGroup memberGroup = MemberGroup.createMemberGroup(Authority.OWNER, member, group); //memberGroup을 만들고
+        MemberGroup memberGroup = MemberGroup.createMemberGroup(Authority.OWNER, member, group, chatroomId); //memberGroup을 만들고
         group.getMemberGroups().add(memberGroup); //group안에 memberGroup을 넣어준다
-        Chatroom.createChatroomByGroup(groupTitle, memberGroup); //group을 만들때 chatroom도 만들어줘야 하므로
         return group;
     }
 
-    public static Group createGroup(GroupDto.CreateReq createReq, String imageUrl, Member member) {
+    public static Group createGroup(GroupDto.CreateReq createReq, String imageUrl, Member member, Long chatroomId) {
         Group group = new Group(createReq.getGroupTitle(), createReq.getDescription(), createReq.getMaxMemberCount(),
                 createReq.getRoughAddress(), imageUrl);
-        MemberGroup memberGroup = MemberGroup.createMemberGroup(Authority.OWNER, member, group); //memberGroup을 만들고
+        MemberGroup memberGroup = MemberGroup.createMemberGroup(Authority.OWNER, member, group, chatroomId); //memberGroup을 만들고
         group.getMemberGroups().add(memberGroup); //group안에 memberGroup을 넣어준다
-        Chatroom.createChatroomByGroup(createReq.getGroupTitle(), memberGroup); //group을 만들때 chatroom도 만들어줘야 하므로
         return group;
     }
 
@@ -74,6 +72,7 @@ public class Group extends TimeStamped {
     public void setCafe(Cafe cafe) {
         this.cafe = cafe;
     }
+
 
     public void patch(GroupDto.CreateReq createReq, String imageUrl) {
         this.groupTitle = createReq.getGroupTitle();
