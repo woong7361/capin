@@ -29,7 +29,7 @@ public class MemberService {
 
 
     //내 프로필 조회
-    public MemberResponseDto getMyProfile(Long memberId) { //유저정보 받아와야됨
+    public MemberResponseDto getMyProfile(Long memberId) {
         Member member= memberRepository.findById(memberId).orElseThrow(
                 () -> new IllegalArgumentException("해당 memberId가 존재하지 않습니다.")
         );

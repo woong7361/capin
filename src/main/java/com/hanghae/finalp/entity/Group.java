@@ -6,7 +6,6 @@ import com.hanghae.finalp.entity.mappedsuperclass.TimeStamped;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -62,7 +61,7 @@ public class Group extends TimeStamped {
 
     public static Group createGroup(GroupDto.CreateReq createReq, String imageUrl, Member member) {
         Group group = new Group(createReq.getGroupTitle(), createReq.getDescription(), createReq.getMaxMemberCount(),
-                createReq.getRoughAddress(), imageUrl);
+                createReq.getRoughAddress(), imageUrl);  //group을 만들고
         MemberGroup memberGroup = MemberGroup.createMemberGroup(Authority.OWNER, member, group); //memberGroup을 만들고
         group.getMemberGroups().add(memberGroup); //group안에 memberGroup을 넣어준다
         Chatroom.createChatroomByGroup(createReq.getGroupTitle(), memberGroup); //group을 만들때 chatroom도 만들어줘야 하므로
@@ -81,6 +80,13 @@ public class Group extends TimeStamped {
         this.maxMemberCount = createReq.getMaxMemberCount();
         this.roughAddress = createReq.getRoughAddress();
         this.imageUrl = imageUrl;
+    }
+
+    public void addMemberCount(){
+        this.memberCount += 1;
+    }
+    public void minusMemberCount(){
+        this.memberCount -= 1;
     }
 }
 

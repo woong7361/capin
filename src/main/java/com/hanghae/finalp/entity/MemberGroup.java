@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Getter
@@ -61,4 +60,10 @@ public class MemberGroup extends TimeStamped {
     public void setChatroom(Chatroom chatroom) {
         this.chatroom = chatroom;
     }
+
+
+    public void setAuthority(Authority authority) {
+        this.authority = authority;
+    }
+
 }
