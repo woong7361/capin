@@ -20,30 +20,34 @@ public class Message extends TimeStamped {
     private Long id;
 
     private Long senderId;
+    private String senderName;
     private String content;
 
     @Enumerated(EnumType.STRING)
     private MessageType messageType;
 
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "chat_member_id")
+//    private ChatMember chatMember;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_member_id")
-    private ChatMember chatMember;
-
-
+    @JoinColumn(name = "chatroom_id")
+    private Chatroom chatroom;
     //========================================생성자=============================================//
 
-    private Message(Long senderId, String content, MessageType messageType) {
+    private Message(Long senderId, String content, MessageType messageType, Chatroom chatroom, String senderName) {
         this.senderId = senderId;
+        this.senderName = senderName;
         this.content = content;
         this.messageType = messageType;
+        this.chatroom = chatroom;
     }
 
 
     //========================================생성 편의자=============================================//
 
-    private Message createMessage(Long senderId, String content, MessageType messageType, ChatMember chatMember) {
-        Message message = new Message(senderId, content, messageType);
-        message.chatMember = chatMember;
+    public static Message createMessage(Long senderId, String senderName, String content, MessageType messageType, Chatroom chatroom) {
+        Message message = new Message(senderId, content, messageType, chatroom, senderName);
 
         return message;
     }

@@ -52,10 +52,6 @@ public class MemberGroup extends TimeStamped {
     }
 
 
-    public void setChatroom(Chatroom chatroom) {
-        this.chatroom = chatroom;
-    }
-
 
     public void setAuthority(Authority authority) {
         this.authority = authority;
