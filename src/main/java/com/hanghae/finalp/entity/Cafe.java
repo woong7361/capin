@@ -1,5 +1,6 @@
 package com.hanghae.finalp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hanghae.finalp.entity.mappedsuperclass.TimeStamped;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class Cafe extends TimeStamped {
     private String locationY;
     private String address;
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "study_group_id")
     private Group group;
