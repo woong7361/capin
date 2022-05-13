@@ -81,6 +81,13 @@ public class Group extends TimeStamped {
         this.roughAddress = createReq.getRoughAddress();
         this.imageUrl = imageUrl;
     }
+
+    public void addMemberCount(){
+        this.memberCount += 1;
+    }
+    public void minusMemberCount(){
+        this.memberCount -= 1;
+    }
 }
 
 

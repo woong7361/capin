@@ -108,7 +108,7 @@ public class GroupService {
 
     //그룹 참가자 승인
     @Transactional
-    public void approvalGroup(Long myMemberId, Long groupId, Long memberId) {
+    public void approveGroup(Long myMemberId, Long groupId, Long memberId) {
 
         //내가 속했으며, 승인을 요청한 멤버그룹을 찾는다
         Optional<MemberGroup> myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId);
@@ -124,9 +124,34 @@ public class GroupService {
                 //만약 현재인원이 최대인원보다 작다면
                 if(yourMemberGroup.getGroup().getMemberCount() < yourMemberGroup.getGroup().getMaxMemberCount()) {
                     yourMemberGroup.setAuthority(Authority.JOIN); //wait일 경우 join으로 바꿔줌
+                    yourMemberGroup.getGroup().addMemberCount();
                 }else{
                     throw new RuntimeException("최대인원 초과");
                 }
+            }
+        }
+    }
+
+    //그룹 참가자 거절
+    @Transactional
+    public void denyGroup(Long myMemberId, Long groupId, Long memberId) {
+
+        //내가 속했으며, 승인을 요청한 멤버그룹을 찾는다
+        Optional<MemberGroup> myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId);
+
+        //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너이면
+        if(Authority.OWNER.equals(myMemberGroup.get().getAuthority())){
+
+            MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
+                    () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다.")
+            );
+            //그사람의 auth 확인 ->그사람의 권한이 wait일 경우
+            if(Authority.WAIT.equals(yourMemberGroup.getAuthority())){
+                memberGroupRepository.delete(yourMemberGroup);
+                Group group= groupRepository.findById(groupId).orElseThrow(
+                        () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다.")
+                );
+                group.getMemberGroups().remove(yourMemberGroup);
             }
         }
     }
@@ -151,11 +176,13 @@ public class GroupService {
 //                yourMemberGroup.setAuthority(null);
 
                 //멤버그룹 삭제
+                yourMemberGroup.getGroup().minusMemberCount();
                 memberGroupRepository.delete(yourMemberGroup);
                 Group group= groupRepository.findById(groupId).orElseThrow(
                         () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다.")
                 );
                 group.getMemberGroups().remove(yourMemberGroup);
+
             }
         }
     }

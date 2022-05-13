@@ -85,7 +85,19 @@ public class GroupController {
             @PathVariable("memberId") Long memberId //참가자 승인은 관리자가 하기때문에 memberId가 필요함
     ){
         Long myMemberId = principalDetails.getMemberId();
-        groupService.approvalGroup(myMemberId, groupId, memberId);
+        groupService.approveGroup(myMemberId, groupId, memberId);
+        return new ResultMsg("success");
+    }
+
+    //그룹 참가자 거절
+    @PostMapping("/api/groups/{groupId}/denial/{memberId}")
+    public ResultMsg GroupDenial(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable("groupId") Long groupId,
+            @PathVariable("memberId") Long memberId
+    ){
+        Long myMemberId = principalDetails.getMemberId();
+        groupService.denyGroup(myMemberId, groupId, memberId);
         return new ResultMsg("success");
     }
 
