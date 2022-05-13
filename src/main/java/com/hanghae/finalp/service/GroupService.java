@@ -107,7 +107,7 @@ public class GroupService {
                 () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다.")
         );
         //WAIT으로 memberGroup을 생성
-        MemberGroup newMemberGroup = MemberGroup.createMemberGroup(Authority.WAIT, member, group);
+        MemberGroup newMemberGroup = MemberGroup.createMemberGroup(Authority.WAIT, member, group, null); //chatroomId 넣어주기
         group.getMemberGroups().add(newMemberGroup);
     }
 
