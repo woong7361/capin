@@ -50,7 +50,7 @@ public class RedisSubscriber implements MessageListener {
             // redis에서 발행된 데이터를 받아 deserialize
             String publishMessage = (String) redisTemplate.getStringSerializer().deserialize(message.getBody());
             // ChatMessage 객채로 맵핑
-            MessageDto.Reqeust message1 = objectMapper.readValue(publishMessage, MessageDto.Reqeust.class);
+            MessageDto.Send message1 = objectMapper.readValue(publishMessage, MessageDto.Send.class);
             // Websocket 구독자에게 채팅 메시지 Send
             messagingTemplate.convertAndSend("/sub/channel/" + message1.getChatroomId(), message1);
         } catch (Exception e) {

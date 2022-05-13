@@ -13,6 +13,7 @@ import com.hanghae.finalp.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -59,11 +60,9 @@ public class KakaoOauth {
 
     @Transactional
     public ResponseEntity<LoginDto.Response> login(String providerName, String code) {
-        ClientRegistration provider = inMemoryRepository.findByRegistrationId(providerName); //provider 찾아서 - registrationId가 구글,네이버,카카오같은거
 
-
-        OAuthToken tokenResponse = getToken(code, provider); //provider에 해당하는 카카오의 OAuthToken 얻어서
-        KakaoProfile kakaoProfile = getUserProfile(providerName, tokenResponse, provider); //카카오 프로필 요청해서 얻고
+        OAuthToken tokenResponse = getToken(code); //provider에 해당하는 카카오의 OAuthToken 얻어서
+        KakaoProfile kakaoProfile = getUserProfile(providerName, tokenResponse); //카카오 프로필 요청해서 얻고
 
         PrincipalDetails principalDetails = saveMember(providerName, kakaoProfile); //멤버 저장
 
@@ -87,16 +86,19 @@ public class KakaoOauth {
 
     //==============================================================================================//
 
-    private OAuthToken getToken(String code, ClientRegistration provider) {
+    private OAuthToken getToken(String code) {
         OAuthToken oAuthToken = WebClient.create()
                 .post()
-                .uri(provider.getProviderDetails().getTokenUri())
+                .uri(tokenUri)
                 .headers(header -> {
                     header.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
                     header.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8));
                 })
-                .bodyValue(tokenReqeust(code, provider))
+                .bodyValue(tokenReqeust(code))
                 .retrieve()
+                .onStatus(
+                        HttpStatus.BAD_REQUEST::equals,
+                        response -> response.bodyToMono(String.class).map(Exception::new))
                 .bodyToMono(OAuthToken.class)
                 .block();
 
@@ -104,22 +106,22 @@ public class KakaoOauth {
         return oAuthToken;
     }
 
-    private MultiValueMap<String, String> tokenReqeust(String code, ClientRegistration provider) {
+    private MultiValueMap<String, String> tokenReqeust(String code) {
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("code", code);
-        formData.add("grant_type", "authorization_code");
-        formData.add("redirect_uri", "http://localhost:8080/login/oauth2/Kakao");
+        formData.add("grant_type", authorizationGrantType);
+        formData.add("redirect_uri", redirectUri);
 //        formData.add("client_secret", provider.getClientSecret());
-        formData.add("client_id", provider.getClientId());
+        formData.add("client_id", clientId);
         return formData;
     }
 
     //카카오 프로필 얻기
-    private KakaoProfile getUserProfile(String providerName, OAuthToken tokenResponse, ClientRegistration provider) {
+    private KakaoProfile getUserProfile(String providerName, OAuthToken tokenResponse) {
         KakaoProfile kakaoProfile = WebClient.create()
                 .get()
-                .uri(provider.getProviderDetails().getUserInfoEndpoint().getUri())
+                .uri(userInfoUri)
                 .headers(header -> header.setBearerAuth(tokenResponse.getAccess_token()))
                 .retrieve()
                 .bodyToMono(KakaoProfile.class)

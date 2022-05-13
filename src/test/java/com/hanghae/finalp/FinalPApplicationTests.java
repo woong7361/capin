@@ -41,23 +41,23 @@ class FinalPApplicationTests {
     }
 
 //    @Test
-    @Rollback(value = false)
-    public void groupTest() throws Exception{
-        //given
-        Member member = Member.createMember("kakaoId", "username", null);
-        Group group =
-                Group.createGroup("title", "desc", 5, "adrress", null, member);
-        em.persist(member);
-        em.persist(group);
-        clearContext();
-        //when
-        Group findGroup = em.find(Group.class, group.getId());
-        //then
-
-        assertThat(findGroup.getGroupTitle()).isEqualTo("title");
-        assertThat(findGroup.getMemberGroups().get(0).getAuthority()).isEqualTo(Authority.OWNER);
-        assertThat(findGroup.getMemberGroups().get(0).getChatroom().getChatroomTitle()).isEqualTo("title");
-    }
+//    @Rollback(value = false)
+//    public void groupTest() throws Exception{
+//        //given
+//        Member member = Member.createMember("kakaoId", "username", null);
+//        Group group =
+//                Group.createGroup("title", "desc", 5, "adrress", null, member);
+//        em.persist(member);
+//        em.persist(group);
+//        clearContext();
+//        //when
+//        Group findGroup = em.find(Group.class, group.getId());
+//        //then
+//
+//        assertThat(findGroup.getGroupTitle()).isEqualTo("title");
+//        assertThat(findGroup.getMemberGroups().get(0).getAuthority()).isEqualTo(Authority.OWNER);
+//        assertThat(findGroup.getMemberGroups().get(0).getChatroom().getChatroomTitle()).isEqualTo("title");
+//    }
 
 //    @Test
     @Rollback(value = false)
