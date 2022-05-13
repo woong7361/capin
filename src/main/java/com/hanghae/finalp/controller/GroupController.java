@@ -2,16 +2,15 @@ package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.GroupDto;
+import com.hanghae.finalp.entity.dto.ResultMsg;
+import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,10 +31,11 @@ public class GroupController {
     @PostMapping("/api/groups")
     public GroupDto.SimpleRes createGroup(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            GroupDto.CreateReq createReq,
+            GroupDto.CreateReq createReq, //GroupDto의 CreateReq클래스 => GroupCreateReqestDto라고 보면됨
             @RequestPart(value = "image", required = false) MultipartFile multipartFile
     ) {
         return groupService.createGroup(principalDetails.getMemberId(), createReq, multipartFile);
+        //GroupRequestDto가 반환됨
     }
 
     /**
@@ -56,12 +56,51 @@ public class GroupController {
     @PostMapping("/api/groups/{groupId}/patch")
     public ResultMsg patchReq(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            GroupDto.CreateReq createReq,
+            GroupDto.CreateReq createReq, //groupTitle, desctiption, maxMemberCount, roughAddress 들어있음
             @RequestPart(value = "image", required = false) MultipartFile multipartFile,
             @PathVariable("groupId") Long groupId
     ) {
         groupService.patchGroup(principalDetails.getMemberId(), groupId, createReq, multipartFile);
         return new ResultMsg("success");
+    }
+
+
+    //--------------------------------------------------------------------------------------
+
+    //그룹 참가 신청
+    @PostMapping("/api/groups/{groupId}/apply")
+    public Long GroupApply(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable("groupId") Long groupId
+    ){
+        Long memberId = principalDetails.getMemberId();
+        Long memberGroupId = groupService.applyGroup(memberId, groupId);
+        return memberGroupId;
+    }
+
+
+    //그룹 참가자 승인
+    @PostMapping("/api/groups/{groupId}/approval/{memberId}")
+    public Authority GroupApproval(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable("groupId") Long groupId,
+            @PathVariable("memberId") Long memberId //참가자 승인은 관리자가 하기때문에 memberId가 필요함
+    ){
+        Long myMemberId = principalDetails.getMemberId();
+        return groupService.approvalGroup(myMemberId, groupId, memberId);
+
+    }
+
+
+   //그룹 참가자 추방
+    @PostMapping("/api/groups/{groupId}/ban/{memberId}")
+    public Authority GroupBan(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable("groupId") Long groupId,
+            @PathVariable("memberId") Long memberId
+    ){
+        Long myMemberId = principalDetails.getMemberId();
+        return groupService.banGroup(myMemberId, groupId, memberId);
     }
 
 }

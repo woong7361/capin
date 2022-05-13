@@ -1,6 +1,7 @@
 package com.hanghae.finalp.repository;
 
 import com.hanghae.finalp.entity.MemberGroup;
+import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,5 +16,7 @@ public interface MemberGroupRepository extends JpaRepository<MemberGroup, Long> 
     Slice<MemberGroup> findMyGroupByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 
     Optional<MemberGroup> findByMemberIdAndGroupId(Long memberId, Long GroupId);
+
+    Optional<MemberGroup> findByAuthorityAndMemberId(Authority authority, Long memberId);
 
 }

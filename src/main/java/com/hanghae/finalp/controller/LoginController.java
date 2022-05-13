@@ -24,7 +24,6 @@ public class LoginController {
      */
     @GetMapping("/login/oauth2/{provider}")
     @ResponseBody
-
     public ResponseEntity<LoginDto.Response> loginOAuth(@PathVariable("provider") String provider, @RequestParam String code) {
         return kakaoOauth.login(provider, code);
     }

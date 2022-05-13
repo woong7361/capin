@@ -66,7 +66,7 @@ public class JwtTokenUtils {
     public String createAccessToken(Long memberId, String username) {
         String token = JWT.create()
                 .withSubject("accessToken")
-                .withExpiresAt(new Date(System.currentTimeMillis() + (30 * MINUTE) ))
+                .withExpiresAt(new Date(System.currentTimeMillis() + (60 * MINUTE) ))
                 .withClaim(CLAIM_ID, memberId)
                 .withClaim(CLAIM_USERNAME, username)
                 .sign(Algorithm.HMAC512(JWT_SECRET));   //secretkey
