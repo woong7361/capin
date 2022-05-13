@@ -76,7 +76,7 @@ public class GroupService {
 
     //그룹 참가 신청
     @Transactional
-    public Long applyGroup(Long memberId, Long groupId) {
+    public void applyGroup(Long memberId, Long groupId) {
         //멤버가 이미 해당 그룹에 속해있는지 확인하기 -> memberGroup에 memberId, groupId 동시에 있는지 확인하면됨
         Optional<MemberGroup> memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId);
 
@@ -102,14 +102,13 @@ public class GroupService {
         //WAIT으로 memberGroup을 생성
         MemberGroup newMemberGroup = MemberGroup.createMemberGroup(Authority.WAIT, member, group);
         group.getMemberGroups().add(newMemberGroup);
-        return newMemberGroup.getId();
     }
 
 
 
     //그룹 참가자 승인
     @Transactional
-    public Authority approvalGroup(Long myMemberId, Long groupId, Long memberId) {
+    public void approvalGroup(Long myMemberId, Long groupId, Long memberId) {
 
         //내가 속했으며, 승인을 요청한 멤버그룹을 찾는다
         Optional<MemberGroup> myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId);
@@ -130,14 +129,13 @@ public class GroupService {
                 }
             }
         }
-        return myMemberGroup.get().getAuthority();
     }
 
 
 
     //그룹 참가자 추방
     @Transactional
-    public Authority banGroup(Long myMemberId, Long groupId, Long memberId) {
+    public void banGroup(Long myMemberId, Long groupId, Long memberId) {
 
         //내가 속했으며, 추방할 멤버그룹을 찾는다
         Optional<MemberGroup> myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId);
@@ -160,7 +158,6 @@ public class GroupService {
                 group.getMemberGroups().remove(yourMemberGroup);
             }
         }
-        return myMemberGroup.get().getAuthority();
     }
 
 }
