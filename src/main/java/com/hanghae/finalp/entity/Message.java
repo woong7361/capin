@@ -8,14 +8,15 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GroupMessage extends TimeStamped {
+public class Message extends TimeStamped {
 
     @Id
     @GeneratedValue
-    @Column(name = "group_message_id")
+    @Column(name = "message_id")
     private Long id;
 
     private Long senderId;
@@ -25,13 +26,13 @@ public class GroupMessage extends TimeStamped {
     private MessageType messageType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_group_id")
-    private MemberGroup memberGroup;
+    @JoinColumn(name = "chat_member_id")
+    private ChatMember chatMember;
 
 
     //========================================생성자=============================================//
 
-    private GroupMessage(Long senderId, String content, MessageType messageType) {
+    private Message(Long senderId, String content, MessageType messageType) {
         this.senderId = senderId;
         this.content = content;
         this.messageType = messageType;
@@ -40,10 +41,12 @@ public class GroupMessage extends TimeStamped {
 
     //========================================생성 편의자=============================================//
 
-    private GroupMessage createGroupMessage(Long senderId, String content, MessageType messageType, MemberGroup memberGroup) {
-        GroupMessage groupMessage = new GroupMessage(senderId, content, messageType);
-        groupMessage.memberGroup = memberGroup;
+    private Message createMessage(Long senderId, String content, MessageType messageType, ChatMember chatMember) {
+        Message message = new Message(senderId, content, messageType);
+        message.chatMember = chatMember;
 
-        return groupMessage;
+        return message;
     }
+
+
 }

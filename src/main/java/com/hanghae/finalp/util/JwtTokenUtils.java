@@ -6,6 +6,7 @@ import com.auth0.jwt.exceptions.AlgorithmMismatchException;
 import com.auth0.jwt.exceptions.InvalidClaimException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hanghae.finalp.dto.LoginDto;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,13 @@ public class JwtTokenUtils {
         } catch (InvalidClaimException invalidClaimException) {
             throw new IllegalArgumentException("토큰 클레임 에러");
         }
+    }
+
+    public Long getMemberIdFromClaim(DecodedJWT decodedJWT) {
+        return decodedJWT.getClaim(CLAIM_ID).asLong();
+    }
+    public String getUsernameFromClaim(DecodedJWT decodedJWT) {
+        return ((Claim) decodedJWT.getClaim(CLAIM_USERNAME)).asString();
     }
 
     public String getTokenFromHeader(HttpServletRequest request) throws IllegalArgumentException {

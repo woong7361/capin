@@ -18,6 +18,7 @@ public class MessageDto {
         String content;
         MessageType messageType;   //erase
         RoomType roomType;
+        String senderName;
     }
 
     @Data

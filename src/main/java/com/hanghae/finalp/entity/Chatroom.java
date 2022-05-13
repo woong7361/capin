@@ -27,9 +27,6 @@ public class Chatroom {
     @OneToMany(mappedBy = "chatroom", cascade = CascadeType.ALL)
     private List<ChatMember> chatMembers = new ArrayList<>();
 
-//    @OneToMany(mappedBy = "chatroom")
-//    private List<MemberGroup> memberGroups = new ArrayList<>();
-
     //========================================생성자=============================================//
 
     public Chatroom(String chatroomTitle, RoomType roomType) {
@@ -38,11 +35,12 @@ public class Chatroom {
     }
 
     //========================================생성 편의자=============================================//
-    public static Chatroom createChatroomByGroup(String chatroomTitle, MemberGroup memberGroup) {
+    public static Chatroom createChatroomByGroup(String chatroomTitle, Member member) {
 
         Chatroom chatroom = new Chatroom(chatroomTitle, RoomType.GROUP);
+        ChatMember chatMember = ChatMember.createChatMember(member, chatroom);
+        chatroom.getChatMembers().add(chatMember);
 
-        memberGroup.setChatroom(chatroom);
         return chatroom;
     }
 
