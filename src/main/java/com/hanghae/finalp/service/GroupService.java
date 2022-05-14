@@ -107,7 +107,8 @@ public class GroupService {
                 () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다.")
         );
         //WAIT으로 memberGroup을 생성
-        MemberGroup newMemberGroup = MemberGroup.createMemberGroup(Authority.WAIT, member, group, null);
+
+        MemberGroup newMemberGroup = MemberGroup.createMemberGroup(Authority.WAIT, member, group, null); //chatroomId 넣어주기
         group.getMemberGroups().add(newMemberGroup);
     }
 
@@ -132,6 +133,8 @@ public class GroupService {
                 if(yourMemberGroup.getGroup().getMemberCount() < yourMemberGroup.getGroup().getMaxMemberCount()) {
                     yourMemberGroup.setAuthority(Authority.JOIN); //wait일 경우 join으로 바꿔줌
                     yourMemberGroup.getGroup().addMemberCount();
+
+                    //chatMember을 추가해야함
                 }else{
                     throw new RuntimeException("최대인원 초과");
                 }
@@ -189,6 +192,8 @@ public class GroupService {
                         () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다.")
                 );
                 group.getMemberGroups().remove(yourMemberGroup);
+
+                //chatMember을 삭제해야함
 
             }
         }

@@ -52,7 +52,6 @@ public class MemberGroup extends TimeStamped {
     }
 
 
-
     public void setAuthority(Authority authority) {
         this.authority = authority;
     }
