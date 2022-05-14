@@ -1,15 +1,9 @@
 package com.hanghae.finalp.service;
 
-import com.hanghae.finalp.entity.Chatroom;
-import com.hanghae.finalp.entity.Group;
-import com.hanghae.finalp.entity.Member;
-import com.hanghae.finalp.entity.MemberGroup;
+import com.hanghae.finalp.entity.*;
 import com.hanghae.finalp.entity.dto.GroupDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
-import com.hanghae.finalp.repository.ChatRoomRepository;
-import com.hanghae.finalp.repository.GroupRepository;
-import com.hanghae.finalp.repository.MemberGroupRepository;
-import com.hanghae.finalp.repository.MemberRepository;
+import com.hanghae.finalp.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -29,6 +23,8 @@ public class GroupService {
     private final MemberRepository memberRepository;
     private final S3Service s3Service;
     private final ChatRoomRepository chatRoomRepository;
+
+    private final ChatMemberRepository chatMemberRepository;
 
     public Slice<GroupDto.SimpleRes> getMyGroupList(Long memberId, Pageable pageable) {
         Slice<MemberGroup> myGroupByMember = memberGroupRepository.findMyGroupByMemberId(memberId, pageable);
@@ -101,14 +97,12 @@ public class GroupService {
         }
         //그룹에 속하지 않은 경우
         Member member= memberRepository.findById(memberId).orElseThrow(
-                () -> new IllegalArgumentException("해당 memberId가 존재하지 않습니다.")
-        );
+                () -> new IllegalArgumentException("해당 memberId가 존재하지 않습니다."));
         Group group= groupRepository.findById(groupId).orElseThrow(
-                () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다.")
-        );
-        //WAIT으로 memberGroup을 생성
+                () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
+        //WAIT으로 memberGroup을 생성 -chatroodId는 승인시 따로 넣어줄 예정
+        MemberGroup newMemberGroup = MemberGroup.createMemberGroup(Authority.WAIT, member, group, null);
 
-        MemberGroup newMemberGroup = MemberGroup.createMemberGroup(Authority.WAIT, member, group, null); //chatroomId 넣어주기
         group.getMemberGroups().add(newMemberGroup);
     }
 
@@ -119,22 +113,31 @@ public class GroupService {
     public void approveGroup(Long myMemberId, Long groupId, Long memberId) {
 
         //내가 속했으며, 승인을 요청한 멤버그룹을 찾는다
-        Optional<MemberGroup> myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId);
+        MemberGroup myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
 
         //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너이면
-        if(Authority.OWNER.equals(myMemberGroup.get().getAuthority())){
+        if(Authority.OWNER.equals(myMemberGroup.getAuthority())){
+            //그사람도 같은 멤버그룹에서 대기중인지 확인
+            MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
 
-            MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
-                    () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다.")
-            );
-            //그사람의 auth 확인 ->그사람의 권한이 wait일 경우
             if(Authority.WAIT.equals(yourMemberGroup.getAuthority())){
                 //만약 현재인원이 최대인원보다 작다면
                 if(yourMemberGroup.getGroup().getMemberCount() < yourMemberGroup.getGroup().getMaxMemberCount()) {
                     yourMemberGroup.setAuthority(Authority.JOIN); //wait일 경우 join으로 바꿔줌
                     yourMemberGroup.getGroup().addMemberCount();
 
-                    //chatMember을 추가해야함
+                    //승인 전에 안넣어줬던 챗룸아이디를 멤버그룹에 넣어준 후
+                    yourMemberGroup.setChatroomId(myMemberGroup.getChatroomId());
+
+                    //조인이 되는 순간 채팅방도 가입시켜줘야 된다 => 챗멤버 생성필요
+                    Chatroom chatroom = chatRoomRepository.findById(myMemberGroup.getChatroomId())
+                            .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
+
+                    ChatMember chatMember = ChatMember.createChatMember(yourMemberGroup.getMember(), chatroom);
+                    chatroom.getChatMembers().add(chatMember);
+
                 }else{
                     throw new RuntimeException("최대인원 초과");
                 }
@@ -147,20 +150,20 @@ public class GroupService {
     public void denyGroup(Long myMemberId, Long groupId, Long memberId) {
 
         //내가 속했으며, 승인을 요청한 멤버그룹을 찾는다
-        Optional<MemberGroup> myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId);
+        MemberGroup myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
 
         //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너이면
-        if(Authority.OWNER.equals(myMemberGroup.get().getAuthority())){
+        if(Authority.OWNER.equals(myMemberGroup.getAuthority())){
 
             MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
-                    () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다.")
-            );
+                    () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
+
             //그사람의 auth 확인 ->그사람의 권한이 wait일 경우
             if(Authority.WAIT.equals(yourMemberGroup.getAuthority())){
                 memberGroupRepository.delete(yourMemberGroup);
                 Group group= groupRepository.findById(groupId).orElseThrow(
-                        () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다.")
-                );
+                        () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
                 group.getMemberGroups().remove(yourMemberGroup);
             }
         }
@@ -173,28 +176,39 @@ public class GroupService {
     public void banGroup(Long myMemberId, Long groupId, Long memberId) {
 
         //내가 속했으며, 추방할 멤버그룹을 찾는다
-        Optional<MemberGroup> myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId);
+        MemberGroup myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
 
         //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너이면
-        if(Authority.OWNER.equals(myMemberGroup.get().getAuthority())){
+        if(Authority.OWNER.equals(myMemberGroup.getAuthority())){
 
+            //그사람도 같은 멤버그룹에 속했는지 확인
             MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
-                    () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다.")
-            );
+                    () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
+
             //그사람의 auth 확인 ->그사람의 권한이 join일 경우
             if(Authority.JOIN.equals(yourMemberGroup.getAuthority())){
 //                yourMemberGroup.setAuthority(null);
 
                 //멤버그룹 삭제
                 yourMemberGroup.getGroup().minusMemberCount();
+
                 memberGroupRepository.delete(yourMemberGroup);
+
                 Group group= groupRepository.findById(groupId).orElseThrow(
-                        () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다.")
-                );
+                        () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
                 group.getMemberGroups().remove(yourMemberGroup);
 
-                //chatMember을 삭제해야함
+                //채팅룸에서도 드랍 =>
+                // 1.챗멤버를 없애줘야함
+                ChatMember chatMember = chatMemberRepository.findByMemberId(memberId)
+                        .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
+                chatMemberRepository.delete(chatMember);
 
+                //2. 채팅룸에서도 챗멤버를 없애 줘야함. 
+                Chatroom chatroom = chatRoomRepository.findById(myMemberGroup.getChatroomId())
+                        .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
+                chatroom.getChatMembers().remove(chatMember);
             }
         }
     }

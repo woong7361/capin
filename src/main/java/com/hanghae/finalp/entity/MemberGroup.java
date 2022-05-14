@@ -56,5 +56,7 @@ public class MemberGroup extends TimeStamped {
         this.authority = authority;
     }
 
+    public void setChatroomId(Long chatroomId) { this.chatroomId = chatroomId; }
+
 
 }
