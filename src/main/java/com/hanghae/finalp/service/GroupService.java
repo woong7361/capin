@@ -102,6 +102,7 @@ public class GroupService {
                 () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
         //WAIT으로 memberGroup을 생성 -chatroodId는 승인시 따로 넣어줄 예정
         MemberGroup newMemberGroup = MemberGroup.createMemberGroup(Authority.WAIT, member, group, null);
+
         group.getMemberGroups().add(newMemberGroup);
     }
 

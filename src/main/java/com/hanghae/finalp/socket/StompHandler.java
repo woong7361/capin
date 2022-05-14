@@ -2,30 +2,22 @@ package com.hanghae.finalp.socket;
 
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.entity.dto.MessageDto;
 import com.hanghae.finalp.entity.mappedsuperclass.MessageType;
-import com.hanghae.finalp.repository.ChatRoomRepository;
+import com.hanghae.finalp.service.ChatService;
 import com.hanghae.finalp.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 
-import java.security.Principal;
-import java.util.HashMap;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.hanghae.finalp.util.JwtTokenUtils.TOKEN_NAME_WITH_SPACE;
 
@@ -71,7 +63,7 @@ public class StompHandler implements ChannelInterceptor {
 
             MemberDto.RedisPrincipal principal = chatService.getUserEnterInfo(sessionId);
             chatService.setUserEnterInfo(sessionId, principal.getMemberId(), principal.getUsername(), Long.valueOf(roomId));
-            chatService.addRoomMember(roomId, sessionId);
+            chatService.addRoomMember(roomId, principal.getMemberId(), principal.getUsername());
 
             sendMessage(roomId, MessageType.ENTER, principal.getUsername(), principal.getMemberId());
         } else if (StompCommand.DISCONNECT == accessor.getCommand()) { // Websocket 연결 종료
@@ -84,7 +76,8 @@ public class StompHandler implements ChannelInterceptor {
 
             // 퇴장한 클라이언트의 roomId 맵핑 정보를 삭제한다.
             chatService.removeUserEnterInfo(sessionId);
-            chatService.removeRoomMember(redisPrincipal.getRoomId().toString(), sessionId);
+            chatService.removeRoomMember(redisPrincipal.getRoomId().toString(), redisPrincipal.getMemberId(), redisPrincipal.getUsername());
+
 
             // 클라이언트 퇴장 메시지를 채팅방에 발송한다.(redis publish)
             sendMessage(redisPrincipal.getRoomId().toString(), MessageType.QUIT, redisPrincipal.getUsername(), redisPrincipal.getMemberId());
@@ -99,9 +92,9 @@ public class StompHandler implements ChannelInterceptor {
         // 클라이언트 입장, 퇴장 메시지를 채팅방에 발송한다.(redis publish) - token에서 username, userId 추출
 //            String name = Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
 //            chatRoomRepository.findById(Long.valueOf(roomId)).map(Chatroom::getRoomType).orElseThrow(RuntimeException::new);
-        MessageDto.Send sendMessage = MessageDto.Send.builder().
-                chatroomId(roomId).messageType(messageType).senderId(memberId).senderName(username).build();
-        chatService.sendChatMessage(sendMessage);
+        MessageDto.Send sendMessage = new MessageDto.Send(roomId, memberId, username, messageType);
+        Set<String> roomMembers = chatService.getRoomMembers(roomId);
+        chatService.sendChatMessage(sendMessage, roomMembers);
 
         log.info("Type: {}, roomId: {}, username: {}",messageType, roomId, username);
         log.info("count: {} , members: {}", chatService.getRoomMembers(roomId).size(), chatService.getRoomMembers(roomId));
