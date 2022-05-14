@@ -1,15 +1,11 @@
 package com.hanghae.finalp.socket.config;
 
-import com.hanghae.finalp.socket.ChatService;
+import com.hanghae.finalp.service.ChatService;
 import com.hanghae.finalp.socket.StompHandler;
 import com.hanghae.finalp.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.support.ChannelInterceptor;
