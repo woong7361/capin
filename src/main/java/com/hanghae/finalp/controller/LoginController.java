@@ -7,12 +7,10 @@ import com.hanghae.finalp.entity.dto.ResultMsg;
 import com.hanghae.finalp.service.LoginService;
 import com.hanghae.finalp.service.oauth.KakaoOauth;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class LoginController {
 
@@ -23,8 +21,7 @@ public class LoginController {
      * 카카오 로그인 API
      */
     @GetMapping("/login/oauth2/{provider}")
-    @ResponseBody
-    public ResponseEntity<LoginDto.Response> loginOAuth(@PathVariable("provider") String provider, @RequestParam String code) {
+    public LoginDto.Response loginOAuth(@PathVariable("provider") String provider, @RequestParam String code) {
         return kakaoOauth.login(provider, code);
     }
 
@@ -32,8 +29,7 @@ public class LoginController {
      * 토큰 재발급 API
      */
     @PostMapping("/login/refresh-token")
-    @ResponseBody
-    public ResponseEntity<LoginDto.Response> loginOAuth(@RequestHeader("Authorization") String refreshToken) {
+    public LoginDto.refreshTokenRes loginOAuth(@RequestHeader("Authorization") String refreshToken) {
         return longinService.createAccessTokenByRefreshToken(refreshToken);
     }
 
@@ -46,14 +42,6 @@ public class LoginController {
         return new ResultMsg("success");
     }
 
-    /**
-     * form test용
-     */
-    @GetMapping("/form")
-    public String form() {
-
-        return "form.html";
-    }
 
     /**
      * principal test용

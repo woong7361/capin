@@ -7,7 +7,6 @@ import com.hanghae.finalp.repository.MemberRepository;
 import com.hanghae.finalp.util.JwtTokenUtils;
 import com.hanghae.finalp.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +22,7 @@ public class LoginService {
     private final RedisUtils redisUtils;
     private final MemberRepository memberRepository;
 
-    public ResponseEntity<LoginDto.Response> createAccessTokenByRefreshToken(String refreshToken) {
+    public LoginDto.refreshTokenRes createAccessTokenByRefreshToken(String refreshToken) {
         refreshToken = refreshToken.replace(TOKEN_NAME_WITH_SPACE, "");
         DecodedJWT decodedJWT = jwtTokenUtils.verifyToken(refreshToken);
         Long memberId = decodedJWT.getClaim(CLAIM_ID).asLong();
@@ -34,7 +33,7 @@ public class LoginService {
 
         String accessToken = jwtTokenUtils.createAccessToken(memberId, member.getUsername());
 
-        return jwtTokenUtils.makeTokenResponse(refreshToken, accessToken);
+        return new LoginDto.refreshTokenRes(accessToken, refreshToken);
     }
 
     public void logout(Long memberId) {
