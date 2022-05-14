@@ -2,6 +2,7 @@ package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.GroupDto;
+import com.hanghae.finalp.entity.dto.MemberGroupDto;
 import com.hanghae.finalp.entity.dto.ResultMsg;
 import com.hanghae.finalp.service.GroupService;
 import lombok.RequiredArgsConstructor;
@@ -113,5 +114,26 @@ public class GroupController {
         groupService.banGroup(myMemberId, groupId, memberId);
         return new ResultMsg("success");
     }
+
+    //---------------------------------------------------------------------------
+
+    //그룹 내 개인의 세부주소 작성
+    @PostMapping("/api/groups/{groupId}/location")
+    public ResultMsg locationSet(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable("groupId") Long groupId,
+            MemberGroupDto.Request request
+    ){
+        Long memberId = principalDetails.getMemberId();
+        groupService.setlocation(memberId, groupId, request);
+        return new ResultMsg("success");
+    }
+
+    //스터디 카페 추천
+    @GetMapping("/api/groups/{groupId}/cafe-recommendation")
+    public MemberGroupDto.Response locationRecommend(@PathVariable("groupId") Long groupId){
+        return groupService.recommendLocation(groupId);
+    }
+
 
 }
