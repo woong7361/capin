@@ -5,6 +5,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.config.security.kakao.KakaoProfile;
 import com.hanghae.finalp.config.security.kakao.OAuthToken;
+import com.hanghae.finalp.dto.MemberResponseDto;
 import com.hanghae.finalp.util.JwtTokenUtils;
 import com.hanghae.finalp.dto.LoginDto;
 import com.hanghae.finalp.entity.Member;
@@ -59,26 +60,25 @@ public class KakaoOauth {
     private String userInfoUri;
 
     @Transactional
-    public ResponseEntity<LoginDto.Response> login(String providerName, String code) {
+    public LoginDto.Response login(String providerName, String code) {
 
         OAuthToken tokenResponse = getToken(code); //provider에 해당하는 카카오의 OAuthToken 얻어서
         KakaoProfile kakaoProfile = getUserProfile(providerName, tokenResponse); //카카오 프로필 요청해서 얻고
 
-        PrincipalDetails principalDetails = saveMember(providerName, kakaoProfile); //멤버 저장
-
+        LoginDto.Response response = saveMember(providerName, kakaoProfile);//멤버 저장
 
         String accessToken = jwtTokenUtils.
-                createAccessToken(principalDetails.getPrincipal().getMemberId(), principalDetails.getUsername());
-        String refreshToken = jwtTokenUtils.createRefreshToken(principalDetails.getPrincipal().getMemberId());
+                createAccessToken(response.getMember().getMemberId(), response.getMember().getUsername());
+        String refreshToken = jwtTokenUtils.createRefreshToken(response.getMember().getMemberId());
 
         //hardcoding need refactoring
         redisUtils.setDataExpire(
-                String.valueOf(principalDetails.getPrincipal().getMemberId()),
+                String.valueOf(response.getMember().getMemberId()),
                 refreshToken, 14 * DAY
         );
 
-        ResponseEntity<LoginDto.Response> response = jwtTokenUtils.makeTokenResponse(accessToken, refreshToken);
-
+        response.setAccessToken(accessToken);
+        response.setRefreshToken(refreshToken);
         return response;
     }
 
@@ -131,7 +131,7 @@ public class KakaoOauth {
         return kakaoProfile;
     }
 
-    private PrincipalDetails saveMember(String providerName, KakaoProfile kakaoProfile) {
+    private LoginDto.Response saveMember(String providerName, KakaoProfile kakaoProfile) {
         String kakaoId = kakaoProfile.getId() + "_" + providerName; //카카오에서 받아온 아이디를 kakaoId로.
         String username = kakaoProfile.getProperties().getNickname();  //카카오에서 받아온 nickname을 username으로.
         String imageUrl = kakaoProfile.getProperties().getProfile_image(); //카카오에서 받아온 Profile_image를 imageUrl로.
@@ -139,17 +139,20 @@ public class KakaoOauth {
 
         //멤버가 db에 있을 경우 멤버 아이디를 얻고, 없을 경우 db에 멤버값을 저장한다.
         Long memberId = null;
+        Boolean isFirst = null;
         Optional<Member> member = memberRepository.findByKakaoId(kakaoId);
         if(member.isPresent()){ //db에 카카오아이디가 있으면 카카오아이디를 통해, memberId를 얻는다.
             memberId = member.get().getId();
+            isFirst = false;
         } else{ //db에 카카오아이디가 없으면 member을 만들어준다.
             Member newMember = memberRepository.save(Member.createMember(kakaoId, username, imageUrl));
             memberId = newMember.getId();
+            isFirst = true;
         }
         PrincipalDetails principalDetails = new PrincipalDetails(memberId, username); //principalDetails을 생성해줌
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(principalDetails, null, null);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return principalDetails;
+        return new LoginDto.Response(new LoginDto.MemberRes(memberId, username, imageUrl), isFirst);
     }
 
 }
