@@ -217,13 +217,16 @@ public class GroupService {
 
 
     @Transactional
-    public String setlocation(Long memberId, Long groupId, MemberGroupDto.Request request) {
+    public void setlocation(Long memberId, Long groupId, MemberGroupDto.Request request) { //wait체크 추가
         //해당하는 멤버그룹에 받아온 값을 넣어준다
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
 
+        if(Authority.WAIT.equals(memberGroup.getAuthority())){
+            throw new RuntimeException("가입 승인이 완료되지 않았습니다.");
+        }
+
         memberGroup.setLocation(request.getStartLocationX(), request.getStartLocationY(), request.getStartAddress());
-        return request.getStartLocationX();
     }
 
 
@@ -242,10 +245,11 @@ public class GroupService {
             totalX += startLocationX;
             totalY += startLocationY;
         }
+
         String averageX = Double.toString(totalX / memberGroupList.size());
         String averageY = Double.toString(totalY / memberGroupList.size());
 
-        MemberGroupDto.Response response = new MemberGroupDto.Response(); //결과를 담을 response
+        MemberGroupDto.Response response = new MemberGroupDto.Response();
         response.setStartLocationX(averageX);
         response.setStartLocationY(averageY);
 
