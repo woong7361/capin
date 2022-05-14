@@ -2,6 +2,7 @@ package com.hanghae.finalp.service;
 
 import com.hanghae.finalp.entity.*;
 import com.hanghae.finalp.entity.dto.GroupDto;
+import com.hanghae.finalp.entity.dto.MemberGroupDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,7 +25,6 @@ public class GroupService {
     private final MemberRepository memberRepository;
     private final S3Service s3Service;
     private final ChatRoomRepository chatRoomRepository;
-
     private final ChatMemberRepository chatMemberRepository;
 
     public Slice<GroupDto.SimpleRes> getMyGroupList(Long memberId, Pageable pageable) {
@@ -192,7 +193,6 @@ public class GroupService {
 
                 //멤버그룹 삭제
                 yourMemberGroup.getGroup().minusMemberCount();
-
                 memberGroupRepository.delete(yourMemberGroup);
 
                 Group group= groupRepository.findById(groupId).orElseThrow(
@@ -202,7 +202,7 @@ public class GroupService {
                 //채팅룸에서도 드랍 =>
                 // 1.챗멤버를 없애줘야함
                 ChatMember chatMember = chatMemberRepository.findByMemberId(memberId)
-                        .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
+                        .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
                 chatMemberRepository.delete(chatMember);
 
                 //2. 채팅룸에서도 챗멤버를 없애 줘야함. 
@@ -213,4 +213,42 @@ public class GroupService {
         }
     }
 
+    //------------------------------------------------------------------------------------------------
+
+
+    @Transactional
+    public String setlocation(Long memberId, Long groupId, MemberGroupDto.Request request) {
+        //해당하는 멤버그룹에 받아온 값을 넣어준다
+        MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
+
+        memberGroup.setLocation(request.getStartLocationX(), request.getStartLocationY(), request.getStartAddress());
+        return request.getStartLocationX();
+    }
+
+
+    @Transactional
+    public MemberGroupDto.Response recommendLocation(Long groupId) {
+        //그룹에 속해있는 멤버들을 다 찾는다. => 멤버그룹에서 그룹아이디를 가진 멤버그룹을 다 찾음
+        List<MemberGroup> memberGroupList = memberGroupRepository.findAllByGroupId(groupId);
+
+        //멤버들의 locationx,y를 다 받아와서 평균값을 반환함
+        Double totalX = 0.0;
+        Double totalY = 0.0;
+        for (MemberGroup memberGroup : memberGroupList){
+            Double startLocationX = Double.parseDouble(memberGroup.getStartLocationX());
+            Double startLocationY = Double.parseDouble(memberGroup.getStartLocationY());
+
+            totalX += startLocationX;
+            totalY += startLocationY;
+        }
+        String averageX = Double.toString(totalX / memberGroupList.size());
+        String averageY = Double.toString(totalY / memberGroupList.size());
+
+        MemberGroupDto.Response response = new MemberGroupDto.Response(); //결과를 담을 response
+        response.setStartLocationX(averageX);
+        response.setStartLocationY(averageY);
+
+        return response;
+    }
 }

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberGroupRepository extends JpaRepository<MemberGroup, Long> {
@@ -16,7 +17,8 @@ public interface MemberGroupRepository extends JpaRepository<MemberGroup, Long> 
     Slice<MemberGroup> findMyGroupByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 
     Optional<MemberGroup> findByMemberIdAndGroupId(Long memberId, Long GroupId);
-
     Optional<MemberGroup> findByAuthorityAndMemberId(Authority authority, Long memberId);
+
+    List<MemberGroup> findAllByGroupId(Long groupId);
 
 }

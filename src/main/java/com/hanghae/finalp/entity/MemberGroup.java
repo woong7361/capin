@@ -51,12 +51,17 @@ public class MemberGroup extends TimeStamped {
         return new MemberGroup(authority, member, group, chatroomId);
     }
 
-
     public void setAuthority(Authority authority) {
         this.authority = authority;
     }
 
     public void setChatroomId(Long chatroomId) { this.chatroomId = chatroomId; }
+
+    public void setLocation(String startLocationX, String startLocationY, String startAddress){
+        this.startLocationX = startLocationX;
+        this.startLocationY = startLocationY;
+        this.startAddress = startAddress;
+    }
 
 
 }
