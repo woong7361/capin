@@ -51,10 +51,5 @@ public class Member extends TimeStamped {
     public void patchImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
-    public void patcMember(String username, String imageUrl) {
-        this.username = username;
-        this.imageUrl = imageUrl;
-    }
-
 
 }

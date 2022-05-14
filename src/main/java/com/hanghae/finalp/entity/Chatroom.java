@@ -29,7 +29,7 @@ public class Chatroom {
 
     //========================================생성자=============================================//
 
-    public Chatroom(String chatroomTitle, RoomType roomType) {
+    private Chatroom(String chatroomTitle, RoomType roomType) {
         this.chatroomTitle = chatroomTitle;
         this.roomType = roomType;
     }

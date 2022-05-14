@@ -41,7 +41,7 @@ public class Message extends TimeStamped {
 
     //========================================생성 편의자=============================================//
 
-    private Message createMessage(Long senderId, String content, MessageType messageType, ChatMember chatMember) {
+    public static Message createMessage(Long senderId, String content, MessageType messageType, ChatMember chatMember) {
         Message message = new Message(senderId, content, messageType);
         message.chatMember = chatMember;
 
