@@ -39,3 +39,4 @@ out/
 
 ### custom ignore ###
 *.yml
+logs
