@@ -1,5 +1,6 @@
 package com.hanghae.finalp.entity;
 
+import com.hanghae.finalp.entity.dto.GroupDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.entity.mappedsuperclass.TimeStamped;
 import lombok.AccessLevel;
@@ -28,10 +29,11 @@ public class Group extends TimeStamped {
     private String roughAddress;
     private String imageUrl;
 
+
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<MemberGroup> memberGroups = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "group")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "group", cascade = CascadeType.ALL)
     private Cafe cafe;
 
 
@@ -49,20 +51,42 @@ public class Group extends TimeStamped {
     //========================================생성 편의자=============================================//
 
     public static Group createGroup(
-            String groupTitle, String description, int maxMemberCount, String roughAddress, String imageUrl, Member member) {
-        Group group = new Group(groupTitle, description, maxMemberCount, roughAddress, imageUrl);
-        MemberGroup memberGroup = MemberGroup.createMemberGroup(Authority.OWNER, member, group);
-        group.getMemberGroups().add(memberGroup);
-        Chatroom.createChatroomByGroup(groupTitle, memberGroup);
-
+            String groupTitle, String description, int maxMemberCount, String roughAddress, String imageUrl, Member member, Long chatroomId) {
+        Group group = new Group(groupTitle, description, maxMemberCount, roughAddress, imageUrl); //group을 만들고
+        MemberGroup memberGroup = MemberGroup.createMemberGroup(Authority.OWNER, member, group, chatroomId); //memberGroup을 만들고
+        group.getMemberGroups().add(memberGroup); //group안에 memberGroup을 넣어준다
         return group;
     }
+
+    public static Group createGroup(GroupDto.CreateReq createReq, String imageUrl, Member member, Long chatroomId) {
+        Group group = new Group(createReq.getGroupTitle(), createReq.getDescription(), createReq.getMaxMemberCount(),
+                createReq.getRoughAddress(), imageUrl);
+        MemberGroup memberGroup = MemberGroup.createMemberGroup(Authority.OWNER, member, group, chatroomId); //memberGroup을 만들고
+        group.getMemberGroups().add(memberGroup); //group안에 memberGroup을 넣어준다
+        return group;
+    }
+
 
     //========================================비즈니스 로직=============================================//
     public void setCafe(Cafe cafe) {
         this.cafe = cafe;
     }
 
+
+    public void patch(GroupDto.CreateReq createReq, String imageUrl) {
+        this.groupTitle = createReq.getGroupTitle();
+        this.description = createReq.getDescription();
+        this.maxMemberCount = createReq.getMaxMemberCount();
+        this.roughAddress = createReq.getRoughAddress();
+        this.imageUrl = imageUrl;
+    }
+
+    public void addMemberCount(){
+        this.memberCount += 1;
+    }
+    public void minusMemberCount(){
+        this.memberCount -= 1;
+    }
 }
 
 

@@ -4,9 +4,8 @@ import com.hanghae.finalp.entity.Chatroom;
 import com.hanghae.finalp.entity.Group;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
-import org.junit.jupiter.api.Test;
+import com.hanghae.finalp.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,10 +13,11 @@ import javax.persistence.EntityManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+//@DataJpaTest
 @Transactional
 class FinalPApplicationTests {
 
+    @Autowired private S3Service s3Service;
     @Autowired private EntityManager em;
 
     public void clearContext() {
@@ -25,7 +25,7 @@ class FinalPApplicationTests {
         em.clear();
     }
 
-    @Test
+//    @Test
     @Rollback(value = false)
     public void testMember() throws Exception{
         //given
@@ -40,26 +40,26 @@ class FinalPApplicationTests {
         assertThat(member.getKakaoId()).isEqualTo("kakaoId");
     }
 
-    @Test
-    @Rollback(value = false)
-    public void groupTest() throws Exception{
-        //given
-        Member member = Member.createMember("kakaoId", "username", null);
-        Group group =
-                Group.createGroup("title", "desc", 5, "adrress", null, member);
-        em.persist(member);
-        em.persist(group);
-        clearContext();
-        //when
-        Group findGroup = em.find(Group.class, group.getId());
-        //then
+//    @Test
+//    @Rollback(value = false)
+//    public void groupTest() throws Exception{
+//        //given
+//        Member member = Member.createMember("kakaoId", "username", null);
+//        Group group =
+//                Group.createGroup("title", "desc", 5, "adrress", null, member);
+//        em.persist(member);
+//        em.persist(group);
+//        clearContext();
+//        //when
+//        Group findGroup = em.find(Group.class, group.getId());
+//        //then
+//
+//        assertThat(findGroup.getGroupTitle()).isEqualTo("title");
+//        assertThat(findGroup.getMemberGroups().get(0).getAuthority()).isEqualTo(Authority.OWNER);
+//        assertThat(findGroup.getMemberGroups().get(0).getChatroom().getChatroomTitle()).isEqualTo("title");
+//    }
 
-        assertThat(findGroup.getGroupTitle()).isEqualTo("title");
-        assertThat(findGroup.getMemberGroups().get(0).getAuthority()).isEqualTo(Authority.OWNER);
-        assertThat(findGroup.getMemberGroups().get(0).getChatroom().getChatroomTitle()).isEqualTo("title");
-    }
-
-    @Test
+//    @Test
     @Rollback(value = false)
     public void chatMember() throws Exception{
         //given
@@ -77,6 +77,16 @@ class FinalPApplicationTests {
         assertThat(findChatroom.getChatroomTitle()).isEqualTo("titleMember");
         assertThat(findChatroom.getChatMembers().size()).isEqualTo(2);
 
+    }
+
+//    @Test
+    public void test() throws Exception{
+        //given
+        Long a = 3L;
+        System.out.println("a.toString() = " + a.toString());
+        //when
+
+        //then
     }
 
 }

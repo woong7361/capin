@@ -17,9 +17,9 @@ public class Member extends TimeStamped {
     @Id @GeneratedValue
     @Column(name = "member_id")
     private Long id;
-
     private String kakaoId;
     private String username;
+    @Column(columnDefinition = "TEXT")
     private String imageUrl;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -32,6 +32,7 @@ public class Member extends TimeStamped {
 
     //========================================생성자=============================================//
 
+
     private Member(String kakaoId, String username, String imageUrl) {
         this.kakaoId = kakaoId;
         this.username = username;
@@ -43,10 +44,12 @@ public class Member extends TimeStamped {
     public static Member createMember(String kakaoId, String username, String imageUrl) {
         return new Member(kakaoId, username, imageUrl);
     }
-
     //========================================비즈니스 로직==============================================//
-    public void patchMember(String username, String imageUrl) {
+    public void patchUsername(String username) {
         this.username = username;
+    }
+    public void patchImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
 }
