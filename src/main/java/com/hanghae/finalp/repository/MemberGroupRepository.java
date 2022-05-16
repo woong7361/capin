@@ -21,4 +21,7 @@ public interface MemberGroupRepository extends JpaRepository<MemberGroup, Long> 
 
     List<MemberGroup> findAllByGroupId(Long groupId);
 
+//    @Query("select gm from MemberGroup gm join fetch gm.member where gm.member.id = :groupId")
+//    List<MemberGroup> findMemberByGroupId(@Param("groupId") Long groupId);
+
 }
