@@ -13,15 +13,12 @@ import java.util.Optional;
 
 public interface MemberGroupRepository extends JpaRepository<MemberGroup, Long> {
 
-    @Query("select gm from MemberGroup gm join fetch gm.group where gm.group.id = :memberId")
+    @Query("select gm from MemberGroup gm join fetch gm.group where gm.group.id= :memberId")
     Slice<MemberGroup> findMyGroupByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 
     Optional<MemberGroup> findByMemberIdAndGroupId(Long memberId, Long GroupId);
     Optional<MemberGroup> findByAuthorityAndMemberId(Authority authority, Long memberId);
 
     List<MemberGroup> findAllByGroupId(Long groupId);
-
-//    @Query("select gm from MemberGroup gm join fetch gm.member where gm.member.id = :groupId")
-//    List<MemberGroup> findMemberByGroupId(@Param("groupId") Long groupId);
 
 }

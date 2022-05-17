@@ -6,6 +6,7 @@ import com.hanghae.finalp.entity.dto.MemberGroupDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -77,29 +78,24 @@ public class GroupService {
 
 
     //------------------------------------------------------------------------------------
-//
-//    //페이징
-//    @Transactional
-//    public Page<Group> getGroupList(Pageable pageable) {
-//        return groupRepository.findALL(pageable);
-//    }
-//
-//    //그룹 검색
-//    @Transactional
-//    public Page<Group> groupSearch(String searchKeyword, Pageable pageable) {
-//        return groupRepository.findByGroupTitleContainingOrRoughAddressContaining(searchKeyword, pageable);
-//    }
-//
-//    //특정 그룹 불러오기
-//    @Transactional
-//    public Group groupView(Long groupId){
-//        return groupRepository.findById(groupId).get();
-//    }
-//    @Transactional
-//    public List<MemberGroup> groupView2(Long groupId) {
-//        return memberGroupRepository.findMemberByGroupId(groupId);
-//    }
 
+    //페이징
+    @Transactional
+    public Page<Group> getGroupList(Long groupId, Pageable pageable) {
+        return groupRepository.findAllById(groupId, pageable);
+    }
+
+    //그룹 검색
+    @Transactional
+    public Page<Group> groupSearch(String searchKeyword, Pageable pageable) {
+        return groupRepository.findByGroupTitleContaining(searchKeyword, pageable);
+    }
+
+    //특정 그룹 불러오기
+    @Transactional
+    public Slice<Group> groupView(Long groupId){
+        return groupRepository.findMemberByGroupId(groupId);
+    }
 
     //그룹 참가 신청
     @Transactional
