@@ -79,12 +79,6 @@ public class GroupService {
 
     //------------------------------------------------------------------------------------
 
-    //페이징
-    @Transactional
-    public Page<GroupDto.SimpleRes> getGroupList(Pageable pageable) {
-        return groupRepository.findALL(pageable);
-    }
-
     //그룹 검색
     @Transactional
     public Page<GroupDto.SimpleRes> groupSearch(String searchKeyword, Pageable pageable) {
@@ -94,7 +88,10 @@ public class GroupService {
     //특정 그룹 불러오기
     @Transactional
     public Group groupView(Long groupId){
-        return groupRepository.findById(groupId).get();
+//        return groupRepository.findById(groupId).get();
+        Group group = groupRepository.findById(groupId).orElseThrow(
+                        () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
+        return group;
     }
 
 

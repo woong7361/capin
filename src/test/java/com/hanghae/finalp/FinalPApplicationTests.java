@@ -1,3 +1,4 @@
+/*
 package com.hanghae.finalp;
 
 import com.hanghae.finalp.entity.Chatroom;
@@ -89,4 +90,4 @@ class FinalPApplicationTests {
         //then
     }
 
-}
+}*/
