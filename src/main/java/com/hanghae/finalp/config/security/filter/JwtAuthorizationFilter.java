@@ -49,7 +49,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             if (jwtHeader == null || !jwtHeader.startsWith(TOKEN_NAME_WITH_SPACE)) {
                 throw new IllegalArgumentException("no header request");
             }
-            String jwtToken = jwtTokenUtils.getTokenFromHeader(request);
+            String jwtToken = jwtTokenUtils.replaceBearer(jwtHeader);
 
             DecodedJWT decodedJWT = jwtTokenUtils.verifyToken(jwtToken);
 

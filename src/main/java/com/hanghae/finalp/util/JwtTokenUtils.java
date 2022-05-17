@@ -8,6 +8,7 @@ import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.hanghae.finalp.config.exception.customexception.TokenException;
 import com.hanghae.finalp.dto.LoginDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+
+import static com.hanghae.finalp.config.exception.code.ErrorCode.TOKEN_ERROR_CODE;
 
 
 @Slf4j
@@ -44,13 +47,13 @@ public class JwtTokenUtils {
                     .build()
                     .verify(jwtToken);
         } catch (AlgorithmMismatchException algorithmMismatchException){
-            throw new IllegalArgumentException("토큰 알고리즘 미스매칭");
+            throw new TokenException(TOKEN_ERROR_CODE, "토큰 알고리즘 미스매칭");
         } catch (SignatureVerificationException signatureVerificationException){
-            throw new IllegalArgumentException("signature verifying 에러");
+            throw new TokenException(TOKEN_ERROR_CODE, "토큰 signature verifying 에러");
         } catch (TokenExpiredException tokenExpiredException) {
             throw new TokenExpiredException("토큰 만료됨");
         } catch (InvalidClaimException invalidClaimException) {
-            throw new IllegalArgumentException("토큰 클레임 에러");
+            throw new TokenException(TOKEN_ERROR_CODE, "토큰 클레임 에러");
         }
     }
 
@@ -61,13 +64,21 @@ public class JwtTokenUtils {
         return ((Claim) decodedJWT.getClaim(CLAIM_USERNAME)).asString();
     }
 
-    public String getTokenFromHeader(HttpServletRequest request) throws IllegalArgumentException {
+    public String getTokenFromHeader(HttpServletRequest request) {
         try {
             return request.
                     getHeader(TOKEN_HEADER_NAME).
                     replace(TOKEN_NAME_WITH_SPACE, "");
         } catch (Exception e) {
-            throw new IllegalArgumentException("헤더 추출 에러");
+            throw new TokenException(TOKEN_ERROR_CODE, "헤더에서 토큰 추출중 에러");
+        }
+    }
+
+    public String replaceBearer(String tokenString) {
+        try {
+            return tokenString.replace(TOKEN_NAME_WITH_SPACE, "");
+        } catch (Exception e) {
+            throw new TokenException(TOKEN_ERROR_CODE, "Bearer 없음");
         }
     }
 

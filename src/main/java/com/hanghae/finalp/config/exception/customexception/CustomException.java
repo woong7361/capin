@@ -1,4 +1,4 @@
-package com.hanghae.finalp.config.exception;
+package com.hanghae.finalp.config.exception.customexception;
 
 public class CustomException extends RuntimeException{
 //    private static final long serialVersionUID = 1L;

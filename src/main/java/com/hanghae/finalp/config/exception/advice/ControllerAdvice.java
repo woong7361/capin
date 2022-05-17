@@ -1,6 +1,6 @@
 package com.hanghae.finalp.config.exception.advice;
 
-import com.hanghae.finalp.config.exception.CustomException;
+import com.hanghae.finalp.config.exception.customexception.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
