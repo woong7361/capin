@@ -68,7 +68,7 @@ public class KakaoOauth {
         String refreshToken = jwtTokenUtils.createRefreshToken(response.getMember().getMemberId());
 
         //hardcoding need refactoring
-        redisUtils.setDataExpire(
+        redisUtils.setRefreshTokenDataExpire(
                 String.valueOf(response.getMember().getMemberId()),
                 refreshToken.replace(TOKEN_NAME_WITH_SPACE, ""), 14 * DAY
         );

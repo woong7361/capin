@@ -33,7 +33,7 @@ public class TestController {
         memberRepository.save(member);
         String accessToken = jwtTokenUtils.createAccessToken(member.getId(), member.getUsername());
         String refreshToken = jwtTokenUtils.createRefreshToken(member.getId());
-        redisUtils.setDataExpire(member.getId().toString(), refreshToken, 14 * JwtTokenUtils.DAY);
+        redisUtils.setRefreshTokenDataExpire(member.getId().toString(), refreshToken, 14 * JwtTokenUtils.DAY);
         return new LoginDto.refreshTokenRes(accessToken, refreshToken);
     }
 
