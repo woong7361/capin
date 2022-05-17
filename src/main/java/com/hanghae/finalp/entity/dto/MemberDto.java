@@ -21,4 +21,12 @@ public class MemberDto {
         private Long roomId;
     }
 
+    @Data
+    @AllArgsConstructor
+    public static class ProfileRes {
+        private String username;
+        private String imageUrl;
+    }
+
+
 }

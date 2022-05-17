@@ -9,11 +9,9 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hanghae.finalp.config.exception.customexception.TokenException;
-import com.hanghae.finalp.dto.LoginDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -89,7 +87,7 @@ public class JwtTokenUtils {
                 .withClaim(CLAIM_ID, memberId)
                 .withClaim(CLAIM_USERNAME, username)
                 .sign(Algorithm.HMAC512(JWT_SECRET));   //secretkey
-        return token;
+        return TOKEN_NAME_WITH_SPACE + token;
     }
 
     public String createRefreshToken(Long memberId) {
@@ -98,15 +96,6 @@ public class JwtTokenUtils {
                 .withExpiresAt(new Date(System.currentTimeMillis() + (14 * DAY) ))
                 .withClaim(CLAIM_ID, memberId)
                 .sign(Algorithm.HMAC512(JWT_SECRET));   //secretkey
-        return token;
+        return TOKEN_NAME_WITH_SPACE + token;
     }
-
-    public ResponseEntity<LoginDto.Response> makeTokenResponse(String accessToken, String refreshToken) {
-        return ResponseEntity.ok()
-                .body(new LoginDto.Response(
-                        TOKEN_NAME_WITH_SPACE + accessToken,
-                        TOKEN_NAME_WITH_SPACE + refreshToken)
-                );
-    }
-
 }

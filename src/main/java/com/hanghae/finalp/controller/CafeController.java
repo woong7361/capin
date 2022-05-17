@@ -21,9 +21,9 @@ public class CafeController {
     //카페 선택 -> 생성과 같음
     @PostMapping("/api/groups/{groupId}/cafe")
     public ResultMsg cafeSelect(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                CafeDto.Reqeust reqeust,
-                                @PathVariable("groupId") Long groupId) {
-        cafeService.selectCafe(principalDetails.getMemberId(), reqeust, groupId);
+                                @PathVariable("groupId") Long groupId,
+                                CafeDto.Reqeust cafeReq) {
+        cafeService.selectCafe(principalDetails.getMemberId(), cafeReq, groupId);
         return new ResultMsg("success");
     }
 

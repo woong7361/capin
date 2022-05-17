@@ -2,7 +2,7 @@ package com.hanghae.finalp.service;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hanghae.finalp.config.exception.customexception.RefreshTokenException;
-import com.hanghae.finalp.dto.LoginDto;
+import com.hanghae.finalp.entity.dto.LoginDto;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.repository.MemberRepository;
 import com.hanghae.finalp.util.JwtTokenUtils;

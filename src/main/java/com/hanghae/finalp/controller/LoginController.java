@@ -2,7 +2,7 @@ package com.hanghae.finalp.controller;
 
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
-import com.hanghae.finalp.dto.LoginDto;
+import com.hanghae.finalp.entity.dto.LoginDto;
 import com.hanghae.finalp.entity.dto.ResultMsg;
 import com.hanghae.finalp.service.LoginService;
 import com.hanghae.finalp.service.oauth.KakaoOauth;

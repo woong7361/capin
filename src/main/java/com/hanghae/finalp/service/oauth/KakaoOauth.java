@@ -5,7 +5,7 @@ import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.config.security.kakao.KakaoProfile;
 import com.hanghae.finalp.config.security.kakao.OAuthToken;
 import com.hanghae.finalp.util.JwtTokenUtils;
-import com.hanghae.finalp.dto.LoginDto;
+import com.hanghae.finalp.entity.dto.LoginDto;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.repository.MemberRepository;
 import com.hanghae.finalp.util.RedisUtils;
@@ -70,7 +70,7 @@ public class KakaoOauth {
         //hardcoding need refactoring
         redisUtils.setDataExpire(
                 String.valueOf(response.getMember().getMemberId()),
-                refreshToken, 14 * DAY
+                refreshToken.replace(TOKEN_NAME_WITH_SPACE, ""), 14 * DAY
         );
 
         response.setAccessToken(accessToken);
