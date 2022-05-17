@@ -2,7 +2,7 @@ package com.hanghae.finalp.service;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hanghae.finalp.config.exception.customexception.RefreshTokenException;
-import com.hanghae.finalp.dto.LoginDto;
+import com.hanghae.finalp.entity.dto.LoginDto;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.repository.MemberRepository;
 import com.hanghae.finalp.util.JwtTokenUtils;
@@ -28,7 +28,7 @@ public class LoginService {
         refreshToken = refreshToken.replace(TOKEN_NAME_WITH_SPACE, "");
         DecodedJWT decodedJWT = jwtTokenUtils.verifyToken(refreshToken);
         Long memberId = decodedJWT.getClaim(CLAIM_ID).asLong();
-        String inRedisToken = redisUtils.getData(memberId.toString());
+        String inRedisToken = redisUtils.getRefreshTokenData(memberId.toString());
         if(!refreshToken.equals(inRedisToken)) throw new RefreshTokenException(REFRESH_TOKEN_ERROR_CODE, "refresh토큰이 redis와 불일치");
 
         Member member = memberRepository.findById(memberId)
@@ -40,6 +40,6 @@ public class LoginService {
     }
 
     public void logout(Long memberId) {
-        redisUtils.deleteData(memberId.toString());
+        redisUtils.deleteRefreshTokenData(memberId.toString());
     }
 }

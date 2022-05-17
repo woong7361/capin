@@ -224,14 +224,14 @@ public class GroupService {
 
                 //채팅룸에서도 드랍 =>
                 // 1.챗멤버를 없애줘야함
-                ChatMember chatMember = chatMemberRepository.findByMemberId(memberId)
-                        .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
-                chatMemberRepository.delete(chatMember);
-
-                //2. 채팅룸에서도 챗멤버를 없애 줘야함. 
-                Chatroom chatroom = chatRoomRepository.findById(myMemberGroup.getChatroomId())
-                        .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
-                chatroom.getChatMembers().remove(chatMember);
+//                ChatMember chatMember = chatMemberRepository.findByMemberId(memberId)
+//                        .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
+//                chatMemberRepository.delete(chatMember);
+//
+//                //2. 채팅룸에서도 챗멤버를 없애 줘야함.
+//                Chatroom chatroom = chatRoomRepository.findById(myMemberGroup.getChatroomId())
+//                        .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
+//                chatroom.getChatMembers().remove(chatMember);
             }
         }
     }

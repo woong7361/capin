@@ -40,5 +40,3 @@ out/
 ### custom ignore ###
 *.yml
 logs
-
-/src/main/resources/errors.properties
