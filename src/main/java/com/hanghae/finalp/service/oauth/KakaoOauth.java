@@ -1,13 +1,11 @@
 package com.hanghae.finalp.service.oauth;
 
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.config.security.kakao.KakaoProfile;
 import com.hanghae.finalp.config.security.kakao.OAuthToken;
-import com.hanghae.finalp.dto.MemberResponseDto;
 import com.hanghae.finalp.util.JwtTokenUtils;
-import com.hanghae.finalp.dto.LoginDto;
+import com.hanghae.finalp.entity.dto.LoginDto;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.repository.MemberRepository;
 import com.hanghae.finalp.util.RedisUtils;
@@ -16,10 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,8 +58,8 @@ public class KakaoOauth {
     @Transactional
     public LoginDto.Response login(String providerName, String code) {
 
-        OAuthToken tokenResponse = getToken(code); //provider에 해당하는 카카오의 OAuthToken 얻어서
-        KakaoProfile kakaoProfile = getUserProfile(providerName, tokenResponse); //카카오 프로필 요청해서 얻고
+        OAuthToken tokenResponse = getTokenFromKakao(code); //provider에 해당하는 카카오의 OAuthToken 얻어서
+        KakaoProfile kakaoProfile = getUserProfileFromKakao(providerName, tokenResponse); //카카오 프로필 요청해서 얻고
 
         LoginDto.Response response = saveMember(providerName, kakaoProfile);//멤버 저장
 
@@ -72,9 +68,9 @@ public class KakaoOauth {
         String refreshToken = jwtTokenUtils.createRefreshToken(response.getMember().getMemberId());
 
         //hardcoding need refactoring
-        redisUtils.setDataExpire(
+        redisUtils.setRefreshTokenDataExpire(
                 String.valueOf(response.getMember().getMemberId()),
-                refreshToken, 14 * DAY
+                refreshToken.replace(TOKEN_NAME_WITH_SPACE, ""), 14 * DAY
         );
 
         response.setAccessToken(accessToken);
@@ -86,7 +82,7 @@ public class KakaoOauth {
 
     //==============================================================================================//
 
-    private OAuthToken getToken(String code) {
+    private OAuthToken getTokenFromKakao(String code) {
         OAuthToken oAuthToken = WebClient.create()
                 .post()
                 .uri(tokenUri)
@@ -102,7 +98,6 @@ public class KakaoOauth {
                 .bodyToMono(OAuthToken.class)
                 .block();
 
-        log.info("kakao token response = {}", oAuthToken.toString());
         return oAuthToken;
     }
 
@@ -118,17 +113,15 @@ public class KakaoOauth {
     }
 
     //카카오 프로필 얻기
-    private KakaoProfile getUserProfile(String providerName, OAuthToken tokenResponse) {
-        KakaoProfile kakaoProfile = WebClient.create()
+    private KakaoProfile getUserProfileFromKakao(String providerName, OAuthToken tokenResponse) {
+
+        return WebClient.create()
                 .get()
                 .uri(userInfoUri)
                 .headers(header -> header.setBearerAuth(tokenResponse.getAccess_token()))
                 .retrieve()
                 .bodyToMono(KakaoProfile.class)
                 .block();
-
-        log.info("kakao profile response = {}", kakaoProfile.toString());
-        return kakaoProfile;
     }
 
     private LoginDto.Response saveMember(String providerName, KakaoProfile kakaoProfile) {

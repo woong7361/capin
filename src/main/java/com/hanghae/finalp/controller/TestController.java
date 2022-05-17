@@ -1,6 +1,6 @@
 package com.hanghae.finalp.controller;
 
-import com.hanghae.finalp.dto.LoginDto;
+import com.hanghae.finalp.entity.dto.LoginDto;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.repository.MemberRepository;
 import com.hanghae.finalp.service.oauth.KakaoOauth;
@@ -36,7 +36,7 @@ public class TestController {
         memberRepository.save(member);
         String accessToken = jwtTokenUtils.createAccessToken(member.getId(), member.getUsername());
         String refreshToken = jwtTokenUtils.createRefreshToken(member.getId());
-        redisUtils.setDataExpire(member.getId().toString(), refreshToken, 14 * JwtTokenUtils.DAY);
+        redisUtils.setRefreshTokenDataExpire(member.getId().toString(), refreshToken, 14 * JwtTokenUtils.DAY);
         return new LoginDto.refreshTokenRes(accessToken, refreshToken);
     }
 

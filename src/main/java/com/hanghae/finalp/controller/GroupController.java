@@ -67,6 +67,33 @@ public class GroupController {
     //--------------------------------------------------------------------------------------
 
 
+//    //그룹 리스트 페이징, 검색
+//    @GetMapping("/api/groups/list")
+//    public Page<Group> GroupList(@PageableDefault(size = 20, sort = "groupId", direction = Sort.Direction.DESC) Pageable pageable,
+//                            String searchKeyword) {
+//
+//        Page<Group> list = null;
+//
+//        if(searchKeyword == null) {
+//            list = groupService.getGroupList(pageable);
+//        } else {
+//            list = groupService.groupSearch(searchKeyword, pageable);
+//        }
+//
+////        int nowPage = list.getPageable().getPageNumber() + 1; //페이지는 0부터 시작하므로 +1
+////        int startPage = Math.max(0,nowPage - 4);
+////        int endPage = Math.min(list.getTotalPages(), nowPage + 5);
+//
+//        return list;
+//    }
+//
+//    //특정 그룹
+//    @GetMapping("/api/groups/{groupId}")
+//    public Group groupView(@AuthenticationPrincipal PrincipalDetails principalDetails,
+//                           @PathVariable("groupId") Long groupId
+//    ){
+//        return
+//    }
 
 
     //그룹 참가 신청

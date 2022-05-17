@@ -4,6 +4,7 @@ package com.hanghae.finalp.config.security.filter;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.hanghae.finalp.config.exception.customexception.TokenException;
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.util.JwtTokenUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static com.hanghae.finalp.config.exception.code.ErrorMessageCode.TOKEN_ERROR_CODE;
 import static com.hanghae.finalp.util.JwtTokenUtils.*;
 
 
@@ -40,16 +42,16 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     //인증이나 권한이 필요하면 doFilterInternal 탄다.
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         log.info("인증 시도중...");
         try {
             String jwtHeader = request.getHeader(TOKEN_HEADER_NAME);
 
             //헤더가 있는지 확인
             if (jwtHeader == null || !jwtHeader.startsWith(TOKEN_NAME_WITH_SPACE)) {
-                throw new IllegalArgumentException("no header request");
+                throw new TokenException(TOKEN_ERROR_CODE, "헤더에 Bearer 토큰이 없다.");
             }
-            String jwtToken = jwtTokenUtils.getTokenFromHeader(request);
+            String jwtToken = jwtTokenUtils.replaceBearer(jwtHeader);
 
             DecodedJWT decodedJWT = jwtTokenUtils.verifyToken(jwtToken);
 
@@ -65,9 +67,14 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (TokenExpiredException e) {
-            request.setAttribute("error", "accessTokenExpire");
+            request.setAttribute("error", e);
+            request.setAttribute("type", "tokenExpiredException");
+        }catch (TokenException e) {
+            request.setAttribute("error", e);
+            request.setAttribute("type", "tokenException");
         } catch (Exception e) {
             request.setAttribute("error", e);
+            request.setAttribute("type", "exception");
         } finally { //에러가 발생시 authenticationentrypoint로
             chain.doFilter(request, response);
         }
