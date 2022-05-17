@@ -3,11 +3,11 @@ package com.hanghae.finalp.config.exception.customexception;
 import lombok.Getter;
 
 @Getter
-public class TokenException extends RuntimeException {
+public class RefreshTokenException extends RuntimeException{
 
     private String code;
 
-    public TokenException(String code, String message) {
+    public RefreshTokenException(String code, String message) {
         super(message);
         this.code = code;
     }

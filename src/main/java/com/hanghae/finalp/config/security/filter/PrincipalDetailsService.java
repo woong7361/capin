@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class PrincipalDetailsService implements UserDetailsService {
-
+    //UserDetailsService를 쓰지는 않지만, 구현체가 없다면 WebSecurityConfigurerAdapter에서 authenticationManager를 사용 불가능
     private final MemberRepository memberRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

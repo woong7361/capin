@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
-import static com.hanghae.finalp.config.exception.code.ErrorCode.TOKEN_ERROR_CODE;
+import static com.hanghae.finalp.config.exception.code.ErrorMessageCode.TOKEN_ERROR_CODE;
 
 
 @Slf4j
