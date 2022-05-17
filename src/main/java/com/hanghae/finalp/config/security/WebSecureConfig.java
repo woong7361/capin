@@ -23,6 +23,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class WebSecureConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final JwtTokenUtils jwtTokenUtils;
 
     //이걸로 안막으면 인증이 필요없는 부분도 필터를 탐 (forbidden으로 막히지는 않음)
     @Override
@@ -30,11 +31,7 @@ public class WebSecureConfig extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .antMatchers("/h2-console/**")
                 .antMatchers("/sub");
-//                .antMatchers("/api/login");
     }
-
-    private final JwtTokenUtils jwtTokenUtils;
-
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

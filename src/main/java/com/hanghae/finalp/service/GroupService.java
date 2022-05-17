@@ -6,7 +6,6 @@ import com.hanghae.finalp.entity.dto.MemberGroupDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -79,23 +78,28 @@ public class GroupService {
 
     //------------------------------------------------------------------------------------
 
-    //페이징
-    @Transactional
-    public Page<GroupDto.SimpleRes> getGroupList(Pageable pageable) {
-        return groupRepository.findALL(pageable);
-    }
-
-    //그룹 검색
-    @Transactional
-    public Page<GroupDto.SimpleRes> groupSearch(String searchKeyword, Pageable pageable) {
-        return groupRepository.findByGroupTitleContainingOrRoughAddressContaining(searchKeyword, pageable);
-    }
-
-    //특정 그룹 불러오기
-    @Transactional
-    public Group groupView(Long groupId){
-        return groupRepository.findById(groupId).get();
-    }
+//
+//    //페이징
+//    @Transactional
+//    public Page<Group> getGroupList(Pageable pageable) {
+//        return groupRepository.findALL(pageable);
+//    }
+//
+//    //그룹 검색
+//    @Transactional
+//    public Page<Group> groupSearch(String searchKeyword, Pageable pageable) {
+//        return groupRepository.findByGroupTitleContainingOrRoughAddressContaining(searchKeyword, pageable);
+//    }
+//
+//    //특정 그룹 불러오기
+//    @Transactional
+//    public Group groupView(Long groupId){
+//        return groupRepository.findById(groupId).get();
+//    }
+//    @Transactional
+//    public List<MemberGroup> groupView2(Long groupId) {
+//        return memberGroupRepository.findMemberByGroupId(groupId);
+//    }
 
 
     //그룹 참가 신청
@@ -221,14 +225,14 @@ public class GroupService {
 
                 //채팅룸에서도 드랍 =>
                 // 1.챗멤버를 없애줘야함
-                ChatMember chatMember = chatMemberRepository.findByMemberId(memberId)
-                        .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
-                chatMemberRepository.delete(chatMember);
-
-                //2. 채팅룸에서도 챗멤버를 없애 줘야함. 
-                Chatroom chatroom = chatRoomRepository.findById(myMemberGroup.getChatroomId())
-                        .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
-                chatroom.getChatMembers().remove(chatMember);
+//                ChatMember chatMember = chatMemberRepository.findByMemberId(memberId)
+//                        .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
+//                chatMemberRepository.delete(chatMember);
+//
+//                //2. 채팅룸에서도 챗멤버를 없애 줘야함.
+//                Chatroom chatroom = chatRoomRepository.findById(myMemberGroup.getChatroomId())
+//                        .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
+//                chatroom.getChatMembers().remove(chatMember);
             }
         }
     }
@@ -237,7 +241,7 @@ public class GroupService {
 
 
     @Transactional
-    public void setlocation(Long memberId, Long groupId, MemberGroupDto.Request request) { //wait체크 추가
+    public void setlocation(Long memberId, Long groupId, MemberGroupDto.Request request) {
         //해당하는 멤버그룹에 받아온 값을 넣어준다
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));

@@ -1,6 +1,6 @@
 package com.hanghae.finalp.controller;
 
-import com.hanghae.finalp.dto.LoginDto;
+import com.hanghae.finalp.entity.dto.LoginDto;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.repository.MemberRepository;
 import com.hanghae.finalp.service.oauth.KakaoOauth;
@@ -10,10 +10,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.PostConstruct;
 
@@ -34,7 +36,7 @@ public class TestController {
         memberRepository.save(member);
         String accessToken = jwtTokenUtils.createAccessToken(member.getId(), member.getUsername());
         String refreshToken = jwtTokenUtils.createRefreshToken(member.getId());
-        redisUtils.setDataExpire(member.getId().toString(), refreshToken, 14 * JwtTokenUtils.DAY);
+        redisUtils.setRefreshTokenDataExpire(member.getId().toString(), refreshToken, 14 * JwtTokenUtils.DAY);
         return new LoginDto.refreshTokenRes(accessToken, refreshToken);
     }
 
@@ -43,7 +45,6 @@ public class TestController {
      */
     @GetMapping("/form")
     public String form() {
-
         return "form.html";
     }
 

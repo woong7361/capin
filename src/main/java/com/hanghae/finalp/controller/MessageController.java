@@ -31,18 +31,22 @@ public class MessageController {
     private final MessageService messageService;
 
     /**
-     * webSocket  --  /pub/chat 으로 들어온 메시징 처리
+     * webSocket  --  /pub/channel 으로 들어온 메시징 처리
      */
     @MessageMapping("/channel")
     public void redisMessage(MessageDto.Reqeust message) {
         message.setMessageType(MessageType.TALK);
 
-        chatService.saveMessage(message.getChatroomId(), message.getSenderId(),message.getSenderName(), message.getContent(), message.getMessageType());
+        chatService.saveMessage(message.getChatroomId(), message.getSenderId(),message.getSenderName(),
+                message.getContent(), message.getMessageType());
 
         redisTemplate.convertAndSend(channelTopic.getTopic(), message);
     }
 
 
+    /**
+     * chatroomId를 통해 과거 메시지들을 가져오는 API
+     */
     @GetMapping("/api/messages/{chatroomId}")
     public Slice<MessageDto.Send> getPreviousMessage(@PathVariable("chatroomId") Long chatroomId, Pageable pageable) {
         return messageService.getPreviousMessage(chatroomId, pageable);

@@ -45,11 +45,9 @@ public class Member extends TimeStamped {
         return new Member(kakaoId, username, imageUrl);
     }
     //========================================비즈니스 로직==============================================//
-    public void patchUsername(String username) {
+
+    public void patchMember(String username, String imageUrl) {
         this.username = username;
-    }
-    public void patchImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
-
 }
