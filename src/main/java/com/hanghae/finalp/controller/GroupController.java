@@ -70,6 +70,7 @@ public class GroupController {
 
     //--------------------------------------------------------------------------------------
 
+
     //그룹 리스트 페이징, 검색
     @GetMapping("/api/groups/list")
     public Page<Group> GroupList(@PageableDefault(size = 20, sort = "groupId", direction = Sort.Direction.DESC) Pageable pageable,

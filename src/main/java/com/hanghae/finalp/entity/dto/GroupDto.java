@@ -2,7 +2,6 @@ package com.hanghae.finalp.entity.dto;
 
 import com.hanghae.finalp.entity.Group;
 import com.hanghae.finalp.entity.MemberGroup;
-import com.hanghae.finalp.util.S3Utils;
 import lombok.Data;
 
 public class GroupDto {
