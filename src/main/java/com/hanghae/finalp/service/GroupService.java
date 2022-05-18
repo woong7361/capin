@@ -1,24 +1,36 @@
 package com.hanghae.finalp.service;
 
 import com.hanghae.finalp.entity.*;
+import com.hanghae.finalp.entity.dto.CrawlingDto;
 import com.hanghae.finalp.entity.dto.GroupDto;
+import com.hanghae.finalp.entity.dto.KakaoApiDto;
 import com.hanghae.finalp.entity.dto.MemberGroupDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
+import com.hanghae.finalp.entity.mappedsuperclass.RoomType;
 import com.hanghae.finalp.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-
+@Slf4j
 public class GroupService {
     private final MemberGroupRepository memberGroupRepository;
     private final GroupRepository groupRepository;
@@ -26,6 +38,9 @@ public class GroupService {
     private final S3Service s3Service;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMemberRepository chatMemberRepository;
+
+    private final WebClient kakaoWebClient;
+
 
     public Slice<GroupDto.SimpleRes> getMyGroupList(Long memberId, Pageable pageable) {
         Slice<MemberGroup> myGroupByMember = memberGroupRepository.findMyGroupByMemberId(memberId, pageable);
@@ -213,7 +228,32 @@ public class GroupService {
 
             //그사람의 auth 확인 ->그사람의 권한이 join일 경우
             if(Authority.JOIN.equals(yourMemberGroup.getAuthority())){
-//                yourMemberGroup.setAuthority(null);
+                //채팅룸에서 드랍 =>
+                // 1.챗멤버를 없애줘야함
+
+                List<ChatMember> chatMemberList = chatMemberRepository.findByMemberIdAndChatroomId(memberId, yourMemberGroup.getChatroomId());//ㅇㅣ건 사용불가
+                //챗룸에서 룸타입이랑 챗룸아이디로 챗룸 찾음
+                //
+                log.info("chatroomId:" + yourMemberGroup.getChatroomId()); //ok
+
+                Chatroom chatroom = chatRoomRepository.findById(yourMemberGroup.getChatroomId())
+                        .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
+                //챗룸의 룸타입이 그룹인 경우의 챗룸만 없애줘야함
+                if(RoomType.GROUP.equals(chatroom.getRoomType())){
+                    log.info("roomType:" + chatroom.getRoomType()); //ok
+//                    chatMemberRepository.deleteAll(chatMembers); //이거 안되서 밑에꺼 시도
+                    log.info("====================================================");
+                    //2. 채팅룸에서도 챗멤버를 없애 줘야함. - 이게 먼저임
+                    chatroom.getChatMembers().removeAll(chatMemberList);//리무브할때 객체여야하는데...이것도 안됨
+
+                    for (ChatMember chatMember : chatMemberList) {
+                        Long chatMemberId = chatMember.getId();
+                        log.info("===================================================="); //ok
+
+                        chatMemberRepository.deleteById(chatMemberId); //이거 안됨
+                        log.info("chatMemberId:" + chatMember.getId()); //ok
+                    }
+                }
 
                 //멤버그룹 삭제
                 yourMemberGroup.getGroup().minusMemberCount();
@@ -221,18 +261,7 @@ public class GroupService {
 
                 Group group= groupRepository.findById(groupId).orElseThrow(
                         () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
-                group.getMemberGroups().remove(yourMemberGroup);
-
-                //채팅룸에서도 드랍 =>
-                // 1.챗멤버를 없애줘야함
-//                ChatMember chatMember = chatMemberRepository.findByMemberId(memberId)
-//                        .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
-//                chatMemberRepository.delete(chatMember);
-//
-//                //2. 채팅룸에서도 챗멤버를 없애 줘야함.
-//                Chatroom chatroom = chatRoomRepository.findById(myMemberGroup.getChatroomId())
-//                        .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
-//                chatroom.getChatMembers().remove(chatMember);
+                group.getMemberGroups().remove(yourMemberGroup);//리무브할때 객체여야하는데...
             }
         }
     }
@@ -278,5 +307,95 @@ public class GroupService {
         response.setStartLocationY(averageY);
 
         return response;
+    }
+
+    public List<CrawlingDto.Response> getRecoCafe(MemberGroupDto.Response mdRes) throws IOException, InterruptedException {
+        KakaoApiDto kakaoApiDto = kakaoWebClient.get()
+                .uri(builder -> builder.path("/v2/local/search/keyword.json") //키워드로 검색하기
+                        .queryParam("query", "스터디카페")
+                        .queryParam("category_group_code", "CE7") //카테고리 그룹 코드
+                        .queryParam("x", mdRes.getStartLocationX())
+                        .queryParam("y", mdRes.getStartLocationY())
+                        .queryParam("radius", "100") //반경
+                        .queryParam("size", "3") //추천 카페 수
+                        .build()
+                )
+                .retrieve()
+                .bodyToMono(KakaoApiDto.class)
+                .block();
+
+
+        String title;
+        String img;
+        String star;
+
+        WebDriver driver;
+        WebElement element;
+
+        List<CrawlingDto.Response> crawlingDtoList = new ArrayList<>();
+
+        for (KakaoApiDto.Document document : kakaoApiDto.getDocuments()) {
+            log.info(document.getPlace_url());
+            String place_url = document.getPlace_url();
+
+            // 드라이버 설치 경로
+            String WEB_DRIVER_ID = "webdriver.chrome.driver";
+            String WEB_DRIVER_PATH = "C:/Users/mj/Desktop/study/chromedriver.exe"; //폴더위치
+            System.setProperty(WEB_DRIVER_ID, WEB_DRIVER_PATH);
+
+            // WebDriver 옵션 설정
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--start-maximized");
+            options.addArguments("--disable-popup-blocking");       //팝업안띄움
+            options.addArguments("headless");                       //브라우저 안띄움
+            options.addArguments("--disable-gpu");            //gpu 비활성화
+            options.addArguments("--blink-settings=imagesEnabled=false"); //이미지 다운 안받음
+
+            driver = new ChromeDriver(options);
+
+            driver.get(place_url);
+            Thread.sleep(7000); // 3. 페이지 로딩 대기 시간
+
+            CrawlingDto.Response response = new CrawlingDto.Response();
+
+            //카페이름
+            if(!driver.findElements(By.xpath("//*[@id=\"mArticle\"]/div[1]/div[1]/div[2]/div/h2")).isEmpty()) {
+                element = driver.findElement(By.xpath("//*[@id=\"mArticle\"]/div[1]/div[1]/div[2]/div/h2"));
+                title = element.getText();
+                log.info("-----------------------------" + title);
+                response.setTitle(title);
+            }else {
+                title = null;
+                log.info("------------title없음-----------------");
+            }
+
+            //평점
+            if(!driver.findElements(By.xpath("//*[@id=\"mArticle\"]/div[5]/div[2]/div/em")).isEmpty()){
+                element = driver.findElement(By.xpath("//*[@id=\"mArticle\"]/div[5]/div[2]/div/em"));
+                star = element.getText();
+                log.info("-----------------------------" + star);
+                response.setStar(star);
+            }else{
+                star = null;
+                log.info("-------------star없음----------------");
+            }
+
+
+            //이미지
+            if(!driver.findElements(By.className("bg_present")).isEmpty()) {
+                element = driver.findElement(By.className("bg_present"));
+                String bgImage = element.getCssValue("background-image");
+                img = bgImage.substring(5, bgImage.length() - 2);
+                log.info("-----------------------------" + img);
+                response.setImgUrl(img);
+            }else{
+                img = null;
+                log.info("------------img없음-----------------");
+            }
+
+            crawlingDtoList.add(response);
+        }
+        log.info(crawlingDtoList.toString());
+        return crawlingDtoList;
     }
 }
