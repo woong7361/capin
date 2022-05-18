@@ -1,7 +1,6 @@
 package com.hanghae.finalp.repository;
 
 import com.hanghae.finalp.entity.Group;
-import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -16,7 +15,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     //제목과 지역으로 검색
     Page<Group> findByGroupTitleContaining(String searchKeyword, Pageable pageable);
 
-    @Query("select distinct g from Group g join fetch g.memberGroups where g.memberGroups = :groupId")
-    Slice<Group> findMemberByGroupId(@Param("groupId") Long groupId);
+    @Query("select distinct g from Group g join fetch g.memberGroups where g.id = :groupId")
+    Slice<Group> findMemberByGroupId(@io.lettuce.core.dynamic.annotation.Param("groupId") Long groupId);
 
 }
