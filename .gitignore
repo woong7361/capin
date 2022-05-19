@@ -38,5 +38,6 @@ out/
 
 
 ### custom ignore ###
-*.yml
+#*.yml
+src/main/resources/application.yml
 
