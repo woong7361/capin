@@ -10,11 +10,8 @@ import com.hanghae.finalp.entity.mappedsuperclass.RoomType;
 import com.hanghae.finalp.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -334,7 +331,7 @@ public class GroupService {
 
         List<CrawlingDto.Response> crawlingDtoList = new ArrayList<>();
 
-        for (KakaoApiDto.Document document : kakaoApiDto.getDocuments()) {
+       /* for (KakaoApiDto.Document document : kakaoApiDto.getDocuments()) {
             log.info(document.getPlace_url());
             String place_url = document.getPlace_url();
 
@@ -394,7 +391,7 @@ public class GroupService {
             }
 
             crawlingDtoList.add(response);
-        }
+          }*/
         log.info(crawlingDtoList.toString());
         return crawlingDtoList;
     }
