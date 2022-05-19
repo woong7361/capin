@@ -15,8 +15,8 @@ public interface ChatMemberRepository extends JpaRepository<ChatMember, Long> {
 
 //    Optional<ChatMember> deleteByMemberId(Long memberId);
     List<ChatMember> findByMemberId(Long memberId);
-
-
+    List<ChatMember> findByMemberIdAndChatroomId(Long memberId, Long chatroomid);
+// Optional로 바꾸기
 
     @Query("select cm from ChatMember cm join fetch cm.chatroom where cm.member.id = :memberId")
     Slice<ChatMember> findChatroomByMemberId(@Param("memberId") Long memberId, Pageable pageable);
