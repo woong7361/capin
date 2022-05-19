@@ -1,6 +1,7 @@
 package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
+import com.hanghae.finalp.entity.dto.CrawlingDto;
 import com.hanghae.finalp.entity.Group;
 import com.hanghae.finalp.entity.dto.GroupDto;
 import com.hanghae.finalp.entity.dto.MemberGroupDto;
@@ -15,6 +16,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -164,8 +168,9 @@ public class GroupController {
 
     //스터디 카페 추천
     @GetMapping("/api/groups/{groupId}/cafe-recommendation")
-    public MemberGroupDto.Response locationRecommend(@PathVariable("groupId") Long groupId){
-        return groupService.recommendLocation(groupId);
+    public List<CrawlingDto.Response> locationRecommend(@PathVariable("groupId") Long groupId) throws IOException, InterruptedException {
+        MemberGroupDto.Response response = groupService.recommendLocation(groupId);
+        return groupService.getRecoCafe(response);
     }
 
 

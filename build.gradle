@@ -39,8 +39,9 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 //    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-
-
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: '2.6.7'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 
     //jwt token
