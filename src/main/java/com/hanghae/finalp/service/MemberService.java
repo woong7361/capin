@@ -21,7 +21,8 @@ public class MemberService {
 
     //내 프로필 조회
     public MemberDto.ProfileRes getMyProfile(Long memberId) {
-        Member member = findMemberFromDB(memberId);
+       Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 memberId가 존재하지 않습니다."));
         //member 엔티티를 dto로 바꿔줌
         return new MemberDto.ProfileRes(member.getUsername(), member.getImageUrl());
     }
@@ -29,10 +30,13 @@ public class MemberService {
     //프로필 수정
     @Transactional
     public MemberDto.ProfileRes editMyProfile(String username, MultipartFile file, Long memberId) {
-        Member member = findMemberFromDB(memberId);
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 memberId가 존재하지 않습니다."));
+
         String currentFilePath = member.getImageUrl();
-        String newFilePath = s3Service.uploadFile(file);
-        member.patchMember(username, newFilePath);
+        String fullFilePath = s3Service.uploadFile(file); //이미지 조회시 imageFullUrl가 필요하다
+
+        member.patchMember(username, fullFilePath);
         s3Service.deleteFile(currentFilePath);
 
         return new MemberDto.ProfileRes(member.getUsername(), member.getImageUrl());
@@ -41,20 +45,9 @@ public class MemberService {
     //회원탈퇴
     @Transactional
     public void deleteMember(Long memberId) {
-        Member member = findMemberFromDB(memberId);
-
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 memberId가 존재하지 않습니다."));
         s3Service.deleteFile(member.getImageUrl()); //카카오 이미지가 아닐경우에만 이거 해주게됨
         memberRepository.delete(member);
     }
-
-
-    //===================================================================================================//
-
-
-    private Member findMemberFromDB(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(
-                () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 memberId가 존재하지 않습니다.")
-        );
-    }
-
 }

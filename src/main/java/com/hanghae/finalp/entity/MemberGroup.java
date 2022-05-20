@@ -20,11 +20,9 @@ public class MemberGroup extends TimeStamped {
 
     @Enumerated(EnumType.STRING)
     private Authority authority;
-
     private String startLocationX;
     private String startLocationY;
     private String startAddress;
-
     private Long chatroomId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,11 +42,23 @@ public class MemberGroup extends TimeStamped {
         this.chatroomId = chatroomId;
     }
 
+    private MemberGroup(Authority authority, Long memberId, Long groupId, Long chatroomId) {
+        this.authority = authority;
+        this.member = new Member();
+        this.member.setId(memberId);
+        this.group = new Group();
+        this.group.setId(groupId);
+        this.chatroomId = chatroomId;
+    }
 
     //========================================생성 편의자=============================================//
 
     public static MemberGroup createMemberGroup(Authority authority, Member member, Group group, Long chatroomId) {
         return new MemberGroup(authority, member, group, chatroomId);
+    }
+
+    public static MemberGroup createMemberGroup(Authority authority, Long memberId, Long groupId, Long chatroomId) {
+        return new MemberGroup(authority, memberId, groupId, chatroomId);
     }
 
     public void setAuthority(Authority authority) {
@@ -62,6 +72,5 @@ public class MemberGroup extends TimeStamped {
         this.startLocationY = startLocationY;
         this.startAddress = startAddress;
     }
-
 
 }

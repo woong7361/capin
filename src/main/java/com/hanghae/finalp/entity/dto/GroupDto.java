@@ -2,7 +2,14 @@ package com.hanghae.finalp.entity.dto;
 
 import com.hanghae.finalp.entity.Group;
 import com.hanghae.finalp.entity.MemberGroup;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 public class GroupDto {
 
@@ -35,10 +42,19 @@ public class GroupDto {
 
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CreateReq {
+        @NotBlank(message = "그룹의 이름을 입력해 주세요.")
         String groupTitle;
+
         String description;
+
+        @ColumnDefault("30")
+        @Max(value = 100, message = "그룹의 최대 인원수는 100명 입니다.")
+        @Min(value = 2, message = "그룹의 최소 인원수는 2명 입니다.")
         int maxMemberCount;
+
         String roughAddress;
     }
 }

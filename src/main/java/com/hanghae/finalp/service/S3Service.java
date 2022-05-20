@@ -28,8 +28,6 @@ public class S3Service {
     private final AmazonS3 amazonS3;
     @Value("${cloud.aws.cloudFront.distributionDomain}")
     private String CLOUD_FRONT_DOMAIN_NAME;
-//    public static final String CLOUD_FRONT_DOMAIN_NAME = "d1ai09q40aghzs.cloudfront.net";
-
 
 
     public String uploadFile(MultipartFile file) {
@@ -44,9 +42,10 @@ public class S3Service {
         } catch (IOException e) {
             throw new S3Exception(S3_ERROR_CODE, "S3 upload Exception");
         }
-
-        return getFullPath(fileName);
+        String fullFilePath = "https://" + CLOUD_FRONT_DOMAIN_NAME + "/" + fileName;
+        return fullFilePath;
     }
+
 
 
     public void deleteFile(String currentFilePath) {
@@ -60,15 +59,4 @@ public class S3Service {
             amazonS3.deleteObject(bucket, filePath);
         }
     }
-
-
-
-    //이미지 조회시 imageFullUrl가 필요하다
-    private String getFullPath(String fileName) {
-        return "https://" + CLOUD_FRONT_DOMAIN_NAME + "/" + fileName;
-    }
-
 }
-
-
-

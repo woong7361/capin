@@ -72,6 +72,9 @@ public class Group extends TimeStamped {
         this.cafe = cafe;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public void patch(GroupDto.CreateReq createReq, String imageUrl) {
         this.groupTitle = createReq.getGroupTitle();
@@ -81,7 +84,7 @@ public class Group extends TimeStamped {
         this.imageUrl = imageUrl;
     }
 
-    public void addMemberCount(){
+    public void plusMemberCount(){
         this.memberCount += 1;
     }
     public void minusMemberCount(){
