@@ -1,7 +1,7 @@
 package com.hanghae.finalp.config.exception.advice;
 
 import com.hanghae.finalp.config.exception.customexception.AuthorityException;
-import com.hanghae.finalp.config.exception.customexception.CountNumberException;
+import com.hanghae.finalp.config.exception.customexception.MaxNumberException;
 import com.hanghae.finalp.config.exception.dto.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,10 +55,10 @@ public class OtherControllerAdvice {
     }
 
 
-    @ExceptionHandler(CountNumberException.class)
+    @ExceptionHandler(MaxNumberException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse countNumberException(CountNumberException e) {
-        log.info("개수 관련 에러입니다 {}", e.getMessage());
+    public ErrorResponse maxNumberException(MaxNumberException e) {
+        log.info("최대 인원수 에러입니다 {}", e.getMessage());
         return new ErrorResponse(ms.getMessage(e.getCode(), null, null));
     }
 
