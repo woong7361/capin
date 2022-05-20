@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 public class CafeController {
@@ -22,7 +24,7 @@ public class CafeController {
     @PostMapping("/api/groups/{groupId}/cafe")
     public ResultMsg cafeSelect(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                 @PathVariable("groupId") Long groupId,
-                                CafeDto.Reqeust cafeReq) {
+                                @Valid CafeDto.Reqeust cafeReq) { //무슨값 받을지 확실x 수정가능성 있음
         cafeService.selectCafe(principalDetails.getMemberId(), cafeReq, groupId);
         return new ResultMsg("success");
     }

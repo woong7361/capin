@@ -1,12 +1,14 @@
 package com.hanghae.finalp.service;
 
+import com.hanghae.finalp.config.exception.customexception.AuthorityException;
+import com.hanghae.finalp.config.exception.customexception.CountNumberException;
+import com.hanghae.finalp.config.exception.customexception.EntityNotExistException;
 import com.hanghae.finalp.entity.*;
 import com.hanghae.finalp.entity.dto.CrawlingDto;
 import com.hanghae.finalp.entity.dto.GroupDto;
 import com.hanghae.finalp.entity.dto.KakaoApiDto;
 import com.hanghae.finalp.entity.dto.MemberGroupDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
-import com.hanghae.finalp.entity.mappedsuperclass.RoomType;
 import com.hanghae.finalp.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,15 +17,18 @@ import org.openqa.selenium.WebElement;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static com.hanghae.finalp.config.exception.code.ErrorMessageCode.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,7 +41,6 @@ public class GroupService {
     private final S3Service s3Service;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMemberRepository chatMemberRepository;
-
     private final WebClient kakaoWebClient;
 
 
@@ -47,7 +51,8 @@ public class GroupService {
 
     @Transactional
     public GroupDto.SimpleRes createGroup(Long memberId, GroupDto.CreateReq createReq, MultipartFile multipartFile) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("not exist member"));
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 memberId가 존재하지 않습니다."));
         String imageUrl = s3Service.uploadFile(multipartFile);
 
         Chatroom groupChatroom = Chatroom.createChatroomByGroup(createReq.getGroupTitle(), member);
@@ -60,10 +65,10 @@ public class GroupService {
 
     @Transactional
     public void deleteGroup(Long memberId, Long groupId) {
-        MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
-                .orElseThrow(() -> new RuntimeException("not exist member"));
+        MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
+                () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 멤버그룹이 존재하지 않습니다."));
         if(!memberGroup.getAuthority().equals(Authority.OWNER)){
-            throw new RuntimeException("not owner");
+            throw new AuthorityException(AUTHORITY_ERROR_CODE, "카페를 지울 수 없는 권한 입니다.");
         }
 
         s3Service.deleteFile(memberGroup.getGroup().getImageUrl());
@@ -72,10 +77,10 @@ public class GroupService {
 
     @Transactional
     public void patchGroup(Long memberId, Long groupId, GroupDto.CreateReq createReq, MultipartFile multipartFile) {
-        MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
-                .orElseThrow(() -> new RuntimeException("not owner or not exist"));
+        MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
+                () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 멤버그룹이 존재하지 않습니다."));
         if(!memberGroup.getAuthority().equals(Authority.OWNER)){
-            throw new RuntimeException("not owner");
+            throw new AuthorityException(AUTHORITY_ERROR_CODE, "카페를 지울 수 없는 권한 입니다.");
         }
         //fetch join 필요
         Group group = memberGroup.getGroup();
@@ -120,21 +125,18 @@ public class GroupService {
             Authority authority = memberGroup.get().getAuthority(); //get()할 경우 값이 null 이면 exception 반환함.이 경우 괜춘
 
             if (authority.equals(Authority.OWNER)) {
-                throw new RuntimeException("부적절한 접근입니다.");
+                throw new AuthorityException(AUTHORITY_ERROR_CODE, "부적절한 접근입니다.");
             } else if (authority.equals(Authority.JOIN)) {
-                throw new RuntimeException("이미 가입중입니다.");
+                throw new AuthorityException(AUTHORITY_ERROR_CODE, "카페에 이미 가입중입니다.");
             } else if (authority.equals(Authority.WAIT)){
-                throw new RuntimeException("가입 승인을 대기 중입니다.");
+                throw new AuthorityException(AUTHORITY_ERROR_CODE, "가입 승인을 대기 중입니다.");
             }
         }
         //그룹에 속하지 않은 경우
-        Member member= memberRepository.findById(memberId).orElseThrow(
-                () -> new IllegalArgumentException("해당 memberId가 존재하지 않습니다."));
-        Group group= groupRepository.findById(groupId).orElseThrow(
-                () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
         //WAIT으로 memberGroup을 생성 -chatroodId는 승인시 따로 넣어줄 예정
-        MemberGroup newMemberGroup = MemberGroup.createMemberGroup(Authority.WAIT, member, group, null);
-
+        MemberGroup newMemberGroup = MemberGroup.createMemberGroup(Authority.WAIT, memberId, groupId, null);
+        Group group= groupRepository.findById(groupId).orElseThrow(
+                () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 그룹이 존재하지 않습니다."));
         group.getMemberGroups().add(newMemberGroup);
     }
 
@@ -146,35 +148,38 @@ public class GroupService {
 
         //내가 속했으며, 승인을 요청한 멤버그룹을 찾는다
         MemberGroup myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 멤버그룹이 존재하지 않습니다."));
 
-        //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너이면
-        if(Authority.OWNER.equals(myMemberGroup.getAuthority())){
-            //그사람도 같은 멤버그룹에서 대기중인지 확인
-            MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
+        //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너가 아니라면
+        if(!Authority.OWNER.equals(myMemberGroup.getAuthority())){
+            throw new AuthorityException(AUTHORITY_ERROR_CODE, "승인을 할 수 없는 권한 입니다.");
+        }
 
-            if(Authority.WAIT.equals(yourMemberGroup.getAuthority())){
-                //만약 현재인원이 최대인원보다 작다면
-                if(yourMemberGroup.getGroup().getMemberCount() < yourMemberGroup.getGroup().getMaxMemberCount()) {
-                    yourMemberGroup.setAuthority(Authority.JOIN); //wait일 경우 join으로 바꿔줌
-                    yourMemberGroup.getGroup().addMemberCount();
+        //그사람도 같은 멤버그룹에서 대기중인지 확인 & 권한 확인
+        MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
+                .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 멤버그룹이 존재하지 않습니다."));
 
-                    //승인 전에 안넣어줬던 챗룸아이디를 멤버그룹에 넣어준 후
-                    yourMemberGroup.setChatroomId(myMemberGroup.getChatroomId());
+        if(Authority.WAIT.equals(yourMemberGroup.getAuthority())){
+            //만약 현재인원이 최대인원보다 작다면
+            if(yourMemberGroup.getGroup().getMemberCount() < yourMemberGroup.getGroup().getMaxMemberCount()) {
+                yourMemberGroup.setAuthority(Authority.JOIN); //wait일 경우 join으로 바꿔줌
+                yourMemberGroup.getGroup().plusMemberCount();
 
-                    //조인이 되는 순간 채팅방도 가입시켜줘야 된다 => 챗멤버 생성필요
-                    Chatroom chatroom = chatRoomRepository.findById(myMemberGroup.getChatroomId())
-                            .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
+                //승인 전에 안넣어줬던 챗룸아이디를 멤버그룹에 넣어준 후
+                yourMemberGroup.setChatroomId(myMemberGroup.getChatroomId());
 
-                    ChatMember chatMember = ChatMember.createChatMember(yourMemberGroup.getMember(), chatroom);
-                    chatroom.getChatMembers().add(chatMember);
+                //조인이 되는 순간 채팅방도 가입시켜줘야 된다 => 챗멤버 생성필요
+                Chatroom chatroom = chatRoomRepository.findById(myMemberGroup.getChatroomId()).orElseThrow(
+                        () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 채팅방이 존재하지 않습니다."));
 
-                }else{
-                    throw new RuntimeException("최대인원 초과");
-                }
+                ChatMember chatMember = ChatMember.createChatMember(yourMemberGroup.getMember(), chatroom);
+                chatroom.getChatMembers().add(chatMember);
+
+            }else{
+                throw new CountNumberException(NUMBER_COUNT_ERROR_CODE, "그룹의 최대인원을 초과하였습니다.");
             }
         }
+
     }
 
     //그룹 참가자 거절
@@ -182,22 +187,23 @@ public class GroupService {
     public void denyGroup(Long myMemberId, Long groupId, Long memberId) {
 
         //내가 속했으며, 승인을 요청한 멤버그룹을 찾는다
-        MemberGroup myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
+        MemberGroup myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId).orElseThrow(
+                () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 멤버그룹이 존재하지 않습니다."));
 
-        //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너이면
-        if(Authority.OWNER.equals(myMemberGroup.getAuthority())){
+        //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너가 아니라면
+        if(!Authority.OWNER.equals(myMemberGroup.getAuthority())){
+            throw new AuthorityException(AUTHORITY_ERROR_CODE, "거절을 할 수 없는 권한 입니다.");
+        }
 
-            MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
-                    () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
+        MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
+                () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 멤버그룹이 존재하지 않습니다."));
 
-            //그사람의 auth 확인 ->그사람의 권한이 wait일 경우
-            if(Authority.WAIT.equals(yourMemberGroup.getAuthority())){
-                memberGroupRepository.delete(yourMemberGroup);
-                Group group= groupRepository.findById(groupId).orElseThrow(
-                        () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
-                group.getMemberGroups().remove(yourMemberGroup);
-            }
+        //그사람의 auth 확인 ->그사람의 권한이 wait일 경우
+        if(Authority.WAIT.equals(yourMemberGroup.getAuthority())){
+            memberGroupRepository.delete(yourMemberGroup);
+            Group group= groupRepository.findById(groupId).orElseThrow(
+                    () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 그룹이 존재하지 않습니다."));
+            group.getMemberGroups().remove(yourMemberGroup);
         }
     }
 
@@ -209,52 +215,36 @@ public class GroupService {
 
         //내가 속했으며, 추방할 멤버그룹을 찾는다
         MemberGroup myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 멤버그룹이 존재하지 않습니다."));
 
-        //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너이면
-        if(Authority.OWNER.equals(myMemberGroup.getAuthority())){
+        //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너가 아니라면
+        if(!Authority.OWNER.equals(myMemberGroup.getAuthority())){
+            throw new AuthorityException(AUTHORITY_ERROR_CODE, "거절을 할 수 없는 권한 입니다.");
+        }
 
-            //그사람도 같은 멤버그룹에 속했는지 확인
-            MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
-                    () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
+        //그사람도 같은 멤버그룹에 속했는지 확인
+        MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
+                .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 멤버그룹이 존재하지 않습니다."));
 
-            //그사람의 auth 확인 ->그사람의 권한이 join일 경우
-            if(Authority.JOIN.equals(yourMemberGroup.getAuthority())){
-                //채팅룸에서 드랍 =>
-                // 1.챗멤버를 없애줘야함
+        //그사람의 auth 확인 ->그사람의 권한이 join일 경우
+        if(Authority.JOIN.equals(yourMemberGroup.getAuthority())){
 
-                List<ChatMember> chatMemberList = chatMemberRepository.findByMemberIdAndChatroomId(memberId, yourMemberGroup.getChatroomId());//ㅇㅣ건 사용불가
-                //챗룸에서 룸타입이랑 챗룸아이디로 챗룸 찾음
-                //
-                log.info("chatroomId:" + yourMemberGroup.getChatroomId()); //ok
+            //1.채팅룸에서 드랍 => 1-1.챗멤버를 없애줘야함
+            ChatMember chatMember = chatMemberRepository.findByMemberIdAndChatroomId(memberId, yourMemberGroup.getChatroomId())
+                    .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 챗멤버가 존재하지 않습니다."));
+            chatMemberRepository.delete(chatMember);
+            //1-2. 채팅룸에서도 챗멤버를 없애 줘야함.
+            Chatroom chatroom = chatRoomRepository.findById(yourMemberGroup.getChatroomId())
+                    .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 채팅방이 존재하지 않습니다."));
+            chatroom.getChatMembers().remove(chatMember);
 
-                Chatroom chatroom = chatRoomRepository.findById(yourMemberGroup.getChatroomId())
-                        .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
-                //챗룸의 룸타입이 그룹인 경우의 챗룸만 없애줘야함
-                if(RoomType.GROUP.equals(chatroom.getRoomType())){
-                    log.info("roomType:" + chatroom.getRoomType()); //ok
-//                    chatMemberRepository.deleteAll(chatMembers); //이거 안되서 밑에꺼 시도
-                    log.info("====================================================");
-                    //2. 채팅룸에서도 챗멤버를 없애 줘야함. - 이게 먼저임
-                    chatroom.getChatMembers().removeAll(chatMemberList);//리무브할때 객체여야하는데...이것도 안됨
+            //2.멤버그룹 삭제
+            memberGroupRepository.delete(yourMemberGroup);
 
-                    for (ChatMember chatMember : chatMemberList) {
-                        Long chatMemberId = chatMember.getId();
-                        log.info("===================================================="); //ok
-
-                        chatMemberRepository.deleteById(chatMemberId); //이거 안됨
-                        log.info("chatMemberId:" + chatMember.getId()); //ok
-                    }
-                }
-
-                //멤버그룹 삭제
-                yourMemberGroup.getGroup().minusMemberCount();
-                memberGroupRepository.delete(yourMemberGroup);
-
-                Group group= groupRepository.findById(groupId).orElseThrow(
-                        () -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
-                group.getMemberGroups().remove(yourMemberGroup);//리무브할때 객체여야하는데...
-            }
+            Group group= groupRepository.findById(groupId).orElseThrow(
+                    () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 그룹이 존재하지 않습니다."));
+            group.getMemberGroups().remove(yourMemberGroup);
+            yourMemberGroup.getGroup().minusMemberCount();
         }
     }
 
@@ -265,12 +255,10 @@ public class GroupService {
     public void setlocation(Long memberId, Long groupId, MemberGroupDto.Request request) {
         //해당하는 멤버그룹에 받아온 값을 넣어준다
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
-
+                .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 멤버그룹이 존재하지 않습니다."));
         if(Authority.WAIT.equals(memberGroup.getAuthority())){
-            throw new RuntimeException("가입 승인이 완료되지 않았습니다.");
+            throw new AuthorityException(AUTHORITY_ERROR_CODE, "가입 승인이 완료되지 않았습니다.");
         }
-
         memberGroup.setLocation(request.getStartLocationX(), request.getStartLocationY(), request.getStartAddress());
     }
 
@@ -301,9 +289,9 @@ public class GroupService {
         return response;
     }
 
-    public List<CrawlingDto.Response> getRecoCafe(MemberGroupDto.Response mdRes) throws IOException, InterruptedException {
+    public List<CrawlingDto.Response> getRecoCafe(MemberGroupDto.Response mdRes) {
         KakaoApiDto kakaoApiDto = kakaoWebClient.get()
-                .uri(builder -> builder.path("/v2/local/search/keyword.json") //키워드로 검색하기
+                .uri(builder -> builder.path("/v2/local/search/keyword.json") //카카오 로컬- "키워드로 검색하기"
                         .queryParam("query", "스터디카페")
                         .queryParam("category_group_code", "CE7") //카테고리 그룹 코드
                         .queryParam("x", mdRes.getStartLocationX())
@@ -313,6 +301,12 @@ public class GroupService {
                         .build()
                 )
                 .retrieve()
+                .onStatus(
+                        httpStatus -> httpStatus != HttpStatus.OK,
+                        clientResponse -> {
+                            return clientResponse.createException()
+                                    .flatMap(it -> Mono.error(new RuntimeException("WebClient 접근 예외. code : " + clientResponse.statusCode())));
+                        })
                 .bodyToMono(KakaoApiDto.class)
                 .block();
 
@@ -326,7 +320,7 @@ public class GroupService {
 
         List<CrawlingDto.Response> crawlingDtoList = new ArrayList<>();
 
-       /* for (KakaoApiDto.Document document : kakaoApiDto.getDocuments()) {
+        /*for (KakaoApiDto.Document document : kakaoApiDto.getDocuments()) {
             log.info(document.getPlace_url());
             String place_url = document.getPlace_url();
 
