@@ -64,4 +64,24 @@ public class MemberGroupController {
         return new ResultMsg("success");
     }
 
+    //그룹 참가신청 취소
+    @PostMapping("/api/groups/{groupId}/cancel")
+    public ResultMsg cancelApply(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable("groupId") Long groupId
+    ){
+        memberGroupService.cancelApplyGroup(principalDetails.getMemberId(), groupId);
+        return new ResultMsg("success");
+    }
+
+    //그룹 참가신청 취소
+    @PostMapping("/api/groups/{groupId}/exit")
+    public ResultMsg exitGroup(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable("groupId") Long groupId
+    ){
+        memberGroupService.exitGroup(principalDetails.getMemberId(), groupId);
+        return new ResultMsg("success");
+    }
+
 }

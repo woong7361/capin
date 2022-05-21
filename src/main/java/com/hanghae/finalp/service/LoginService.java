@@ -25,9 +25,8 @@ public class LoginService {
     private final MemberRepository memberRepository;
 
     public LoginDto.refreshTokenRes createAccessTokenByRefreshToken(String refreshToken) {
-        refreshToken = refreshToken.replace(TOKEN_NAME_WITH_SPACE, "");
-        DecodedJWT decodedJWT = jwtTokenUtils.verifyToken(refreshToken);
-        Long memberId = decodedJWT.getClaim(CLAIM_ID).asLong();
+        Long memberId = jwtTokenUtils.verifyToken(refreshToken.replace(TOKEN_NAME_WITH_SPACE, ""))
+                .getClaim(CLAIM_ID).asLong();
         String inRedisToken = redisUtils.getRefreshTokenData(memberId.toString());
         if(!refreshToken.equals(inRedisToken)) throw new RefreshTokenException(REFRESH_TOKEN_ERROR_CODE, "refresh토큰이 redis와 불일치");
 

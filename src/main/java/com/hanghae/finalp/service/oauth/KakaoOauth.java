@@ -70,7 +70,7 @@ public class KakaoOauth {
         //hardcoding need refactoring
         redisUtils.setRefreshTokenDataExpire(
                 String.valueOf(response.getMember().getMemberId()),
-                refreshToken.replace(TOKEN_NAME_WITH_SPACE, ""), 14 * DAY
+                refreshToken, 14 * DAY
         );
 
         response.setAccessToken(accessToken);
