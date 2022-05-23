@@ -7,6 +7,7 @@ public enum ErrorCode {
 
     // Common
     MAX_MEMBER_EXCEPTION(400, "error.count", "max Member Exception, can not add member"),
+    DUPLICATE_REQUSET(400, "error.duplicate" , "duplicate request error"),
 //    INVALID_INPUT_VALUE(400, "C001", " Invalid Input Value"),
 //    METHOD_NOT_ALLOWED(405, "C002", " Invalid Input Value"),
 //    HANDLE_ACCESS_DENIED(403, "C006", "Access is Denied"),
@@ -29,7 +30,7 @@ public enum ErrorCode {
     AUTHORITY_EXCEPTION(403, "error.Authority", "authority error"),
     AUTHORITY_OWNER_EXCEPTION(403, "error.authority.owner", "authority error: required owner Authority"),
     AUTHORITY_WAIT_EXCEPTION(403, "error.authority.wait", "authority error: required wait Authority"),
-    AUTHORITY_JOIN_EXCEPTION(403, "error.authority.join", "authority error: required join Authority"), ;
+    AUTHORITY_JOIN_EXCEPTION(403, "error.authority.join", "authority error: required join Authority"),;
 
     private final String code;
     private final String message;
