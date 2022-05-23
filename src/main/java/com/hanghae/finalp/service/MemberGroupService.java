@@ -29,11 +29,8 @@ import static com.hanghae.finalp.config.exception.code.ErrorMessageCode.ENTITY_N
 public class MemberGroupService {
 
     private final ChatMemberRepository chatMemberRepository;
-
     private final MemberGroupRepository memberGroupRepository;
-
     private final GroupRepository groupRepository;
-
     private final ChatRoomRepository chatRoomRepository;
 
     //그룹 참가 신청
@@ -168,6 +165,38 @@ public class MemberGroupService {
             group.getMemberGroups().remove(yourMemberGroup);
             yourMemberGroup.getGroup().minusMemberCount();
         }
-
     }
+
+
+    @Transactional
+    public void cancelApplyGroup(Long memberId, Long groupId) {
+        MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
+                .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 멤버그룹이 존재하지 않습니다."));
+
+        if (!memberGroup.getAuthority().equals(Authority.WAIT)) {
+            throw new AuthorityException(AUTHORITY_ERROR_CODE, "그룹 참가신청중(Authority.WAIT)이 아닙니다.");
+        }
+
+        memberGroupRepository.delete(memberGroup);
+    }
+
+    @Transactional
+    public void exitGroup(Long memberId, Long groupId) {
+        MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
+                .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 멤버그룹이 존재하지 않습니다."));
+
+        if (!memberGroup.getAuthority().equals(Authority.JOIN)) {
+            throw new AuthorityException(AUTHORITY_ERROR_CODE, "그룹 참여인원(Authority.JOIN)이 아니므로 그룹 나가기가 불가능 합니다.");
+
+        }
+        ChatMember chatMember = chatMemberRepository.findByMemberIdAndChatroomId(memberId, memberGroup.getChatroomId())
+                .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 챗멤버가 존재하지 않습니다."));
+        chatMemberRepository.delete(chatMember);
+        memberGroup.getGroup().minusMemberCount();
+
+        memberGroupRepository.delete(memberGroup);
+    }
+
+
+
 }
