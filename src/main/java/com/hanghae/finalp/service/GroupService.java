@@ -36,7 +36,6 @@ public class GroupService {
 
 
 
-    //수정 필요! -> Authority
     public Slice<GroupDto.SimpleRes> getMyGroupList(Long memberId, Pageable pageable) {
         Slice<MemberGroup> myGroupByMember = memberGroupRepository.findMyGroupByMemberId(memberId, pageable);
         return myGroupByMember
@@ -46,9 +45,10 @@ public class GroupService {
     @Transactional
     public GroupDto.SimpleRes createGroup(Long memberId, GroupDto.CreateReq createReq, MultipartFile multipartFile) {
         Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new MemberNotExistException());
+                MemberNotExistException::new);
         String imageUrl = s3Service.uploadFile(multipartFile);
 
+        log.debug("custom log:: create group chatroom...");
         Chatroom groupChatroom = Chatroom.createChatroomByGroup(createReq.getGroupTitle(), member);
         chatRoomRepository.save(groupChatroom);
         Group group = Group.createGroup(createReq, imageUrl, member, groupChatroom.getId());
@@ -60,8 +60,9 @@ public class GroupService {
     @Transactional
     public void deleteGroup(Long memberId, Long groupId) {
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
-                () -> new MemberGroupNotExistException());
+                MemberGroupNotExistException::new);
         if(!memberGroup.getAuthority().equals(Authority.OWNER)){
+            log.debug("custom log:: delete group is required owner authority");
             throw new AuthorOwnerException();
         }
 
@@ -72,8 +73,9 @@ public class GroupService {
     @Transactional
     public void patchGroup(Long memberId, Long groupId, GroupDto.CreateReq createReq, MultipartFile multipartFile) {
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
-                () -> new MemberGroupNotExistException());
+                MemberGroupNotExistException::new);
         if(!memberGroup.getAuthority().equals(Authority.OWNER)){
+            log.debug("custom log:: patch group is required owner authority");
             throw new AuthorOwnerException();
         }
         //fetch join 필요

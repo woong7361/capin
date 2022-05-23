@@ -31,7 +31,7 @@ public class S3Service {
 
     public String uploadFile(MultipartFile file) {
         if(file == null) return null;
-
+        log.debug("custom log:: upload file to S3...");
         SimpleDateFormat date = new SimpleDateFormat("yyyymmddHHmmss");
         String fileName = file.getOriginalFilename() + "-" + date.format(new Date());
 
@@ -41,8 +41,7 @@ public class S3Service {
         } catch (IOException e) {
             throw new S3Exception();
         }
-        String fullFilePath = "https://" + CLOUD_FRONT_DOMAIN_NAME + "/" + fileName;
-        return fullFilePath;
+        return "https://" + CLOUD_FRONT_DOMAIN_NAME + "/" + fileName;
     }
 
 
@@ -54,7 +53,7 @@ public class S3Service {
         String filePath = currentFilePath.substring(currentFilePath.lastIndexOf("/") + 1);
 
         if (amazonS3.doesObjectExist(bucket, filePath)) {
-            log.info("S3파일 삭제");
+            log.info("custom log:: delete file from S3...");
             amazonS3.deleteObject(bucket, filePath);
         }
     }

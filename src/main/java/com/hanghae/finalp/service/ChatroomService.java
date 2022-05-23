@@ -1,6 +1,5 @@
 package com.hanghae.finalp.service;
 
-import com.hanghae.finalp.config.exception.customexception.entity.EntityNotExistException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberNotExistException;
 import com.hanghae.finalp.entity.ChatMember;
 import com.hanghae.finalp.entity.Chatroom;
@@ -46,9 +45,9 @@ public class ChatroomService {
         }
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotExistException());
+                .orElseThrow(MemberNotExistException::new);
         Member sideMember = memberRepository.findById(sideMemberId)
-                .orElseThrow(() -> new MemberNotExistException());
+                .orElseThrow(MemberNotExistException::new);
 
         Chatroom dm =
                 Chatroom.createChatroomByMember(member.getUsername() + "_" + sideMember.getUsername(), member, sideMember);

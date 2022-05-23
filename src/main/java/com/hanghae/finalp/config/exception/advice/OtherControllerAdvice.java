@@ -1,5 +1,6 @@
 package com.hanghae.finalp.config.exception.advice;
 
+import com.hanghae.finalp.config.exception.customexception.DuplicationRequestException;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorityException;
 import com.hanghae.finalp.config.exception.customexception.MaxNumberException;
 import com.hanghae.finalp.config.exception.dto.ErrorResponse;
@@ -58,9 +59,18 @@ public class OtherControllerAdvice {
     @ExceptionHandler(MaxNumberException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse maxNumberException(MaxNumberException e) {
-        log.info("최대 인원수 에러입니다 {}", e.getErrorCode().getMessage());
+        log.info("중복된 요청 오류입니다. {}", e.getErrorCode().getMessage());
         return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
+
+    @ExceptionHandler(DuplicationRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse duplicationRequestException(DuplicationRequestException e) {
+        log.info("최대 인원수 에러입니다 {}, field: {}", e.getErrorCode().getMessage(), e.getField());
+        return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
+    }
+
+
 
 
     @ExceptionHandler(Exception.class)

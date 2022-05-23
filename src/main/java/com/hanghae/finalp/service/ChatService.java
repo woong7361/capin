@@ -63,7 +63,7 @@ public class ChatService {
     @Transactional
     public void saveMessage(Long chatroomId, Long senderId, String senderName, String content, MessageType messageType) {
         Chatroom chatroom = chatRoomRepository.findById(chatroomId)
-                .orElseThrow(() -> new EntityNotExistException());
+                .orElseThrow(EntityNotExistException::new);
 
         Message saveMessage =
                 Message.createMessage(senderId, senderName, content, messageType, chatroom);
