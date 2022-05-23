@@ -1,5 +1,6 @@
 package com.hanghae.finalp.repository;
 
+import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import org.springframework.data.domain.Pageable;
@@ -25,4 +26,6 @@ public interface MemberGroupRepository extends JpaRepository<MemberGroup, Long> 
 
     List<MemberGroup> findAllByGroupId(Long groupId);
 
+    @Query("select gm from MemberGroup gm join fetch gm.group where gm.group.id = :groupId and gm.authority = 'OWNER'")
+    Optional<MemberGroup> findGroupOwnerByGroupId(@Param("groupId") Long groupId);
 }

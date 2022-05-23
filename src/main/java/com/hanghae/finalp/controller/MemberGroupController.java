@@ -22,7 +22,7 @@ public class MemberGroupController {
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable("groupId") Long groupId
     ){
-        memberGroupService.applyGroup(principalDetails.getMemberId(), groupId);
+        memberGroupService.applyGroup(principalDetails.getMemberId(), principalDetails.getUsername(), groupId);
         return new ResultMsg("success");
     }
 

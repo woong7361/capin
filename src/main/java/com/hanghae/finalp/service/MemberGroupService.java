@@ -4,26 +4,17 @@ import com.hanghae.finalp.config.exception.customexception.DuplicationRequestExc
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorJoinException;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorOwnerException;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorWaitException;
-import com.hanghae.finalp.config.exception.customexception.authority.AuthorityException;
 import com.hanghae.finalp.config.exception.customexception.entity.EntityNotExistException;
 import com.hanghae.finalp.config.exception.customexception.MaxNumberException;
-import com.hanghae.finalp.config.exception.customexception.entity.GroupNotExistException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberGroupNotExistException;
-import com.hanghae.finalp.entity.ChatMember;
-import com.hanghae.finalp.entity.Chatroom;
-import com.hanghae.finalp.entity.Group;
-import com.hanghae.finalp.entity.MemberGroup;
+import com.hanghae.finalp.entity.*;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
-import com.hanghae.finalp.repository.ChatMemberRepository;
-import com.hanghae.finalp.repository.ChatRoomRepository;
-import com.hanghae.finalp.repository.GroupRepository;
-import com.hanghae.finalp.repository.MemberGroupRepository;
+import com.hanghae.finalp.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 
 
 @Service
@@ -36,22 +27,26 @@ public class MemberGroupService {
     private final MemberGroupRepository memberGroupRepository;
     private final GroupRepository groupRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final NoticeRepository noticeRepository;
 
     //그룹 참가 신청
     @Transactional
-    public void applyGroup(Long memberId, Long groupId) {
-        //멤버가 이미 해당 그룹에 속해있는지 확인하기 -> memberGroup에 memberId, groupId 동시에 있는지 확인하면됨
-
+    public void applyGroup(Long memberId, String username, Long groupId) {
+        log.debug("custom log:: 이미 신청하거나 가입되어있는지 확인");
         //중복된 요청입니다
         memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
                 .ifPresent((mg) -> {throw new DuplicationRequestException("apply group");});
 
         //WAIT으로 memberGroup을 생성 -chatroodId는 승인시 따로 넣어줄 예정
-        MemberGroup newMemberGroup = MemberGroup.createMemberGroup(Authority.WAIT, memberId, groupId, null);
-        memberGroupRepository.save(newMemberGroup);
-//        Group group= groupRepository.findById(groupId).orElseThrow(
-//                GroupNotExistException::new);
-//        group.getMemberGroups().add(newMemberGroup);
+        MemberGroup memberGroup = MemberGroup.createMemberGroup(Authority.WAIT, memberId, groupId, null);
+        memberGroupRepository.save(memberGroup);
+
+        log.debug("custom log:: create notice for group owner");
+        MemberGroup ownerMemberGroup = memberGroupRepository.findGroupOwnerByGroupId(groupId)
+                .orElseThrow(MemberGroupNotExistException::new);
+
+        Notice notice = Notice.createGroupApplyNotice(ownerMemberGroup.getGroup().getGroupTitle(), username, ownerMemberGroup.getMember());
+        noticeRepository.save(notice);
     }
 
 
@@ -70,7 +65,7 @@ public class MemberGroupService {
 
         log.debug("custom log:: target's memberGroup 확인");
         //그사람도 같은 멤버그룹에서 대기중인지 확인 & 권한 확인
-        MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
+        MemberGroup yourMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
                 .orElseThrow(MemberGroupNotExistException::new);
 
         if(!Authority.WAIT.equals(yourMemberGroup.getAuthority())) throw new AuthorOwnerException();
@@ -92,7 +87,9 @@ public class MemberGroupService {
         ChatMember chatMember = ChatMember.createChatMember(yourMemberGroup.getMember(), chatroom);
         chatroom.getChatMembers().add(chatMember);
 
-
+        log.debug("custom log:: create notice for target");
+        Notice notice = Notice.createGroupApproveNotice(yourMemberGroup.getGroup().getGroupTitle(), yourMemberGroup.getMember());
+        noticeRepository.save(notice);
     }
 
     //그룹 참가자 거절
@@ -114,14 +111,15 @@ public class MemberGroupService {
                 MemberGroupNotExistException::new);
 
         //그사람의 auth 확인 ->그사람의 권한이 wait일 경우
-        if(Authority.WAIT.equals(yourMemberGroup.getAuthority())) {
+        if(!Authority.WAIT.equals(yourMemberGroup.getAuthority())) {
             throw new AuthorOwnerException();
         }
 
+        log.debug("custom log:: create notice for target");
+        Notice notice = Notice.createGroupDenyNotice(yourMemberGroup.getGroup().getGroupTitle(), yourMemberGroup.getMember());
+        noticeRepository.save(notice);
+
         memberGroupRepository.delete(yourMemberGroup);
-//        Group group = groupRepository.findById(groupId).orElseThrow(
-//                GroupNotExistException::new);
-//        group.getMemberGroups().remove(yourMemberGroup);
     }
 
 
@@ -145,7 +143,7 @@ public class MemberGroupService {
                 .orElseThrow(MemberGroupNotExistException::new);
 
         //그사람의 auth 확인 ->그사람의 권한이 join일 경우
-        if (Authority.JOIN.equals(yourMemberGroup.getAuthority())) {
+        if (!Authority.JOIN.equals(yourMemberGroup.getAuthority())) {
             throw new AuthorOwnerException();
         }
 
@@ -159,13 +157,13 @@ public class MemberGroupService {
                 .orElseThrow(EntityNotExistException::new);
         chatroom.getChatMembers().remove(chatMember);
 
-        //2.멤버그룹 삭제
-        memberGroupRepository.delete(yourMemberGroup);
+        log.debug("custom log:: create notice for target");
+        Notice notice = Notice.createGroupBanNotice(yourMemberGroup.getGroup().getGroupTitle(), yourMemberGroup.getMember());
+        noticeRepository.save(notice);
 
-//        Group group = groupRepository.findById(groupId).orElseThrow(
-//                GroupNotExistException::new);
-//        group.getMemberGroups().remove(yourMemberGroup);
+        //2.멤버그룹 삭제
         yourMemberGroup.getGroup().minusMemberCount();
+        memberGroupRepository.delete(yourMemberGroup);
 
     }
 
