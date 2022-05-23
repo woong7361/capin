@@ -1,8 +1,7 @@
 package com.hanghae.finalp.controller;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.hanghae.finalp.config.exception.code.ErrorMessageCode;
-import com.hanghae.finalp.config.exception.customexception.TokenException;
+import com.hanghae.finalp.config.exception.customexception.token.TokenException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,14 +18,12 @@ public class ErrorController {
     }
     @GetMapping("/error/login/tokenException")
     public void tokenException() {
-        throw new TokenException(ErrorMessageCode.TOKEN_ERROR_CODE, "token error");
+        throw new TokenException();
     }
     @GetMapping("/error/login/exception")
     public void loginException() {
         //그냥 badCredintailExcecption사용
         throw new BadCredentialsException("login error");
     }
-
-
 
 }

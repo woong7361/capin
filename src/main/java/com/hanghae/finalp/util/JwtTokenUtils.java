@@ -8,7 +8,7 @@ import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.hanghae.finalp.config.exception.customexception.TokenException;
+import com.hanghae.finalp.config.exception.customexception.token.TokenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
-import static com.hanghae.finalp.config.exception.code.ErrorMessageCode.TOKEN_ERROR_CODE;
 
 
 @Slf4j
@@ -45,13 +44,17 @@ public class JwtTokenUtils {
                     .build()
                     .verify(jwtToken);
         } catch (AlgorithmMismatchException algorithmMismatchException){
-            throw new TokenException(TOKEN_ERROR_CODE, "토큰 알고리즘 미스매칭");
+            log.debug("토큰 알고리즘 미스매칭");
+            throw new TokenException();
         } catch (SignatureVerificationException signatureVerificationException){
-            throw new TokenException(TOKEN_ERROR_CODE, "토큰 signature verifying 에러");
+            log.debug("토큰 signature verifying 에러");
+            throw new TokenException();
         } catch (TokenExpiredException tokenExpiredException) {
+            log.debug("Access토큰 만료됨");
             throw new TokenExpiredException("토큰 만료됨");
         } catch (InvalidClaimException invalidClaimException) {
-            throw new TokenException(TOKEN_ERROR_CODE, "토큰 클레임 에러");
+            log.debug("토큰 클레임 에러");
+            throw new TokenException();
         }
     }
 
@@ -68,7 +71,8 @@ public class JwtTokenUtils {
                     getHeader(TOKEN_HEADER_NAME).
                     replace(TOKEN_NAME_WITH_SPACE, "");
         } catch (Exception e) {
-            throw new TokenException(TOKEN_ERROR_CODE, "헤더에서 토큰 추출중 에러");
+            log.debug("헤더에서 토큰 추출중 에러");
+            throw new TokenException();
         }
     }
 
@@ -76,7 +80,8 @@ public class JwtTokenUtils {
         try {
             return tokenString.replace(TOKEN_NAME_WITH_SPACE, "");
         } catch (Exception e) {
-            throw new TokenException(TOKEN_ERROR_CODE, "Bearer 없음");
+            log.debug("Bearer 없음");
+            throw new TokenException();
         }
     }
 

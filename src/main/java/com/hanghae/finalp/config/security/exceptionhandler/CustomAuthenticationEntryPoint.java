@@ -1,25 +1,17 @@
 package com.hanghae.finalp.config.security.exceptionhandler;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hanghae.finalp.config.exception.customexception.TokenException;
-import com.hanghae.finalp.entity.dto.ResultMsg;
+import com.hanghae.finalp.config.exception.customexception.token.TokenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
 
 @Slf4j
 @Component
@@ -37,7 +29,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             response.sendRedirect("/error/login/tokenExpiredException");
         } else if (request.getAttribute("type").equals("tokenException")) {
             TokenException error = (TokenException) request.getAttribute("error");
-            log.info("TokenException 에러 {}", error.getMessage());
+            log.info("TokenException 에러 {}", error.getErrorCode().getMessage());
             response.sendRedirect("/error/login/tokenException");
         } else {
             Exception error = (Exception) request.getAttribute("error");

@@ -1,14 +1,14 @@
 package com.hanghae.finalp.config.exception.customexception;
 
+import com.hanghae.finalp.config.exception.code.ErrorCode;
 import lombok.Getter;
 
 @Getter
-public class MaxNumberException extends RuntimeException {
-    private String code;
+public class MaxNumberException extends CustomException {
 
-    public MaxNumberException(String code, String message){
-        super(message);
-        this.code = code;
+    public MaxNumberException(){
+        super(ErrorCode.MAX_MEMBER_EXCEPTION);
+
     }
 }
 

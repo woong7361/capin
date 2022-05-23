@@ -1,14 +1,12 @@
 package com.hanghae.finalp.config.exception.customexception;
 
+import com.hanghae.finalp.config.exception.code.ErrorCode;
 import lombok.Getter;
 
 @Getter
-public class S3Exception extends RuntimeException{
+public class S3Exception extends CustomException{
 
-    private String code;
-
-    public S3Exception(String code, String message) {
-        super(message);
-        this.code = code;
+    public S3Exception() {
+        super(ErrorCode.S3_EXCEPTION);
     }
 }

@@ -1,8 +1,7 @@
 package com.hanghae.finalp.config.exception.advice;
 
 
-import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.hanghae.finalp.config.exception.customexception.EntityNotExistException;
+import com.hanghae.finalp.config.exception.customexception.entity.EntityNotExistException;
 import com.hanghae.finalp.config.exception.dto.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +23,8 @@ public class RepositoryControllerAdvice {
     @ExceptionHandler(EntityNotExistException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse entityNotExistException(EntityNotExistException e) {
-        log.info("entityNotExistException - DB에서 조회 에러 -> {}", e.getMessage());
-        return new ErrorResponse(ms.getMessage(e.getCode(), null, null));
+        log.info("entityNotExistException - DB에서 조회 에러 -> {}", e.getErrorCode().getMessage());
+        return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 
 }

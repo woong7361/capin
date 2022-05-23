@@ -1,6 +1,6 @@
 package com.hanghae.finalp.service;
 
-import com.hanghae.finalp.config.exception.customexception.EntityNotExistException;
+import com.hanghae.finalp.config.exception.customexception.entity.EntityNotExistException;
 import com.hanghae.finalp.entity.Chatroom;
 import com.hanghae.finalp.entity.Message;
 import com.hanghae.finalp.entity.dto.MessageDto;
@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.hanghae.finalp.config.exception.code.ErrorMessageCode.ENTITY_NOT_FOUND_CODE;
 
 @RequiredArgsConstructor
 @Service
@@ -64,7 +63,7 @@ public class ChatService {
     @Transactional
     public void saveMessage(Long chatroomId, Long senderId, String senderName, String content, MessageType messageType) {
         Chatroom chatroom = chatRoomRepository.findById(chatroomId)
-                .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "not exist chatroom"));
+                .orElseThrow(() -> new EntityNotExistException());
 
         Message saveMessage =
                 Message.createMessage(senderId, senderName, content, messageType, chatroom);

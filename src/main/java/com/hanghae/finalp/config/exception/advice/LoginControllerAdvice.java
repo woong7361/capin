@@ -1,13 +1,12 @@
 package com.hanghae.finalp.config.exception.advice;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.hanghae.finalp.config.exception.customexception.RefreshTokenException;
-import com.hanghae.finalp.config.exception.customexception.TokenException;
+import com.hanghae.finalp.config.exception.customexception.token.RefreshTokenException;
+import com.hanghae.finalp.config.exception.customexception.token.TokenException;
 import com.hanghae.finalp.config.exception.dto.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -44,8 +43,8 @@ public class LoginControllerAdvice {
     @ExceptionHandler(RefreshTokenException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse refreshTokenException(RefreshTokenException e) {
-        log.info("refresh token Exception! {}", e.getMessage());
-        return new ErrorResponse(ms.getMessage(e.getCode(), null, null));
+        log.info("refresh token Exception! {}", e.getErrorCode().getMessage());
+        return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 
 }

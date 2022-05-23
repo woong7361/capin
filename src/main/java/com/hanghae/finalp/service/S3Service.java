@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static com.hanghae.finalp.config.exception.code.ErrorMessageCode.S3_ERROR_CODE;
 
 @Service
 //@Component
@@ -40,7 +39,7 @@ public class S3Service {
             amazonS3.putObject(new PutObjectRequest(bucket, fileName, file.getInputStream(), null)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (IOException e) {
-            throw new S3Exception(S3_ERROR_CODE, "S3 upload Exception");
+            throw new S3Exception();
         }
         String fullFilePath = "https://" + CLOUD_FRONT_DOMAIN_NAME + "/" + fileName;
         return fullFilePath;
