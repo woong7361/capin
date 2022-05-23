@@ -8,7 +8,10 @@ import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.dto.GroupDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
-import com.hanghae.finalp.repository.*;
+import com.hanghae.finalp.repository.ChatRoomRepository;
+import com.hanghae.finalp.repository.GroupRepository;
+import com.hanghae.finalp.repository.MemberGroupRepository;
+import com.hanghae.finalp.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -91,18 +94,19 @@ public class GroupService {
         return groupRepository.findAllById(groupId, pageable);
     }
 
+
     //그룹 검색
     @Transactional
     public Page<Group> groupSearch(String searchKeyword, Pageable pageable) {
         return groupRepository.findByGroupTitleContaining(searchKeyword, pageable);
     }
 
+
     //특정 그룹 불러오기
     @Transactional
     public Slice<Group> groupView(Long groupId){
         return groupRepository.findMemberByGroupId(groupId);
     }
-
 
 
     //------------------------------------------------------------------------------------------------

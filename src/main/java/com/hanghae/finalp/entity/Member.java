@@ -22,8 +22,9 @@ public class Member extends TimeStamped {
     @Column(columnDefinition = "TEXT")
     private String imageUrl;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<MemberGroup> memberGroups = new ArrayList<>();
+
+
+
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<ChatMember> chatMembers = new ArrayList<>();
@@ -54,4 +55,5 @@ public class Member extends TimeStamped {
     public void setId(Long id) {
         this.id = id;
     }
+
 }
