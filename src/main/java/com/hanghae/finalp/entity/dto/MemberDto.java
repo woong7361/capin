@@ -2,10 +2,14 @@ package com.hanghae.finalp.entity.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 public class MemberDto {
+//    private String username;//이거 추가함
+//    private String imageUrl;
+
     @Data
     @AllArgsConstructor
     public static class Principal {
@@ -23,10 +27,15 @@ public class MemberDto {
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class ProfileRes {
         private String username;
         private String imageUrl;
     }
 
 
+//    public  MemberDto(Member member){
+//        this.username = member.getUsername();
+//        this.imageUrl = member.getImageUrl();
+//    }
 }
