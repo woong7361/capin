@@ -31,7 +31,7 @@ public class MemberController {
     //내 프로필 수정
     @PostMapping("/api/profile/edit")
     public MemberDto.ProfileRes memberEdit(@NotBlank @RequestPart("username") String username,
-                             @RequestPart(value = "file", required = false) MultipartFile file,
+                             @RequestPart(value = "image", required = false) MultipartFile file,
                              @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
         return memberService.editMyProfile(username, file, principalDetails.getMemberId());

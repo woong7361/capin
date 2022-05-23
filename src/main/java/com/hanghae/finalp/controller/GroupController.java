@@ -75,12 +75,13 @@ public class GroupController {
     //그룹 리스트 페이징, 검색
     @GetMapping("/api/groups/list")
     public Page<Group> GroupList(@PageableDefault(size = 20, sort = "groupId", direction = Sort.Direction.DESC) Pageable pageable,
-                                 @PathVariable("groupId") Long groupId, String searchKeyword) {
+//                                 @PathVariable("groupId") Long groupId,
+                                 String searchKeyword) {
 
         Page<Group> list = null;
 
         if(searchKeyword == null) {
-            list = groupService.getGroupList(groupId, pageable);
+//            list = groupService.getGroupList(groupId, pageable);
         } else {
             list = groupService.groupSearch(searchKeyword, pageable);
         }

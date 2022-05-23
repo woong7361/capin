@@ -8,13 +8,13 @@ import java.util.List;
 
 @Data
 public class CrawlingDto {
-    public List<Response> responses;
+    private List<Response> responses;
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Response {
-        public String title;
-        public String imgUrl;
-        public String star;
+        private String title;
+        private String imgUrl;
+        private String star;
     }
 }

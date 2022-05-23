@@ -48,6 +48,6 @@ public class MemberService {
         Member member = memberRepository.findById(memberId).orElseThrow(
                 () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 memberId가 존재하지 않습니다."));
         s3Service.deleteFile(member.getImageUrl()); //카카오 이미지가 아닐경우에만 이거 해주게됨
-        memberRepository.delete(member);
+        memberRepository.deleteById(memberId);
     }
 }
