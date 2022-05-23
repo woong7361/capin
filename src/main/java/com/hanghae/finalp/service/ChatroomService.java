@@ -1,6 +1,7 @@
 package com.hanghae.finalp.service;
 
-import com.hanghae.finalp.config.exception.customexception.EntityNotExistException;
+import com.hanghae.finalp.config.exception.customexception.entity.EntityNotExistException;
+import com.hanghae.finalp.config.exception.customexception.entity.MemberNotExistException;
 import com.hanghae.finalp.entity.ChatMember;
 import com.hanghae.finalp.entity.Chatroom;
 import com.hanghae.finalp.entity.Member;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.hanghae.finalp.config.exception.code.ErrorMessageCode.ENTITY_NOT_FOUND_CODE;
 
 @Service
 @RequiredArgsConstructor
@@ -46,9 +46,9 @@ public class ChatroomService {
         }
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "not exist member"));
+                .orElseThrow(() -> new MemberNotExistException());
         Member sideMember = memberRepository.findById(sideMemberId)
-                .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "not exist side member"));
+                .orElseThrow(() -> new MemberNotExistException());
 
         Chatroom dm =
                 Chatroom.createChatroomByMember(member.getUsername() + "_" + sideMember.getUsername(), member, sideMember);

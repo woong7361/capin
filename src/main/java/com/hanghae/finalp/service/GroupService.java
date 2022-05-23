@@ -1,7 +1,8 @@
 package com.hanghae.finalp.service;
 
-import com.hanghae.finalp.config.exception.customexception.AuthorityException;
-import com.hanghae.finalp.config.exception.customexception.EntityNotExistException;
+import com.hanghae.finalp.config.exception.customexception.authority.AuthorOwnerException;
+import com.hanghae.finalp.config.exception.customexception.entity.MemberGroupNotExistException;
+import com.hanghae.finalp.config.exception.customexception.entity.MemberNotExistException;
 import com.hanghae.finalp.entity.Chatroom;
 import com.hanghae.finalp.entity.Group;
 import com.hanghae.finalp.entity.Member;
@@ -21,8 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import static com.hanghae.finalp.config.exception.code.ErrorMessageCode.AUTHORITY_ERROR_CODE;
-import static com.hanghae.finalp.config.exception.code.ErrorMessageCode.ENTITY_NOT_FOUND_CODE;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,15 +35,18 @@ public class GroupService {
     private final ChatRoomRepository chatRoomRepository;
 
 
+
+    //수정 필요! -> Authority
     public Slice<GroupDto.SimpleRes> getMyGroupList(Long memberId, Pageable pageable) {
         Slice<MemberGroup> myGroupByMember = memberGroupRepository.findMyGroupByMemberId(memberId, pageable);
-        return myGroupByMember.map(GroupDto.SimpleRes::new);
+        return myGroupByMember
+                .map(GroupDto.SimpleRes::new);
     }
 
     @Transactional
     public GroupDto.SimpleRes createGroup(Long memberId, GroupDto.CreateReq createReq, MultipartFile multipartFile) {
         Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 memberId가 존재하지 않습니다."));
+                () -> new MemberNotExistException());
         String imageUrl = s3Service.uploadFile(multipartFile);
 
         Chatroom groupChatroom = Chatroom.createChatroomByGroup(createReq.getGroupTitle(), member);
@@ -58,9 +60,9 @@ public class GroupService {
     @Transactional
     public void deleteGroup(Long memberId, Long groupId) {
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
-                () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 멤버그룹이 존재하지 않습니다."));
+                () -> new MemberGroupNotExistException());
         if(!memberGroup.getAuthority().equals(Authority.OWNER)){
-            throw new AuthorityException(AUTHORITY_ERROR_CODE, "카페를 지울 수 없는 권한 입니다.");
+            throw new AuthorOwnerException();
         }
 
         s3Service.deleteFile(memberGroup.getGroup().getImageUrl());
@@ -70,9 +72,9 @@ public class GroupService {
     @Transactional
     public void patchGroup(Long memberId, Long groupId, GroupDto.CreateReq createReq, MultipartFile multipartFile) {
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
-                () -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 멤버그룹이 존재하지 않습니다."));
+                () -> new MemberGroupNotExistException());
         if(!memberGroup.getAuthority().equals(Authority.OWNER)){
-            throw new AuthorityException(AUTHORITY_ERROR_CODE, "카페를 지울 수 없는 권한 입니다.");
+            throw new AuthorOwnerException();
         }
         //fetch join 필요
         Group group = memberGroup.getGroup();

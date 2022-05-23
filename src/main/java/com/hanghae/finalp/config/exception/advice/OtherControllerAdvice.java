@@ -1,6 +1,6 @@
 package com.hanghae.finalp.config.exception.advice;
 
-import com.hanghae.finalp.config.exception.customexception.AuthorityException;
+import com.hanghae.finalp.config.exception.customexception.authority.AuthorityException;
 import com.hanghae.finalp.config.exception.customexception.MaxNumberException;
 import com.hanghae.finalp.config.exception.dto.ErrorResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +29,8 @@ public class OtherControllerAdvice {
     @ExceptionHandler(AuthorityException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse authorityException(AuthorityException e) {
-        log.info("권한관련 에러 발생 {}", e.getMessage());
-        return new ErrorResponse(ms.getMessage(e.getCode(), null, null));
+        log.info("권한관련 에러 발생 {}", e.getErrorCode().getMessage());
+        return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 
 
@@ -58,8 +58,8 @@ public class OtherControllerAdvice {
     @ExceptionHandler(MaxNumberException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse maxNumberException(MaxNumberException e) {
-        log.info("최대 인원수 에러입니다 {}", e.getMessage());
-        return new ErrorResponse(ms.getMessage(e.getCode(), null, null));
+        log.info("최대 인원수 에러입니다 {}", e.getErrorCode().getMessage());
+        return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 
 

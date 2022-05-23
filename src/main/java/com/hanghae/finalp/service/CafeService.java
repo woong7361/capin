@@ -1,7 +1,8 @@
 package com.hanghae.finalp.service;
 
-import com.hanghae.finalp.config.exception.customexception.AuthorityException;
-import com.hanghae.finalp.config.exception.customexception.EntityNotExistException;
+import com.hanghae.finalp.config.exception.customexception.authority.AuthorOwnerException;
+import com.hanghae.finalp.config.exception.customexception.entity.EntityNotExistException;
+import com.hanghae.finalp.config.exception.customexception.entity.MemberGroupNotExistException;
 import com.hanghae.finalp.entity.Cafe;
 import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.dto.CafeDto;
@@ -24,8 +25,6 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.hanghae.finalp.config.exception.code.ErrorMessageCode.AUTHORITY_ERROR_CODE;
-import static com.hanghae.finalp.config.exception.code.ErrorMessageCode.ENTITY_NOT_FOUND_CODE;
 
 
 @Service
@@ -43,9 +42,9 @@ public class CafeService {
     public void selectCafe(Long memberId, CafeDto.Reqeust request, Long groupId){
         //카페 선택 버튼이 오너일 경우에만 보이는지 , 버튼은 누구나 볼 수 있고 오너만 누를 수 있게 할 것인지 정해야함
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(memberId, groupId)
-                .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "memberGroup에 memberId가 존재하지 않는다."));
+                .orElseThrow(() -> new MemberGroupNotExistException());
         if(!memberGroup.getAuthority().equals(Authority.OWNER)) {
-            throw new AuthorityException(AUTHORITY_ERROR_CODE, "카페를 만들 수 없는 권한 입니다.");
+            throw new AuthorOwnerException();
         }
         //이전의 카페 삭제
         cafeRepository.deleteByGroupId(memberGroup.getGroup().getId());
@@ -57,9 +56,9 @@ public class CafeService {
     @Transactional
     public void deleteCafe(Long memberId, Long groupId) {
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
-                .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "memberGroup에 memberId가 존재하지 않는다."));
+                .orElseThrow(() -> new MemberGroupNotExistException());
         if(!memberGroup.getAuthority().equals(Authority.OWNER)){
-            throw new AuthorityException(AUTHORITY_ERROR_CODE, "카페를 지울 수 없는 권한 입니다.");
+            throw new AuthorOwnerException();
         }
         cafeRepository.deleteByGroupId(groupId);
     }
@@ -69,10 +68,7 @@ public class CafeService {
     public void setlocation(Long memberId, Long groupId, MemberGroupDto.Request request) {
         //해당하는 멤버그룹에 받아온 값을 넣어준다
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
-                .orElseThrow(() -> new EntityNotExistException(ENTITY_NOT_FOUND_CODE, "해당 멤버그룹이 존재하지 않습니다."));
-        if(Authority.WAIT.equals(memberGroup.getAuthority())){
-            throw new AuthorityException(AUTHORITY_ERROR_CODE, "가입 승인이 완료되지 않았습니다.");
-        }
+                .orElseThrow(() -> new MemberGroupNotExistException());
         memberGroup.setLocation(request.getStartLocationX(), request.getStartLocationY(), request.getStartAddress());
     }
 
