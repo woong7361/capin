@@ -47,6 +47,6 @@ public class MemberService {
         Member member = memberRepository.findById(memberId).orElseThrow(
                 MemberNotExistException::new);
         s3Service.deleteFile(member.getImageUrl()); //카카오 이미지가 아닐경우에만 이거 해주게됨
-        memberRepository.delete(member);
+        memberRepository.deleteById(memberId);
     }
 }

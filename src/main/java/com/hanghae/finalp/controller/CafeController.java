@@ -9,10 +9,7 @@ import com.hanghae.finalp.entity.dto.ResultMsg;
 import com.hanghae.finalp.service.CafeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -28,8 +25,8 @@ public class CafeController {
     @PostMapping("/api/groups/{groupId}/cafe")
     public ResultMsg cafeSelect(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                 @PathVariable("groupId") Long groupId,
-                                @Valid CafeDto.Reqeust cafeReq) { //무슨값 받을지 확실x 수정가능성 있음
-        cafeService.selectCafe(principalDetails.getMemberId(), cafeReq, groupId);
+                                @Valid @RequestBody CafeDto.Reqeust request) { //무슨값 받을지 확실x 수정가능성 있음
+        cafeService.selectCafe(principalDetails.getMemberId(), request, groupId);
         return new ResultMsg("success");
     }
 
@@ -50,7 +47,7 @@ public class CafeController {
     public ResultMsg locationSet(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable("groupId") Long groupId,
-            @Valid MemberGroupDto.Request request
+            @Valid @RequestBody MemberGroupDto.Request request
     ){
         Long memberId = principalDetails.getMemberId();
         cafeService.setlocation(memberId, groupId, request);
