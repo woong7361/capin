@@ -8,7 +8,7 @@ import java.util.List;
 public class KakaoApiDto {
     private List<Document> documents;
     @Data
-    private static class Document {
+    public static class Document {
         private String id; //장소 id
         private String category_group_code; //카테고리 그룹 코드
         private String category_group_name; //카테고리 글룹명

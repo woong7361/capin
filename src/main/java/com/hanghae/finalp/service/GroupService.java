@@ -1,6 +1,7 @@
 package com.hanghae.finalp.service;
 
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorOwnerException;
+import com.hanghae.finalp.config.exception.customexception.entity.GroupNotExistException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberGroupNotExistException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberNotExistException;
 import com.hanghae.finalp.entity.Chatroom;
@@ -8,6 +9,7 @@ import com.hanghae.finalp.entity.Group;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.dto.GroupDto;
+import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.repository.ChatRoomRepository;
 import com.hanghae.finalp.repository.GroupRepository;
@@ -15,12 +17,13 @@ import com.hanghae.finalp.repository.MemberGroupRepository;
 import com.hanghae.finalp.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -33,7 +36,6 @@ public class GroupService {
     private final MemberRepository memberRepository;
     private final S3Service s3Service;
     private final ChatRoomRepository chatRoomRepository;
-
 
 
     public Slice<GroupDto.SimpleRes> getMyGroupList(Long memberId, Pageable pageable) {
@@ -92,32 +94,48 @@ public class GroupService {
 
     //------------------------------------------------------------------------------------
 
-    //페이징
-    @Transactional
-    public Page<Group> getGroupList(Long groupId, Pageable pageable) {
-        return groupRepository.findAllById(groupId, pageable);
-    }
 
-
-    //그룹 검색
+    //그룹 목록
     @Transactional
-    public Page<Group> groupSearch(String searchKeyword, Pageable pageable) {
-        return groupRepository.findByGroupTitleContaining(searchKeyword, pageable);
+    public Page<GroupDto.SimpleRes> getGroupList(int page, int size, String sortBy, boolean isAsc, String searchKeyword) {
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Group> groups;
+        if (searchKeyword == null) {
+            groups = groupRepository.findAll(pageable);
+        }else {
+            groups = groupRepository.findAllByGroupTitleContainingOrRoughAddressContaining(searchKeyword, pageable);
+        }
+        return groups.map(GroupDto.SimpleRes::new);
     }
 
 
     //특정 그룹 불러오기
     @Transactional
-    public Slice<Group> groupView(Long groupId){
-        return groupRepository.findMemberByGroupId(groupId);
+    public GroupDto.SimpleRes groupView(Long groupId) {
+        Group group = groupRepository.findById(groupId).orElseThrow(GroupNotExistException::new);
+        List<MemberGroup> memberGroupList = memberGroupRepository.findAllByGroupId(groupId);
+
+        List<Member> memberList = new ArrayList<>();
+        for (MemberGroup memberGroup : memberGroupList) {
+            memberList.add(memberGroup.getMember());
+        }
+
+        List<MemberDto.ProfileRes> memberDtoList = new ArrayList<>();
+        for (Member member : memberList) {
+            MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(member.getId(), groupId)
+                    .orElseThrow(MemberGroupNotExistException::new);
+
+            if ((Authority.JOIN.equals(memberGroup.getAuthority()) || (Authority.OWNER.equals(memberGroup.getAuthority())))) {
+                MemberDto.ProfileRes profileRes = new MemberDto.ProfileRes();
+                profileRes.setUsername(member.getUsername());
+                memberDtoList.add(profileRes);
+            }
+        }
+        return new GroupDto.SimpleRes(group, memberDtoList);
     }
-
-
-    //------------------------------------------------------------------------------------------------
-
-
-
-
 
 
 }
