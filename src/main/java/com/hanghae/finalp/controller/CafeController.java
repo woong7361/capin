@@ -2,17 +2,14 @@ package com.hanghae.finalp.controller;
 
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
-import com.hanghae.finalp.entity.dto.CafeDto;
-import com.hanghae.finalp.entity.dto.CrawlingDto;
-import com.hanghae.finalp.entity.dto.MemberGroupDto;
-import com.hanghae.finalp.entity.dto.ResultMsg;
+import com.hanghae.finalp.entity.dto.*;
+import com.hanghae.finalp.entity.dto.scraping.KakaoApiDto;
 import com.hanghae.finalp.service.CafeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,25 +37,11 @@ public class CafeController {
     }
 
 
-    //---------------------------------------------------------------------------
-
-    //그룹 내 개인의 세부주소 작성
-    @PostMapping("/api/groups/{groupId}/location")
-    public ResultMsg locationSet(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable("groupId") Long groupId,
-            @Valid @RequestBody MemberGroupDto.Request request
-    ){
-        Long memberId = principalDetails.getMemberId();
-        cafeService.setlocation(memberId, groupId, request);
-        return new ResultMsg("success");
-    }
 
     //스터디 카페 추천
     @GetMapping("/api/groups/{groupId}/cafe-recommendation")
-    public List<CrawlingDto.Response> locationRecommend(@PathVariable("groupId") Long groupId) {
-        MemberGroupDto.Response response = cafeService.recommendLocation(groupId);
-        return cafeService.getRecoCafe(response);
+    public CafeDto.RecoRes locationRecommend(@PathVariable("groupId") Long groupId) {
+        return cafeService.getRecoCafe(groupId);
     }
 
 }

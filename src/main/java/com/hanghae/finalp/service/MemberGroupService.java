@@ -8,6 +8,7 @@ import com.hanghae.finalp.config.exception.customexception.entity.EntityNotExist
 import com.hanghae.finalp.config.exception.customexception.MaxNumberException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberGroupNotExistException;
 import com.hanghae.finalp.entity.*;
+import com.hanghae.finalp.entity.dto.MemberGroupDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,6 @@ public class MemberGroupService {
 
     private final ChatMemberRepository chatMemberRepository;
     private final MemberGroupRepository memberGroupRepository;
-    private final GroupRepository groupRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final NoticeRepository noticeRepository;
 
@@ -201,6 +201,17 @@ public class MemberGroupService {
         memberGroupRepository.delete(memberGroup);
     }
 
+
+    /**
+     * 개인의 세부 주소 작성
+     */
+    @Transactional
+    public void setlocation(Long memberId, Long groupId, MemberGroupDto.Request request) {
+        //해당하는 멤버그룹에 받아온 값을 넣어준다
+        MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
+                .orElseThrow(() -> new MemberGroupNotExistException());
+        memberGroup.setLocation(request.getStartLocationX(), request.getStartLocationY(), request.getStartAddress());
+    }
 
 
 }

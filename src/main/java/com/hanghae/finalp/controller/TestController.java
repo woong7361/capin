@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -49,6 +50,18 @@ public class TestController {
     }
 
 
+
+
+
+    @GetMapping("/test5")
+    @ResponseBody
+    public Dto form(@RequestBody Dto dto) {
+        System.out.println("dto = " + dto);
+        return dto;
+//        return "form.html";
+    }
+
+
     @PostConstruct
     public void createDummyMember() {
         Member dummy = Member.createMember("1", "testUser", null);
@@ -61,6 +74,16 @@ public class TestController {
     @NoArgsConstructor
     private static class MemberCreateReq {
         private String username;
+    }
+
+    @Data
+    public static class Dto {
+        public List<Username> username;
+
+        @Data
+        public static class Username {
+            String a;
+        }
     }
 
 }

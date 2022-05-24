@@ -1,13 +1,17 @@
 package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
+import com.hanghae.finalp.entity.dto.MemberGroupDto;
 import com.hanghae.finalp.entity.dto.ResultMsg;
 import com.hanghae.finalp.service.MemberGroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -81,6 +85,18 @@ public class MemberGroupController {
             @PathVariable("groupId") Long groupId
     ){
         memberGroupService.exitGroup(principalDetails.getMemberId(), groupId);
+        return new ResultMsg("success");
+    }
+
+    //그룹 내 개인의 세부주소 작성
+    @PostMapping("/api/groups/{groupId}/location")
+    public ResultMsg locationSet(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PathVariable("groupId") Long groupId,
+            @Valid @RequestBody MemberGroupDto.Request request
+    ){
+        Long memberId = principalDetails.getMemberId();
+        memberGroupService.setlocation(memberId, groupId, request);
         return new ResultMsg("success");
     }
 

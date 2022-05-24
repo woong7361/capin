@@ -1,30 +1,35 @@
 package com.hanghae.finalp.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorOwnerException;
-import com.hanghae.finalp.config.exception.customexception.entity.EntityNotExistException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberGroupNotExistException;
 import com.hanghae.finalp.entity.Cafe;
 import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.dto.CafeDto;
-import com.hanghae.finalp.entity.dto.CrawlingDto;
-import com.hanghae.finalp.entity.dto.KakaoApiDto;
+import com.hanghae.finalp.entity.dto.scraping.KakaoApiDto;
 import com.hanghae.finalp.entity.dto.MemberGroupDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.repository.CafeRepository;
 import com.hanghae.finalp.repository.MemberGroupRepository;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
-
+import java.util.Optional;
 
 
 @Service
@@ -40,9 +45,8 @@ public class CafeService {
 
     @Transactional
     public void selectCafe(Long memberId, CafeDto.Reqeust request, Long groupId){
-        //카페 선택 버튼이 오너일 경우에만 보이는지 , 버튼은 누구나 볼 수 있고 오너만 누를 수 있게 할 것인지 정해야함
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(memberId, groupId)
-                .orElseThrow(() -> new MemberGroupNotExistException());
+                .orElseThrow(MemberGroupNotExistException::new);
         if(!memberGroup.getAuthority().equals(Authority.OWNER)) {
             throw new AuthorOwnerException();
         }
@@ -56,7 +60,7 @@ public class CafeService {
     @Transactional
     public void deleteCafe(Long memberId, Long groupId) {
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
-                .orElseThrow(() -> new MemberGroupNotExistException());
+                .orElseThrow(MemberGroupNotExistException::new);
         if(!memberGroup.getAuthority().equals(Authority.OWNER)){
             throw new AuthorOwnerException();
         }
@@ -64,51 +68,49 @@ public class CafeService {
     }
 
 
-    @Transactional
-    public void setlocation(Long memberId, Long groupId, MemberGroupDto.Request request) {
-        //해당하는 멤버그룹에 받아온 값을 넣어준다
-        MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
-                .orElseThrow(() -> new MemberGroupNotExistException());
-        memberGroup.setLocation(request.getStartLocationX(), request.getStartLocationY(), request.getStartAddress());
+    /**
+     * 카페 3개 추천
+     */
+    public CafeDto.RecoRes getRecoCafe(Long groupId) {
+        log.debug("get kakao local API");
+        MemberGroupDto.Location location = findMid(groupId);
+
+        log.debug("get kakao map scaping data");
+        //출처 - https://developers.kakao.com/docs/latest/ko/local/dev-guide
+        KakaoApiDto kakaoApiDto = getKakaoKeywordLocalApi(location);
+
+        CafeDto.RecoRes cafeScrapInfo = getCafeScrapInfo(kakaoApiDto);
+        return cafeScrapInfo;
     }
 
-    @Transactional
-    public MemberGroupDto.Response recommendLocation(Long groupId) {
+
+
+    //===================================================================================================//
+
+
+    public MemberGroupDto.Location findMid(Long groupId) {
         //그룹에 속해있는 멤버들을 다 찾는다. => 멤버그룹에서 그룹아이디를 가진 멤버그룹을 다 찾음
-        List<MemberGroup> memberGroupList = memberGroupRepository.findAllByGroupId(groupId);
+        List<MemberGroup> memberGroupList = memberGroupRepository.findJoinMemberByGroupId(groupId);
+        MemberGroupDto.Location location = new MemberGroupDto.Location();
 
-        //멤버들의 locationx,y를 다 받아와서 평균값을 반환함
-        Double totalX = 0.0;
-        Double totalY = 0.0;
-        for (MemberGroup memberGroup : memberGroupList){
-            Double startLocationX = Double.parseDouble(memberGroup.getStartLocationX());
-            Double startLocationY = Double.parseDouble(memberGroup.getStartLocationY());
-
-            totalX += startLocationX;
-            totalY += startLocationY;
-        }
-
-        String averageX = Double.toString(totalX / memberGroupList.size());
-        String averageY = Double.toString(totalY / memberGroupList.size());
-
-        MemberGroupDto.Response response = new MemberGroupDto.Response();
-        response.setStartLocationX(averageX);
-        response.setStartLocationY(averageY);
-
-        return response;
+        memberGroupList.forEach((mg) -> location.addLocation(mg.getStartLocationX(), mg.getStartLocationY()));
+        location.avg(memberGroupList.size());
+        return location;
     }
 
-    public List<CrawlingDto.Response> getRecoCafe(MemberGroupDto.Response mdRes) {
+    private KakaoApiDto getKakaoKeywordLocalApi(MemberGroupDto.Location location) {
         KakaoApiDto kakaoApiDto = kakaoWebClient.get()
-                .uri(builder -> builder.path("/v2/local/search/keyword.json") //카카오 로컬- "키워드로 검색하기"
-                        .queryParam("query", "스터디카페")
-                        .queryParam("category_group_code", "CE7") //카테고리 그룹 코드
-                        .queryParam("x", mdRes.getStartLocationX())
-                        .queryParam("y", mdRes.getStartLocationY())
-                        .queryParam("radius", "100") //반경
-                        .queryParam("size", "3") //추천 카페 수
+                .uri(builder -> builder.path("/v2/local/search/keyword.json") //카카오 로컬- "키워드로 검색하기
+//                        .queryParam("category_group_code", "CE7") //카테고리 그룹 코드
+                                .queryParam("x", location.getLocationX()) //longitude
+                                .queryParam("y", location.getLocationY()) //latitude
+                                .queryParam("radius", 20000) //반경 단위(m) 최대 20000
+                                .queryParam("size", 4) //추천 카페 수
+                                .queryParam("query", URLEncoder.encode("cafe", StandardCharsets.UTF_8))
+                        .queryParam("sort", "distance")
                         .build()
                 )
+                .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(
                         httpStatus -> httpStatus != HttpStatus.OK,
@@ -118,79 +120,52 @@ public class CafeService {
                         })
                 .bodyToMono(KakaoApiDto.class)
                 .block();
+        return kakaoApiDto;
+    }
 
 
-        String title;
-        String img;
-        String star;
+    private CafeDto.RecoRes getCafeScrapInfo(KakaoApiDto kakaoApiDto) {
+        CafeDto.RecoRes recoRes = new CafeDto.RecoRes();
+        // https://place.map.kakao.com/main/v/{id}
+        for (KakaoApiDto.Document doc  : kakaoApiDto.getDocuments()) {
 
-        WebDriver driver;
-        WebElement element;
+            String block = WebClient.create()
+                    .get()
+                    .uri("https://place.map.kakao.com/main/v/" + doc.getId())
+                    .headers(header -> {
+                        header.setContentType(MediaType.APPLICATION_JSON);
+                        header.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8));
+                    })
+                    .retrieve()
+                    .onStatus(
+                        httpStatus -> httpStatus != HttpStatus.OK,
+                        clientResponse -> {
+                            return clientResponse.createException()
+                                    .flatMap(it -> Mono.error(new RuntimeException("WebClient 접근 예외. code : " + clientResponse.statusCode())));
+                    })
+                    .bodyToMono(String.class)
+                    .block();
 
-        List<CrawlingDto.Response> crawlingDtoList = new ArrayList<>();
+            extractValue(recoRes, doc, block);
+        }
+        return recoRes;
+    }
 
-        /*for (KakaoApiDto.Document document : kakaoApiDto.getDocuments()) {
-            log.info(document.getPlace_url());
-            String place_url = document.getPlace_url();
+    private void extractValue(CafeDto.RecoRes recoRes, KakaoApiDto.Document doc, String block) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = objectMapper.readTree(block);
+            JsonNode basicInfo = jsonNode.get("basicInfo");
+            JsonNode feedback = basicInfo.get("feedback");
+            String mainphotourl = Optional.ofNullable(basicInfo.get("mainphotourl"))
+                    .map(JsonNode::textValue).orElse("");
 
-            // 드라이버 설치 경로
-            String WEB_DRIVER_ID = "webdriver.chrome.driver";
-            String WEB_DRIVER_PATH = "C:/Users/mj/Desktop/study/chromedriver.exe"; //폴더위치
-            System.setProperty(WEB_DRIVER_ID, WEB_DRIVER_PATH);
-
-            // WebDriver 옵션 설정
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--start-maximized");
-            options.addArguments("--disable-popup-blocking");       //팝업안띄움
-            options.addArguments("headless");                       //브라우저 안띄움
-            options.addArguments("--disable-gpu");            //gpu 비활성화
-            options.addArguments("--blink-settings=imagesEnabled=false"); //이미지 다운 안받음
-
-            driver = new ChromeDriver(options);
-
-            driver.get(place_url);
-            Thread.sleep(7000); // 3. 페이지 로딩 대기 시간
-
-            CrawlingDto.Response response = new CrawlingDto.Response();
-
-            //카페이름
-            if(!driver.findElements(By.xpath("//*[@id=\"mArticle\"]/div[1]/div[1]/div[2]/div/h2")).isEmpty()) {
-                element = driver.findElement(By.xpath("//*[@id=\"mArticle\"]/div[1]/div[1]/div[2]/div/h2"));
-                title = element.getText();
-                log.info("-----------------------------" + title);
-                response.setTitle(title);
-            }else {
-                title = null;
-                log.info("------------title없음-----------------");
-            }
-
-            //평점
-            if(!driver.findElements(By.xpath("//*[@id=\"mArticle\"]/div[5]/div[2]/div/em")).isEmpty()){
-                element = driver.findElement(By.xpath("//*[@id=\"mArticle\"]/div[5]/div[2]/div/em"));
-                star = element.getText();
-                log.info("-----------------------------" + star);
-                response.setStar(star);
-            }else{
-                star = null;
-                log.info("-------------star없음----------------");
-            }
-
-
-            //이미지
-            if(!driver.findElements(By.className("bg_present")).isEmpty()) {
-                element = driver.findElement(By.className("bg_present"));
-                String bgImage = element.getCssValue("background-image");
-                img = bgImage.substring(5, bgImage.length() - 2);
-                log.info("-----------------------------" + img);
-                response.setImgUrl(img);
-            }else{
-                img = null;
-                log.info("------------img없음-----------------");
-            }
-
-            crawlingDtoList.add(response);
-          }*/
-        log.info(crawlingDtoList.toString());
-        return crawlingDtoList;
+            int comntcnt = feedback.get("comntcnt").intValue();
+            int scoresum = feedback.get("scoresum").intValue();
+            int scorecnt = feedback.get("scorecnt").intValue();
+            recoRes.getCafes().add(new CafeDto.RecoRes.CafeInfo(mainphotourl, comntcnt, scoresum, scorecnt, doc));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
