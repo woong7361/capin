@@ -3,11 +3,13 @@ package com.hanghae.finalp.controller;
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.GroupDto;
 import com.hanghae.finalp.entity.dto.ResultMsg;
+import com.hanghae.finalp.entity.dto.SearchWordDto;
 import com.hanghae.finalp.service.GroupService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -70,25 +72,19 @@ public class GroupController {
 
 
     //그룹 리스트 페이징, 검색
-    @GetMapping("/api/groups/list")
-    public Page<GroupDto.SimpleRes> getGroupList(
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size,
-            @RequestParam(value = "sortBy", defaultValue = "groupTitle") String sortBy,
-            @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc,
-            @RequestParam(value = "searchKeyword", required = false) String searchKeyword
-    ) {
-        page = page - 1;
-        return groupService.getGroupList(page, size, sortBy, isAsc, searchKeyword);
+   @GetMapping("/api/groups/list")
+    public Slice<GroupDto.SimpleRes> getGroupList(
+            @RequestBody(required = false) SearchWordDto searchWordDto,
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
+    ) { //page=1상태로오면 1빼줘야함
+        return groupService.getGroupList(searchWordDto, pageable);
     }
 
 
 
     //특정 그룹
     @GetMapping("/api/groups/{groupId}")
-    public GroupDto.SimpleRes groupView(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                  @PathVariable("groupId") Long groupId
-    ){
+    public GroupDto.SimpleRes groupView(@PathVariable("groupId") Long groupId){
         return groupService.groupView(groupId);
     }
 

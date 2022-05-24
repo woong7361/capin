@@ -1,7 +1,6 @@
 package com.hanghae.finalp.service;
 
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorOwnerException;
-import com.hanghae.finalp.config.exception.customexception.entity.EntityNotExistException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberGroupNotExistException;
 import com.hanghae.finalp.entity.Cafe;
 import com.hanghae.finalp.entity.MemberGroup;
@@ -14,8 +13,11 @@ import com.hanghae.finalp.repository.CafeRepository;
 import com.hanghae.finalp.repository.MemberGroupRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -129,7 +131,7 @@ public class CafeService {
 
         List<CrawlingDto.Response> crawlingDtoList = new ArrayList<>();
 
-        /*for (KakaoApiDto.Document document : kakaoApiDto.getDocuments()) {
+        for (KakaoApiDto.Document document : kakaoApiDto.getDocuments()) {
             log.info(document.getPlace_url());
             String place_url = document.getPlace_url();
 
@@ -149,7 +151,7 @@ public class CafeService {
             driver = new ChromeDriver(options);
 
             driver.get(place_url);
-            Thread.sleep(7000); // 3. 페이지 로딩 대기 시간
+//            Thread.sleep(7000); // 3. 페이지 로딩 대기 시간
 
             CrawlingDto.Response response = new CrawlingDto.Response();
 
@@ -189,7 +191,7 @@ public class CafeService {
             }
 
             crawlingDtoList.add(response);
-          }*/
+          }
         log.info(crawlingDtoList.toString());
         return crawlingDtoList;
     }
