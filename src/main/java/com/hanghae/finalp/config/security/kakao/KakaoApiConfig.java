@@ -16,7 +16,7 @@ public class KakaoApiConfig {
 
     @Bean
     public WebClient kakaoWebClient(){
-        return WebClient.builder().baseUrl("http://dapi.kakao.com")
+        return WebClient.builder().baseUrl("https://dapi.kakao.com")
                 .defaultHeader("Authorization", "KakaoAK " + kakao_apikey).build();
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 
 
 @Service
@@ -27,8 +28,8 @@ public class MemberService {
     }
 
     //프로필 수정
-    @Transactional
-    public MemberDto.ProfileRes editMyProfile(String username, MultipartFile file, Long memberId) {
+    @Transactional()
+    public MemberDto.ProfileRes editMyProfile(String username, MultipartFile file, Long memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(
                 MemberNotExistException::new);
 

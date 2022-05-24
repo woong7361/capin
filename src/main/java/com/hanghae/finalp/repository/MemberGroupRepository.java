@@ -17,6 +17,9 @@ public interface MemberGroupRepository extends JpaRepository<MemberGroup, Long> 
     @Query("select gm from MemberGroup gm join fetch gm.group where gm.member.id = :memberId and not gm.authority = 'WAIT'")
     Slice<MemberGroup> findMyGroupByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 
+    @Query("select gm from MemberGroup gm where gm.group.id = :groupId and not gm.authority = 'WAIT'")
+    List<MemberGroup> findJoinMemberByGroupId(@Param("groupId") Long groupId);
+
     Optional<MemberGroup> findByMemberIdAndGroupId(Long memberId,Long groupId);
 
     @Query("select gm from MemberGroup gm join fetch gm.group where gm.member.id = :memberId and gm.group.id = :groupId")
