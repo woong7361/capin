@@ -1,12 +1,11 @@
 package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
-import com.hanghae.finalp.entity.Group;
 import com.hanghae.finalp.entity.dto.GroupDto;
 import com.hanghae.finalp.entity.dto.ResultMsg;
+import com.hanghae.finalp.entity.dto.SearchWordDto;
 import com.hanghae.finalp.service.GroupService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -36,7 +35,7 @@ public class GroupController {
     @PostMapping("/api/groups")
     public GroupDto.SimpleRes createGroup(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @Valid GroupDto.CreateReq createReq,
+            @Valid @RequestBody GroupDto.CreateReq createReq,
             @RequestPart(value = "image", required = false) MultipartFile multipartFile
     ) {
         return groupService.createGroup(principalDetails.getMemberId(), createReq, multipartFile);
@@ -60,7 +59,7 @@ public class GroupController {
     @PostMapping("/api/groups/{groupId}/patch")
     public ResultMsg patchReq(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @Valid GroupDto.CreateReq createReq,
+            @Valid @RequestBody GroupDto.CreateReq createReq,
             @RequestPart(value = "image", required = false) MultipartFile multipartFile,
             @PathVariable("groupId") Long groupId
     ) {
@@ -73,38 +72,23 @@ public class GroupController {
 
 
     //그룹 리스트 페이징, 검색
-    @GetMapping("/api/groups/list")
-    public Page<Group> GroupList(@PageableDefault(size = 20, sort = "groupId", direction = Sort.Direction.DESC) Pageable pageable,
-//                                 @PathVariable("groupId") Long groupId,
-                                 String searchKeyword) {
-
-        Page<Group> list = null;
-
-        if(searchKeyword == null) {
-//            list = groupService.getGroupList(groupId, pageable);
-        } else {
-            list = groupService.groupSearch(searchKeyword, pageable);
-        }
-
-//        int nowPage = list.getPageable().getPageNumber() + 1; //페이지는 0부터 시작하므로 +1
-//        int startPage = Math.max(0,nowPage - 4);
-//        int endPage = Math.min(list.getTotalPages(), nowPage + 5);
-
-        return list;
+   @GetMapping("/api/groups/list")
+    public Slice<GroupDto.SimpleRes> getGroupList(
+            @RequestBody(required = false) SearchWordDto searchWordDto,
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
+    ) { //page=1상태로오면 1빼줘야함
+        return groupService.getGroupList(searchWordDto, pageable);
     }
+
+
 
     //특정 그룹
     @GetMapping("/api/groups/{groupId}")
-    public Slice<Group> groupView(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                        @PathVariable("groupId") Long groupId
-    ){
+    public GroupDto.SimpleRes groupView(@PathVariable("groupId") Long groupId){
         return groupService.groupView(groupId);
     }
 
 
-
     //---------------------------------------------------------------------------
-
-
 
 }

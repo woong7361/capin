@@ -13,11 +13,15 @@ import com.hanghae.finalp.entity.dto.MemberGroupDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.repository.CafeRepository;
 import com.hanghae.finalp.repository.MemberGroupRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
