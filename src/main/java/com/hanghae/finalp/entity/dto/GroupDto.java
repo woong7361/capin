@@ -24,8 +24,7 @@ public class GroupDto {
         private String firstDay;
         private String lastDay;
         private String description;
-
-        private List<MemberDto.ProfileRes> memberList; //이거이름 바꿔야됨ProfileRes 대신 다른거사용하기
+        private List<MemberDto.ProfileRes> memberList;
 
         public SimpleRes(MemberGroup gm) {
             this.groupId = gm.getGroup().getId();
@@ -51,18 +50,18 @@ public class GroupDto {
             this.description = group.getDescription();
         }
 
-//        public SimpleRes(Group group, List<MemberDto.ProfileRes> memberList) {
-//            this.groupId = group.getId();
-//            this.imageUrl = group.getImageUrl();
-//            this.groupTitle = group.getGroupTitle();
-//            this.roughAddress = group.getRoughAddress();
-//            this.memberCount = group.getMemberCount();
-//            this.maxMemberCount = group.getMaxMemberCount();
-//            this.firstDay = group.getFirstDay();
-//            this.lastDay = group.getLastDay();
-//            this.description = group.getDescription();
-//            this.memberList = memberList;
-//        }
+        public SimpleRes(Group group, List<MemberDto.ProfileRes> memberList) {
+            this.groupId = group.getId();
+            this.imageUrl = group.getImageUrl();
+            this.groupTitle = group.getGroupTitle();
+            this.roughAddress = group.getRoughAddress();
+            this.memberCount = group.getMemberCount();
+            this.maxMemberCount = group.getMaxMemberCount();
+            this.firstDay = group.getFirstDay();
+            this.lastDay = group.getLastDay();
+            this.description = group.getDescription();
+            this.memberList = memberList;
+        }
     }
 
 
