@@ -4,13 +4,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import javax.persistence.EntityManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.springframework.boot.jdbc.EmbeddedDatabaseConnection.H2;
 
-
+@AutoConfigureTestDatabase(connection = H2)
 @DataJpaTest //@DataJpaTest에는 기본적으로 @Transactional이 설정되어있다
 class MemberTest {
     @Autowired private EntityManager em;
@@ -64,21 +67,24 @@ class MemberTest {
     }
 
 
-//    @Test
-//    @Order(4)
-//    @DisplayName("멤버 삭제 테스트")
-//    public void memberDeleteTest() throws Exception {
-//        Member member = Member.createMember("kakaoId", "홍길동", "https://d2yjfe20.cloudfront.net/img.png");
-//        em.persist(member);
-//        clearContext();
-//
+    @Test
+    @Order(4)
+    @DisplayName("멤버 삭제 테스트")
+    public void memberDeleteTest() throws Exception {
+        Member member = Member.createMember("kakaoId", "홍길동", "https://d2yjfe20.cloudfront.net/img.png");
+        em.persist(member);
+        clearContext();
+
 //        em.find(Member.class, member.getId());
 //        em.remove(member);
-//
-////        em.remove(em.contains(member) ? member : em.merge(member));
-//
+
+//        em.remove(em.contains(member) ? member : em.merge(member));
+
+        member = em.merge(member);
+        em.remove(member);
 //        assertEquals(member.getKakaoId(), null);
-//        assertNull(member);
-//    }
+        System.out.println("======================================================================="+member);
+        assertNull(member);
+    }
 
 }

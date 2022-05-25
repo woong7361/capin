@@ -7,9 +7,6 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 public class MemberDto {
-//    private String username;//이거 추가함
-//    private String imageUrl;
-
     @Data
     @AllArgsConstructor
     public static class Principal {
@@ -33,9 +30,4 @@ public class MemberDto {
         private String imageUrl;
     }
 
-
-//    public  MemberDto(Member member){
-//        this.username = member.getUsername();
-//        this.imageUrl = member.getImageUrl();
-//    }
 }

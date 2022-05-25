@@ -87,4 +87,16 @@ public class GroupController {
         return groupService.getGroupList(searchWordDto, pageable);
     }
 
+
+    /**
+    * 특정 그룹
+    */
+    @GetMapping("/api/groups/{groupId}")
+    public GroupDto.SpecificRes groupView(@PathVariable("groupId") Long groupId){
+        return groupService.groupView(groupId);
+    }
+
+
+    //---------------------------------------------------------------------------
+
 }
