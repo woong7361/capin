@@ -1,4 +1,4 @@
-package com.hanghae.finalp.entity.dto;
+package com.hanghae.finalp.entity.dto.other;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

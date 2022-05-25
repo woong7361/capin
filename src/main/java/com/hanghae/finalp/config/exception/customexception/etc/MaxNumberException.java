@@ -1,6 +1,7 @@
-package com.hanghae.finalp.config.exception.customexception;
+package com.hanghae.finalp.config.exception.customexception.etc;
 
 import com.hanghae.finalp.config.exception.code.ErrorCode;
+import com.hanghae.finalp.config.exception.customexception.CustomException;
 import lombok.Getter;
 
 @Getter

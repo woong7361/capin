@@ -20,22 +20,30 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
 
 
+    /**
+     * 알림 가져오기
+     */
     @Transactional
-    public Slice<NoticeDto.Res> getNotice(Long memberId, Pageable pageable) {
+    public Slice<NoticeDto.MessageRes> getNotice(Long memberId, Pageable pageable) {
         Slice<Notice> notices = noticeRepository.findByMemberId(memberId, pageable);
-        Slice<NoticeDto.Res> noticeSlice = notices.map(NoticeDto.Res::new);
+        Slice<NoticeDto.MessageRes> noticeSlice = notices.map(NoticeDto.MessageRes::new);
         for (Notice notice : notices) {
-            notice.read();
+            notice.readNotice();
         }
         return noticeSlice;
     }
 
+    /**
+     * 읽지않은 알림 개수 가져오기
+     */
     public NoticeDto.NonReadCountRes getNonReadCount(Long memberId) {
         return new NoticeDto.NonReadCountRes(noticeRepository.findNonReadCountById(memberId));
     }
 
+    /**
+     * 알림 지우기
+     */
     public void deleteNotice(Long memberId, Long noticeId) {
-        //자신의 알림인지 확인
         noticeRepository.findById(noticeId).filter(notice -> memberId.equals(notice.getMember().getId()))
                 .orElseThrow(AuthorOwnerException::new);
         noticeRepository.deleteById(noticeId);

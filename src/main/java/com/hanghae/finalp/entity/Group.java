@@ -52,6 +52,10 @@ public class Group extends TimeStamped {
         this.lastDay = lastDay;
     }
 
+    private Group(Long id) {
+        this.id = id;
+    }
+
     //========================================생성 편의자=============================================//
 
     public static Group createGroup(
@@ -70,16 +74,12 @@ public class Group extends TimeStamped {
         return group;
     }
 
+    public static Group createMappingGroup(Long groupId) {
+        return new Group(groupId);
+    }
+
 
     //========================================비즈니스 로직=============================================//
-    public void setCafe(Cafe cafe) {
-        this.cafe = cafe;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public void patch(GroupDto.CreateReq createReq, String imageUrl) {
         this.groupTitle = createReq.getGroupTitle();
         this.description = createReq.getDescription();
@@ -87,6 +87,10 @@ public class Group extends TimeStamped {
         this.roughAddress = createReq.getRoughAddress();
         this.lastDay = createReq.getLastDay();
         this.imageUrl = imageUrl;
+    }
+
+    public void setGroupCafe(Cafe cafe) {
+        this.cafe = cafe;
     }
 
     public void plusMemberCount(){

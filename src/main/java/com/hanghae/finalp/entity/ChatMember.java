@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Getter
@@ -24,9 +23,6 @@ public class ChatMember {
     @JoinColumn(name = "chatroom_id")
     private Chatroom chatroom;
 
-//    @OneToMany(mappedBy = "chatMember")
-//    private List<DmMessage> dmMessage;
-
     //========================================생성자=============================================//
 
     private ChatMember(Member member, Chatroom chatroom) {
@@ -34,10 +30,11 @@ public class ChatMember {
         this.chatroom = chatroom;
     }
 
+    //========================================생성 편의자=============================================//
+
     public static ChatMember createChatMember(Member member, Chatroom chatroom) {
         return new ChatMember(member, chatroom);
     }
 
 
-    //========================================생성 편의자=============================================//
 }

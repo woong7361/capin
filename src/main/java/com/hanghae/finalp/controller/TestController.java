@@ -1,5 +1,6 @@
 package com.hanghae.finalp.controller;
 
+import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.dto.LoginDto;
 import com.hanghae.finalp.repository.MemberRepository;
@@ -31,13 +32,14 @@ public class TestController {
     @Transactional
     @ResponseBody
     @PostMapping("/dummy-user")
-    public LoginDto.refreshTokenRes test(@RequestBody MemberCreateReq memberCreateReq) {
+    public MemberDto.refreshTokenRes test(@RequestBody MemberCreateReq memberCreateReq) {
         Member member = Member.createMember("kakaoId", memberCreateReq.getUsername(), null);
         memberRepository.save(member);
         String accessToken = jwtTokenUtils.createAccessToken(member.getId(), member.getUsername());
         String refreshToken = jwtTokenUtils.createRefreshToken(member.getId());
-        redisUtils.setRefreshTokenDataExpire(member.getId().toString(), refreshToken, 14 * JwtTokenUtils.DAY);
-        return new LoginDto.refreshTokenRes(accessToken, refreshToken);
+        redisUtils.setRefreshTokenDataExpire(member.getId().toString(), refreshToken,
+                jwtTokenUtils.getRefreshTokenExpireTime(refreshToken));
+        return new MemberDto.refreshTokenRes(accessToken, refreshToken);
     }
 
     /**
@@ -55,7 +57,6 @@ public class TestController {
     @GetMapping("/test5")
     @ResponseBody
     public Dto form(@RequestBody Dto dto) {
-        System.out.println("dto = " + dto);
         return dto;
 //        return "form.html";
     }

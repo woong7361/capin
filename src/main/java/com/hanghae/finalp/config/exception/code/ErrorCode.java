@@ -9,9 +9,6 @@ public enum ErrorCode {
     MAX_MEMBER_EXCEPTION(400, "error.count", "max Member Exception, can not add member"),
     DUPLICATE_REQUSET(400, "error.duplicate" , "duplicate request error"),
     WEB_CLIENT_EXCEPTION(400, "error.webclient" , "web client exception"),
-//    INVALID_INPUT_VALUE(400, "C001", " Invalid Input Value"),
-//    METHOD_NOT_ALLOWED(405, "C002", " Invalid Input Value"),
-//    HANDLE_ACCESS_DENIED(403, "C006", "Access is Denied"),
 
     // Database,
     ENTITY_NOT_EXIST(400, "error.entity.notExist", "entity not found exception"),

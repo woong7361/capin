@@ -8,12 +8,12 @@ public class NoticeDto {
 
     @Data
     @AllArgsConstructor
-    public static class Res {
+    public static class MessageRes {
         private Long noticeId;
         private String message;
         private Boolean isRead;
 
-        public Res(Notice notice) {
+        public MessageRes(Notice notice) {
             this.noticeId = notice.getId();
             this.message = notice.getMessage();
             this.isRead = notice.getIsRead();

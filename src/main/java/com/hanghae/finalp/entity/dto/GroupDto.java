@@ -107,4 +107,20 @@ public class GroupDto {
         @Pattern(regexp = "^([12]\\d{3}.(0[1-9]|1[0-2]).(0[1-9]|[12]\\d|3[01]))$")
         private String lastDay;
     }
+
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SearchReq {
+        private String title;
+        private List<Address> addressList;
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Address {
+            private String address;
+        }
+    }
 }

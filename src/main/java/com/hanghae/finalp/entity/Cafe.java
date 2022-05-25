@@ -22,7 +22,6 @@ public class Cafe extends TimeStamped {
     private String locationY;
     private String address;
 
-//    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "study_group_id")
     private Group group;
@@ -41,7 +40,7 @@ public class Cafe extends TimeStamped {
 
     public static Cafe createCafe(String locationName, String locationX, String locationY, String address, Group group) {
         Cafe cafe = new Cafe(locationName, locationX, locationY, address, group);
-        group.setCafe(cafe);
+        group.setGroupCafe(cafe);
         return cafe;
     }
 }

@@ -2,7 +2,7 @@ package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.NoticeDto;
-import com.hanghae.finalp.entity.dto.ResultMsg;
+import com.hanghae.finalp.entity.dto.other.ResultMsg;
 import com.hanghae.finalp.service.NoticeService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -22,11 +22,11 @@ public class NoticeController {
     private final NoticeService noticeService;
 
     /**
-     * 알림 보기
+     * 알림 리스트 가져오기
      */
     @GetMapping("/api/notices")
-    public Slice<NoticeDto.Res> getNotice(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                          @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+    public Slice<NoticeDto.MessageRes> getNotice(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                 @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return noticeService.getNotice(principalDetails.getMemberId(), pageable);
     }
 

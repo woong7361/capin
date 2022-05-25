@@ -1,7 +1,7 @@
 package com.hanghae.finalp.config.exception.advice;
 
 
-import com.hanghae.finalp.config.exception.customexception.S3Exception;
+import com.hanghae.finalp.config.exception.customexception.etc.S3Exception;
 import com.hanghae.finalp.config.exception.dto.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

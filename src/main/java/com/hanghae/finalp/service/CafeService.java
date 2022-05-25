@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorOwnerException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberGroupNotExistException;
+import com.hanghae.finalp.config.exception.customexception.etc.WebClientException;
 import com.hanghae.finalp.entity.Cafe;
 import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.dto.CafeDto;
-import com.hanghae.finalp.entity.dto.scraping.KakaoApiDto;
+import com.hanghae.finalp.entity.dto.other.KakaoApiDto;
 import com.hanghae.finalp.entity.dto.MemberGroupDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.repository.CafeRepository;
@@ -17,11 +18,6 @@ import com.hanghae.finalp.repository.MemberGroupRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -48,8 +44,11 @@ public class CafeService {
     private final WebClient kakaoWebClient;
 
 
+    /**
+     * 카페 선택(생성)
+     */
     @Transactional
-    public void selectCafe(Long memberId, CafeDto.Reqeust request, Long groupId){
+    public void selectCafe(Long memberId, CafeDto.CreateReq request, Long groupId){
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(memberId, groupId)
                 .orElseThrow(MemberGroupNotExistException::new);
         if(!memberGroup.getAuthority().equals(Authority.OWNER)) {
@@ -57,11 +56,15 @@ public class CafeService {
         }
         //이전의 카페 삭제
         cafeRepository.deleteByGroupId(memberGroup.getGroup().getId());
-        //group의 변경감지
+
+        //group의 변경감지 - 이상하지만 일단 남겨두기
         Cafe cafe = Cafe.createCafe(request.getLocationName(), request.getLocationX(), request.getLocationY(),
                 request.getAddress(), memberGroup.getGroup());
     }
 
+    /**
+     * 카페 삭제
+     */
     @Transactional
     public void deleteCafe(Long memberId, Long groupId) {
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
@@ -74,14 +77,13 @@ public class CafeService {
 
 
     /**
-     * 카페 3개 추천
+     * 카페 추천
      */
     public CafeDto.RecoRes getRecoCafe(Long groupId) {
         log.debug("get kakao local API");
         MemberGroupDto.Location location = findMid(groupId);
 
         log.debug("get kakao map scaping data");
-        //출처 - https://developers.kakao.com/docs/latest/ko/local/dev-guide
         KakaoApiDto kakaoApiDto = getKakaoKeywordLocalApi(location);
 
         CafeDto.RecoRes cafeScrapInfo = getCafeScrapInfo(kakaoApiDto);
@@ -93,8 +95,10 @@ public class CafeService {
     //===================================================================================================//
 
 
+    /**
+     * 그룹내의 가운데 지점 가져오기
+     */
     public MemberGroupDto.Location findMid(Long groupId) {
-        //그룹에 속해있는 멤버들을 다 찾는다. => 멤버그룹에서 그룹아이디를 가진 멤버그룹을 다 찾음
         List<MemberGroup> memberGroupList = memberGroupRepository.findJoinMemberByGroupId(groupId)
                 .stream().filter(mg -> Optional.ofNullable(mg.getStartLocationX()).isPresent())
                 .collect(Collectors.toList());
@@ -105,6 +109,10 @@ public class CafeService {
         return location;
     }
 
+    /**
+     * 카카오 API에서 좌표주변의 카페 가져오기
+     * 출처 - https://developers.kakao.com/docs/latest/ko/local/dev-guide
+     */
     private KakaoApiDto getKakaoKeywordLocalApi(MemberGroupDto.Location location) {
         KakaoApiDto kakaoApiDto = kakaoWebClient.get()
                 .uri(builder -> builder.path("/v2/local/search/keyword.json") //카카오 로컬- "키워드로 검색하기
@@ -122,18 +130,21 @@ public class CafeService {
                 .onStatus(
                         httpStatus -> httpStatus != HttpStatus.OK,
                         clientResponse -> {
+                            log.debug("kakao local api error statusCode: {}, string: {}", clientResponse.statusCode(), clientResponse.toString());
                             return clientResponse.createException()
-                                    .flatMap(it -> Mono.error(new RuntimeException("WebClient 접근 예외. code : " + clientResponse.statusCode())));
+                                    .flatMap(it -> Mono.error(new WebClientException()));
                         })
                 .bodyToMono(KakaoApiDto.class)
                 .block();
         return kakaoApiDto;
     }
 
-
+    /**
+     * 카카오맵에서 이미지와 코멘트, 별점 가져오기
+     * 출처 - https://place.map.kakao.com/main/v/{id}
+     */
     private CafeDto.RecoRes getCafeScrapInfo(KakaoApiDto kakaoApiDto) {
         CafeDto.RecoRes recoRes = new CafeDto.RecoRes();
-        // https://place.map.kakao.com/main/v/{id}
         for (KakaoApiDto.Document doc  : kakaoApiDto.getDocuments()) {
 
             String block = WebClient.create()
@@ -147,8 +158,9 @@ public class CafeService {
                     .onStatus(
                         httpStatus -> httpStatus != HttpStatus.OK,
                         clientResponse -> {
+                            log.debug("kakao local api error statusCode: {}, string: {}", clientResponse.statusCode(), clientResponse.toString());
                             return clientResponse.createException()
-                                    .flatMap(it -> Mono.error(new RuntimeException("WebClient 접근 예외. code : " + clientResponse.statusCode())));
+                                    .flatMap(it -> Mono.error(new WebClientException()));
                     })
                     .bodyToMono(String.class)
                     .block();
@@ -158,6 +170,9 @@ public class CafeService {
         return recoRes;
     }
 
+    /**
+     * kakaoMap에서 필요한 값 추출
+     */
     private void extractValue(CafeDto.RecoRes recoRes, KakaoApiDto.Document doc, String block) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {

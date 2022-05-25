@@ -31,7 +31,7 @@ public class ChatroomService {
 
 
     /**
-     * DM하기 눌렀을 때
+     * DM하기 눌렀을 때 dm방 만들기
      */
     @Transactional
     public Long createDmChatroom(Long memberId, Long sideMemberId) {
@@ -55,6 +55,9 @@ public class ChatroomService {
         return dm.getId();
     }
 
+    /**
+     * 자신이 속해있는 채팅방 리스트 가져오기
+     */
     public Slice<ChatroomDto.RoomRes> getChatroomList(Long memberId, Pageable pageable) {
         return chatMemberRepository.findChatroomByMemberId(memberId, pageable).map(ChatroomDto.RoomRes::new);
     }

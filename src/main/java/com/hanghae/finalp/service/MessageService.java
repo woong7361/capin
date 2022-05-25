@@ -15,7 +15,10 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
 
-    public Slice<MessageDto.Send> getPreviousMessage(Long chatroomId, Pageable pageable) {
-        return messageRepository.findByChatroomId(chatroomId, pageable).map(MessageDto.Send::new);
+    /**
+     * 이전의 메시지 기록 가져오기
+     */
+    public Slice<MessageDto.SendRes> getPreviousMessage(Long chatroomId, Pageable pageable) {
+        return messageRepository.findByChatroomId(chatroomId, pageable).map(MessageDto.SendRes::new);
     }
 }

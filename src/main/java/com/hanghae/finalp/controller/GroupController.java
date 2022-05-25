@@ -2,8 +2,7 @@ package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.GroupDto;
-import com.hanghae.finalp.entity.dto.ResultMsg;
-import com.hanghae.finalp.entity.dto.SearchWordDto;
+import com.hanghae.finalp.entity.dto.other.ResultMsg;
 import com.hanghae.finalp.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -68,27 +67,24 @@ public class GroupController {
     }
 
 
-    //--------------------------------------------------------------------------------------
-
-
-    //그룹 리스트 페이징, 검색
+    /**
+     * 스터디 그룹 검색
+     */
    @GetMapping("/api/groups/list")
     public Slice<GroupDto.SimpleRes> getGroupList(
-            @RequestBody(required = false) SearchWordDto searchWordDto,
+            @RequestBody(required = false) GroupDto.SearchReq searchReq,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) { //page=1상태로오면 1빼줘야함
-        return groupService.getGroupList(searchWordDto, pageable);
+        return groupService.getSearchGroupList(searchReq, pageable);
     }
 
 
-
-    //특정 그룹
+    /**
+    * 특정 그룹
+    */
     @GetMapping("/api/groups/{groupId}")
     public GroupDto.SpecificRes groupView(@PathVariable("groupId") Long groupId){
         return groupService.groupView(groupId);
     }
-
-
-    //---------------------------------------------------------------------------
 
 }

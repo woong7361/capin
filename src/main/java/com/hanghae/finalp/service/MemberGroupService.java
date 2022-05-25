@@ -1,11 +1,11 @@
 package com.hanghae.finalp.service;
 
-import com.hanghae.finalp.config.exception.customexception.DuplicationRequestException;
+import com.hanghae.finalp.config.exception.customexception.etc.DuplicationRequestException;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorJoinException;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorOwnerException;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorWaitException;
 import com.hanghae.finalp.config.exception.customexception.entity.EntityNotExistException;
-import com.hanghae.finalp.config.exception.customexception.MaxNumberException;
+import com.hanghae.finalp.config.exception.customexception.etc.MaxNumberException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberGroupNotExistException;
 import com.hanghae.finalp.entity.*;
 import com.hanghae.finalp.entity.dto.MemberGroupDto;
@@ -29,7 +29,9 @@ public class MemberGroupService {
     private final ChatRoomRepository chatRoomRepository;
     private final NoticeRepository noticeRepository;
 
-    //그룹 참가 신청
+    /**
+     * 그룹 참가 신청
+     */
     @Transactional
     public void applyGroup(Long memberId, String username, Long groupId) {
         log.debug("custom log:: 이미 신청하거나 가입되어있는지 확인");
@@ -49,9 +51,9 @@ public class MemberGroupService {
         noticeRepository.save(notice);
     }
 
-
-
-    //그룹 참가자 승인
+    /**
+     * 그룹 참가자 승인
+     */
     @Transactional
     public void approveGroup(Long myMemberId, Long groupId, Long memberId) {
 
@@ -75,12 +77,12 @@ public class MemberGroupService {
             throw new MaxNumberException();
         }
 
-        yourMemberGroup.setAuthority(Authority.JOIN); //wait일 경우 join으로 바꿔줌
+        yourMemberGroup.joinGroup(); //wait일 경우 join으로 바꿔줌
         yourMemberGroup.getGroup().plusMemberCount();
 
         log.debug("custom log:: chatroom 관련 logic");
         //승인 전에 안넣어줬던 챗룸아이디를 멤버그룹에 넣어준 후
-        yourMemberGroup.setChatroomId(myMemberGroup.getChatroomId());
+        yourMemberGroup.joinGroupChatRoom(myMemberGroup.getChatroomId());
         //조인이 되는 순간 채팅방도 가입시켜줘야 된다 => 챗멤버 생성필요
         Chatroom chatroom = chatRoomRepository.findById(myMemberGroup.getChatroomId()).orElseThrow(
                 EntityNotExistException::new);
@@ -92,7 +94,9 @@ public class MemberGroupService {
         noticeRepository.save(notice);
     }
 
-    //그룹 참가자 거절
+    /**
+     * 그룹 참가자 거절
+     */
     @Transactional
     public void denyGroup(Long myMemberId, Long groupId, Long memberId) {
 
@@ -101,7 +105,6 @@ public class MemberGroupService {
         MemberGroup myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId).orElseThrow(
                 MemberGroupNotExistException::new);
 
-        //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너가 아니라면
         if(!Authority.OWNER.equals(myMemberGroup.getAuthority())){
             throw new AuthorOwnerException();
         }
@@ -110,7 +113,6 @@ public class MemberGroupService {
         MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
                 MemberGroupNotExistException::new);
 
-        //그사람의 auth 확인 ->그사람의 권한이 wait일 경우
         if(!Authority.WAIT.equals(yourMemberGroup.getAuthority())) {
             throw new AuthorOwnerException();
         }
@@ -122,9 +124,9 @@ public class MemberGroupService {
         memberGroupRepository.delete(yourMemberGroup);
     }
 
-
-
-    //그룹 참가자 추방
+    /**
+     * 그룹 참가자 추방
+     */
     @Transactional
     public void banGroup(Long myMemberId, Long groupId, Long memberId) {
         log.debug("custom log:: owner's memberGroup 확인");
@@ -168,6 +170,9 @@ public class MemberGroupService {
     }
 
 
+    /**
+     * 그룹 참가 취소
+     */
     @Transactional
     public void cancelApplyGroup(Long memberId, Long groupId) {
 
@@ -182,6 +187,9 @@ public class MemberGroupService {
         memberGroupRepository.delete(memberGroup);
     }
 
+    /**
+     * 그룹 나가기
+     */
     @Transactional
     public void exitGroup(Long memberId, Long groupId) {
         log.debug("custom log:: target's memberGroup 확인");
@@ -206,11 +214,11 @@ public class MemberGroupService {
      * 개인의 세부 주소 작성
      */
     @Transactional
-    public void setlocation(Long memberId, Long groupId, MemberGroupDto.Request request) {
+    public void setlocation(Long memberId, Long groupId, MemberGroupDto.LocationReq locationReq) {
         //해당하는 멤버그룹에 받아온 값을 넣어준다
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
                 .orElseThrow(() -> new MemberGroupNotExistException());
-        memberGroup.setLocation(request.getStartLocationX(), request.getStartLocationY(), request.getStartAddress());
+        memberGroup.setStartLocation(locationReq.getStartLocationX(), locationReq.getStartLocationY(), locationReq.getStartAddress());
     }
 
 
