@@ -21,7 +21,6 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     @Query("select g from Group g where g.roughAddress like CONCAT('%',:title,'%') and g.roughAddress in (:addressList)")
     Slice<Group> findAllByGroupTitleContainingAndRoughAddressIn(@Param("title") String title, @Param("addressList") List<String> addressLIst, Pageable pageable);
 
-
     @Query("select distinct g from Group g join fetch g.memberGroups where g.id = :groupId")
     Slice<Group> findMemberByGroupId(@Param("groupId") Long groupId);
 
