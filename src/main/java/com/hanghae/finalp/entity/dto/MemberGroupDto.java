@@ -12,7 +12,7 @@ public class MemberGroupDto {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Request {
+    public static class LocationReq {
         @NotBlank(message = "위치를 입력해주세요.")
         @Pattern(regexp="^[0-9]\\d*\\.?\\d*[0-9]", message="숫자만 입력가능합니다.")
         private String startLocationX;

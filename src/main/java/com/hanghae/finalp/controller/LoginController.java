@@ -41,15 +41,4 @@ public class LoginController {
         longinService.logout(principalDetails.getMemberId());
         return new ResultMsg("success");
     }
-
-
-    /**
-     * principal test용
-     */
-    @GetMapping("/api/test")
-    @ResponseBody
-    public String test(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        return principalDetails.toString();
-        //com.hanghae.finalp.config.security.PrincipalDetails@252e7b12 나옴
-    }
 }

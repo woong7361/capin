@@ -19,8 +19,9 @@ public class MemberGroupController {
 
     private final MemberGroupService memberGroupService;
 
-
-    //그룹 참가 신청
+    /**
+     * 그룹 참가 신청
+     */
     @PostMapping("/api/groups/{groupId}/apply")
     public ResultMsg GroupApply(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -31,44 +32,53 @@ public class MemberGroupController {
     }
 
 
-    //그룹 참가자 승인
+    /**
+     * 그룹 참가자 승인
+     */
     @PostMapping("/api/groups/{groupId}/approval/{memberId}")
     public ResultMsg GroupApproval(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable("groupId") Long groupId,
-            @PathVariable("memberId") Long memberId //참가자 승인은 관리자가 하기때문에 memberId가 필요함
+            @PathVariable("memberId") Long targetMemberId
     ){
-        Long myMemberId = principalDetails.getMemberId();
-        memberGroupService.approveGroup(myMemberId, groupId, memberId);
+        Long GroupOwnerMemberId = principalDetails.getMemberId();
+        memberGroupService.approveGroup(GroupOwnerMemberId, groupId, targetMemberId);
         return new ResultMsg("success");
     }
 
-    //그룹 참가자 거절
+
+    /**
+     * 그룹 참가자 거절
+     */
     @PostMapping("/api/groups/{groupId}/denial/{memberId}")
     public ResultMsg GroupDenial(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable("groupId") Long groupId,
-            @PathVariable("memberId") Long memberId
+            @PathVariable("memberId") Long targetMemberId
     ){
-        Long myMemberId = principalDetails.getMemberId();
-        memberGroupService.denyGroup(myMemberId, groupId, memberId);
+        Long GroupOwnerMemberId = principalDetails.getMemberId();
+        memberGroupService.denyGroup(GroupOwnerMemberId, groupId, targetMemberId);
         return new ResultMsg("success");
     }
 
 
-    //그룹 참가자 추방
+    /**
+     * 그룹 참가자 추방
+     */
     @PostMapping("/api/groups/{groupId}/ban/{memberId}")
     public ResultMsg GroupBan(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable("groupId") Long groupId,
-            @PathVariable("memberId") Long memberId
+            @PathVariable("memberId") Long targetMemberId
     ){
-        Long myMemberId = principalDetails.getMemberId();
-        memberGroupService.banGroup(myMemberId, groupId, memberId);
+        Long GroupOwnerMemberId = principalDetails.getMemberId();
+        memberGroupService.banGroup(GroupOwnerMemberId, groupId, targetMemberId);
         return new ResultMsg("success");
     }
 
-    //그룹 참가신청 취소
+    /**
+     * 신청한 그룹 참가신청 취소
+     */
     @PostMapping("/api/groups/{groupId}/cancel")
     public ResultMsg cancelApply(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -78,7 +88,10 @@ public class MemberGroupController {
         return new ResultMsg("success");
     }
 
-    //그룹 참가신청 취소
+
+    /**
+     * 그룹 나가기
+     */
     @PostMapping("/api/groups/{groupId}/exit")
     public ResultMsg exitGroup(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -88,15 +101,18 @@ public class MemberGroupController {
         return new ResultMsg("success");
     }
 
-    //그룹 내 개인의 세부주소 작성
+
+    /**
+     * 그룹내 개인의 세부 주소 작성
+     */
     @PostMapping("/api/groups/{groupId}/location")
     public ResultMsg locationSet(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable("groupId") Long groupId,
-            @Valid @RequestBody MemberGroupDto.Request request
+            @Valid @RequestBody MemberGroupDto.LocationReq locationReq
     ){
         Long memberId = principalDetails.getMemberId();
-        memberGroupService.setlocation(memberId, groupId, request);
+        memberGroupService.setlocation(memberId, groupId, locationReq);
         return new ResultMsg("success");
     }
 
