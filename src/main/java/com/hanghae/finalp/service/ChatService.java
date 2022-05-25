@@ -40,7 +40,7 @@ public class ChatService {
     }
 
     @Transactional
-    public void sendChatMessage(MessageDto.Send message, Set<String> roomMembers) {
+    public void sendChatMessage(MessageDto.SendRes message, Set<String> roomMembers) {
         if (message.getMessageType().equals(MessageType.ENTER)) {
             message.setContent(message.getSenderName() + "님이 입장하였습니다.");
             message.setSenderName("[알림]");

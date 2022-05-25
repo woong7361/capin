@@ -75,12 +75,12 @@ public class MemberGroupService {
             throw new MaxNumberException();
         }
 
-        yourMemberGroup.setAuthority(Authority.JOIN); //wait일 경우 join으로 바꿔줌
+        yourMemberGroup.joinGroup(); //wait일 경우 join으로 바꿔줌
         yourMemberGroup.getGroup().plusMemberCount();
 
         log.debug("custom log:: chatroom 관련 logic");
         //승인 전에 안넣어줬던 챗룸아이디를 멤버그룹에 넣어준 후
-        yourMemberGroup.setChatroomId(myMemberGroup.getChatroomId());
+        yourMemberGroup.joinGroupChatRoom(myMemberGroup.getChatroomId());
         //조인이 되는 순간 채팅방도 가입시켜줘야 된다 => 챗멤버 생성필요
         Chatroom chatroom = chatRoomRepository.findById(myMemberGroup.getChatroomId()).orElseThrow(
                 EntityNotExistException::new);
@@ -210,7 +210,7 @@ public class MemberGroupService {
         //해당하는 멤버그룹에 받아온 값을 넣어준다
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
                 .orElseThrow(() -> new MemberGroupNotExistException());
-        memberGroup.setLocation(locationReq.getStartLocationX(), locationReq.getStartLocationY(), locationReq.getStartAddress());
+        memberGroup.setStartLocation(locationReq.getStartLocationX(), locationReq.getStartLocationY(), locationReq.getStartAddress());
     }
 
 

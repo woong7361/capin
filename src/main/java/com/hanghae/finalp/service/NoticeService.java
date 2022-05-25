@@ -21,11 +21,11 @@ public class NoticeService {
 
 
     @Transactional
-    public Slice<NoticeDto.Res> getNotice(Long memberId, Pageable pageable) {
+    public Slice<NoticeDto.MessageRes> getNotice(Long memberId, Pageable pageable) {
         Slice<Notice> notices = noticeRepository.findByMemberId(memberId, pageable);
-        Slice<NoticeDto.Res> noticeSlice = notices.map(NoticeDto.Res::new);
+        Slice<NoticeDto.MessageRes> noticeSlice = notices.map(NoticeDto.MessageRes::new);
         for (Notice notice : notices) {
-            notice.read();
+            notice.readNotice();
         }
         return noticeSlice;
     }

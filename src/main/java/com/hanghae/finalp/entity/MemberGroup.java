@@ -44,10 +44,8 @@ public class MemberGroup extends TimeStamped {
 
     private MemberGroup(Authority authority, Long memberId, Long groupId, Long chatroomId) {
         this.authority = authority;
-        this.member = new Member();
-        this.member.setId(memberId);
-        this.group = new Group();
-        this.group.setId(groupId);
+        this.member = Member.createMappingMember(memberId);
+        this.group = Group.createMappingGroup(groupId);
         this.chatroomId = chatroomId;
     }
 
@@ -61,13 +59,13 @@ public class MemberGroup extends TimeStamped {
         return new MemberGroup(authority, memberId, groupId, chatroomId);
     }
 
-    public void setAuthority(Authority authority) {
-        this.authority = authority;
+    public void joinGroup() {
+        this.authority = Authority.JOIN;
     }
 
-    public void setChatroomId(Long chatroomId) { this.chatroomId = chatroomId; }
+    public void joinGroupChatRoom(Long chatroomId) { this.chatroomId = chatroomId; }
 
-    public void setLocation(String startLocationX, String startLocationY, String startAddress){
+    public void setStartLocation(String startLocationX, String startLocationY, String startAddress){
         this.startLocationX = startLocationX;
         this.startLocationY = startLocationY;
         this.startAddress = startAddress;

@@ -23,16 +23,11 @@ public class Member extends TimeStamped {
     private String imageUrl;
 
 
-
-
-
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<ChatMember> chatMembers = new ArrayList<>();
 
 
-
     //========================================생성자=============================================//
-
 
     private Member(String kakaoId, String username, String imageUrl) {
         this.kakaoId = kakaoId;
@@ -40,20 +35,25 @@ public class Member extends TimeStamped {
         this.imageUrl = imageUrl;
     }
 
+    private Member(Long id) {
+        this.id = id;
+    }
+
     //========================================생성 편의자=============================================//
 
     public static Member createMember(String kakaoId, String username, String imageUrl) {
         return new Member(kakaoId, username, imageUrl);
     }
+
+    public static Member createMappingMember(Long memberId) {
+        return new Member(memberId);
+    }
+
     //========================================비즈니스 로직==============================================//
 
     public void patchMember(String username, String imageUrl) {
         this.username = username;
         this.imageUrl = imageUrl;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
 }

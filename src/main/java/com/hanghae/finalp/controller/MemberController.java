@@ -2,7 +2,7 @@ package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.MemberDto;
-import com.hanghae.finalp.entity.dto.ResultMsg;
+import com.hanghae.finalp.entity.dto.other.ResultMsg;
 import com.hanghae.finalp.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

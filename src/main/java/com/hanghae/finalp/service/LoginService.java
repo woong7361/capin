@@ -1,7 +1,7 @@
 package com.hanghae.finalp.service;
 
 import com.hanghae.finalp.config.exception.customexception.token.RefreshTokenException;
-import com.hanghae.finalp.entity.dto.LoginDto;
+import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.repository.MemberRepository;
 import com.hanghae.finalp.util.JwtTokenUtils;
@@ -24,7 +24,7 @@ public class LoginService {
     private final RedisUtils redisUtils;
     private final MemberRepository memberRepository;
 
-    public LoginDto.refreshTokenRes createAccessTokenByRefreshToken(String refreshToken) {
+    public MemberDto.refreshTokenRes createAccessTokenByRefreshToken(String refreshToken) {
         Long memberId = jwtTokenUtils.verifyToken(refreshToken.replace(TOKEN_NAME_WITH_SPACE, ""))
                 .getClaim(CLAIM_ID).asLong();
         String inRedisToken = redisUtils.getRefreshTokenData(memberId.toString());
@@ -36,7 +36,7 @@ public class LoginService {
                 .orElseThrow(RefreshTokenException::new);
         String accessToken = jwtTokenUtils.createAccessToken(memberId, member.getUsername());
 
-        return new LoginDto.refreshTokenRes(accessToken, refreshToken);
+        return new MemberDto.refreshTokenRes(accessToken, refreshToken);
     }
 
     public void logout(Long memberId) {

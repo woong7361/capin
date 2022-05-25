@@ -30,4 +30,34 @@ public class MemberDto {
         private String imageUrl;
     }
 
+
+    @Data
+    @AllArgsConstructor
+    public static class LoginRes {
+        private String accessToken;
+        private String refreshToken;
+        private MemberRes member;
+        private Boolean isFirst;
+
+        public LoginRes(MemberRes member, Boolean isFirst) {
+            this.member = member;
+            this.isFirst = isFirst;
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class MemberRes {
+        private Long memberId;
+        private String username;
+        private String imageUrl;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class refreshTokenRes {
+        private String accessToken;
+        private String refreshToken;
+    }
+
 }
