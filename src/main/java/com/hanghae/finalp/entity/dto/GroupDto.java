@@ -24,7 +24,6 @@ public class GroupDto {
         private String firstDay;
         private String lastDay;
         private String description;
-        private List<MemberDto.ProfileRes> memberList;
 
         public SimpleRes(MemberGroup gm) {
             this.groupId = gm.getGroup().getId();
@@ -49,8 +48,24 @@ public class GroupDto {
             this.lastDay = group.getLastDay();
             this.description = group.getDescription();
         }
+    }
 
-        public SimpleRes(Group group, List<MemberDto.ProfileRes> memberList) {
+
+    @Data
+    @NoArgsConstructor
+    public static class SpecificRes {
+        private Long groupId;
+        private String imageUrl;
+        private String groupTitle;
+        private String roughAddress;
+        private int memberCount;
+        private int maxMemberCount;
+        private String firstDay;
+        private String lastDay;
+        private String description;
+        private List<MemberDto.ProfileRes> memberList;
+
+        public SpecificRes(Group group, List<MemberDto.ProfileRes> memberList) {
             this.groupId = group.getId();
             this.imageUrl = group.getImageUrl();
             this.groupTitle = group.getGroupTitle();
