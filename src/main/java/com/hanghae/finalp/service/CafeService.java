@@ -34,6 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -94,7 +95,9 @@ public class CafeService {
 
     public MemberGroupDto.Location findMid(Long groupId) {
         //그룹에 속해있는 멤버들을 다 찾는다. => 멤버그룹에서 그룹아이디를 가진 멤버그룹을 다 찾음
-        List<MemberGroup> memberGroupList = memberGroupRepository.findJoinMemberByGroupId(groupId);
+        List<MemberGroup> memberGroupList = memberGroupRepository.findJoinMemberByGroupId(groupId)
+                .stream().filter(mg -> Optional.ofNullable(mg.getStartLocationX()).isPresent())
+                .collect(Collectors.toList());
         MemberGroupDto.Location location = new MemberGroupDto.Location();
 
         memberGroupList.forEach((mg) -> location.addLocation(mg.getStartLocationX(), mg.getStartLocationY()));
