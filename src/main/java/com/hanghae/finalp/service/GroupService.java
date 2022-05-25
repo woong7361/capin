@@ -120,9 +120,11 @@ public class GroupService {
 
     //특정 그룹 불러오기
     @Transactional
-    public GroupDto.SimpleRes groupView(Long groupId) {
+    public GroupDto.SpecificRes groupView(Long groupId) {
         Group group = groupRepository.findById(groupId).orElseThrow(GroupNotExistException::new);
         List<MemberGroup> memberGroupList = memberGroupRepository.findAllByGroupId(groupId);
+
+//        memberGroupList.stream().filter(mg-> !mg.getAuthority().equals(Authority.WAIT)).forEach()
 
         List<Member> memberList = new ArrayList<>();
         for (MemberGroup memberGroup : memberGroupList) {
@@ -140,7 +142,7 @@ public class GroupService {
                 memberDtoList.add(profileRes);
             }
         }
-        return new GroupDto.SimpleRes(group, memberDtoList);
+        return new GroupDto.SpecificRes(group, memberDtoList);
     }
 
 
