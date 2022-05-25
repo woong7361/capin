@@ -30,6 +30,14 @@ public class GroupController {
     }
 
     /**
+     * 특정 그룹 조회
+     */
+    @GetMapping("/api/groups/{groupId}")
+    public GroupDto.SimpleRes groupView(@PathVariable("groupId") Long groupId){
+        return groupService.groupView(groupId);
+    }
+
+    /**
      * 스터디 그룹 생성
      */
     @PostMapping("/api/groups")
@@ -68,10 +76,9 @@ public class GroupController {
     }
 
 
-    //--------------------------------------------------------------------------------------
-
-
-    //그룹 리스트 페이징, 검색
+    /**
+     * 스터디 그룹 검색
+     */
    @GetMapping("/api/groups/list")
     public Slice<GroupDto.SimpleRes> getGroupList(
             @RequestBody(required = false) SearchWordDto searchWordDto,
@@ -81,8 +88,9 @@ public class GroupController {
     }
 
 
-
-    //특정 그룹
+    /**
+    * 특정 그룹
+    */
     @GetMapping("/api/groups/{groupId}")
     public GroupDto.SpecificRes groupView(@PathVariable("groupId") Long groupId){
         return groupService.groupView(groupId);

@@ -22,7 +22,7 @@ public class NoticeController {
     private final NoticeService noticeService;
 
     /**
-     * 알림 보기
+     * 알림 리스트 가져오기
      */
     @GetMapping("/api/notices")
     public Slice<NoticeDto.Res> getNotice(@AuthenticationPrincipal PrincipalDetails principalDetails,

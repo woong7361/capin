@@ -206,11 +206,11 @@ public class MemberGroupService {
      * 개인의 세부 주소 작성
      */
     @Transactional
-    public void setlocation(Long memberId, Long groupId, MemberGroupDto.Request request) {
+    public void setlocation(Long memberId, Long groupId, MemberGroupDto.LocationReq locationReq) {
         //해당하는 멤버그룹에 받아온 값을 넣어준다
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
                 .orElseThrow(() -> new MemberGroupNotExistException());
-        memberGroup.setLocation(request.getStartLocationX(), request.getStartLocationY(), request.getStartAddress());
+        memberGroup.setLocation(locationReq.getStartLocationX(), locationReq.getStartLocationY(), locationReq.getStartAddress());
     }
 
 
