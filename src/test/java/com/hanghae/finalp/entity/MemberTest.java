@@ -31,9 +31,9 @@ class MemberTest {
         em.persist(member);
         clearContext();
 
-        assertEquals(member.getKakaoId(), "kakaoId");
-        assertEquals(member.getUsername(), "홍길동");
-        assertEquals(member.getImageUrl(), "https://d2yjfe20.cloudfront.net/img.png");
+        assertEquals("kakaoId", member.getKakaoId());
+        assertEquals("홍길동", member.getUsername());
+        assertEquals("https://d2yjfe20.cloudfront.net/img.png", member.getImageUrl());
     }
 
 
@@ -47,9 +47,9 @@ class MemberTest {
 
         Member findMember = em.find(Member.class, member.getId());
 
-        assertEquals(findMember.getKakaoId(), "kakaoId");
-        assertEquals(findMember.getUsername(), "홍길동");
-        assertEquals(findMember.getImageUrl(), "https://d2yjfe20.cloudfront.net/img.png");
+        assertEquals("kakaoId", findMember.getKakaoId());
+        assertEquals("홍길동", findMember.getUsername());
+        assertEquals("https://d2yjfe20.cloudfront.net/img.png", findMember.getImageUrl());
     }
 
     @Test
@@ -62,8 +62,8 @@ class MemberTest {
 
         member.patchMember( "김철수", "https://d2yjfe20.cloudfront.net/ggg.png");
 
-        assertEquals(member.getUsername(), "김철수");
-        assertEquals(member.getImageUrl(), "https://d2yjfe20.cloudfront.net/ggg.png");
+        assertEquals("김철수", member.getUsername());
+        assertEquals("https://d2yjfe20.cloudfront.net/ggg.png", member.getImageUrl());
     }
 
 
@@ -75,16 +75,12 @@ class MemberTest {
         em.persist(member);
         clearContext();
 
-//        em.find(Member.class, member.getId());
-//        em.remove(member);
+        em.remove(em.find(Member.class, member.getId()));
+        clearContext();
+        Member findMember = em.find(Member.class, member.getId());
 
-//        em.remove(em.contains(member) ? member : em.merge(member));
-
-        member = em.merge(member);
-        em.remove(member);
-//        assertEquals(member.getKakaoId(), null);
-        System.out.println("======================================================================="+member);
-        assertNull(member);
+        assertNull(findMember);
     }
+
 
 }
