@@ -3,7 +3,7 @@ package com.hanghae.finalp.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.hanghae.finalp.config.exception.customexception.S3Exception;
+import com.hanghae.finalp.config.exception.customexception.etc.S3Exception;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

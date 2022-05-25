@@ -1,8 +1,8 @@
 package com.hanghae.finalp.config.exception.advice;
 
-import com.hanghae.finalp.config.exception.customexception.DuplicationRequestException;
+import com.hanghae.finalp.config.exception.customexception.etc.DuplicationRequestException;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorityException;
-import com.hanghae.finalp.config.exception.customexception.MaxNumberException;
+import com.hanghae.finalp.config.exception.customexception.etc.MaxNumberException;
 import com.hanghae.finalp.config.exception.dto.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

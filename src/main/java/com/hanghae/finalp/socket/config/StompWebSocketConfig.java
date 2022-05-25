@@ -34,10 +34,6 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-//        registry
-//                .addEndpoint("/ws")
-//                .setAllowedOriginPatterns("*")
-//                .withSockJS();
         registry
                 .addEndpoint("/ws")
                 .setAllowedOriginPatterns("*");
@@ -51,7 +47,6 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     @Bean
-//    @Order(Ordered.HIGHEST_PRECEDENCE + 99)
     public ChannelInterceptor stompHandler() {
         return new StompHandler(jwtTokenUtils, chatService, redisUtils);
     }

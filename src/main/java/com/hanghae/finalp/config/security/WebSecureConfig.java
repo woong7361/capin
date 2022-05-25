@@ -1,6 +1,5 @@
 package com.hanghae.finalp.config.security;
 
-import com.hanghae.finalp.config.security.exceptionhandler.CustomAccessDeniedHandler;
 import com.hanghae.finalp.config.security.exceptionhandler.CustomAuthenticationEntryPoint;
 import com.hanghae.finalp.config.security.filter.JwtAuthorizationFilter;
 import com.hanghae.finalp.util.JwtTokenUtils;
@@ -38,8 +37,7 @@ public class WebSecureConfig extends WebSecurityConfigurerAdapter {
         http.cors().configurationSource(corsConfigurationSource())
                 .and().csrf().disable()
                 .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .accessDeniedHandler(new CustomAccessDeniedHandler());
+                .authenticationEntryPoint(authenticationEntryPoint);
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
