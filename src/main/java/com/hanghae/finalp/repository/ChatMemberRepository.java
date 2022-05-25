@@ -13,7 +13,6 @@ import java.util.Optional;
 
 public interface ChatMemberRepository extends JpaRepository<ChatMember, Long> {
 
-//    Optional<ChatMember> deleteByMemberId(Long memberId);
     List<ChatMember> findByMemberId(Long memberId);
     Optional<ChatMember> findByMemberIdAndChatroomId(Long memberId, Long chatroomid);
 

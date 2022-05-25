@@ -30,6 +30,9 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
 
 
+    /**
+     * 헤더에서 path variable 추출
+     */
     public String getRoomId(String destination) {
         int lastIndex = destination.lastIndexOf('/');
         if (lastIndex != -1) {
@@ -39,6 +42,9 @@ public class ChatService {
         }
     }
 
+    /**
+     * 입장 퇴장 메시지 보내기
+     */
     @Transactional
     public void sendChatMessage(MessageDto.SendRes message, Set<String> roomMembers) {
         if (message.getMessageType().equals(MessageType.ENTER)) {
@@ -60,6 +66,9 @@ public class ChatService {
         redisTemplate.convertAndSend(channelTopic.getTopic(), message);
     }
 
+    /**
+     * 메시지 DB에 저장
+     */
     @Transactional
     public void saveMessage(Long chatroomId, Long senderId, String senderName, String content, MessageType messageType) {
         Chatroom chatroom = chatRoomRepository.findById(chatroomId)

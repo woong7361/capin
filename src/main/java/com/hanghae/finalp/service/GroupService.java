@@ -40,12 +40,18 @@ public class GroupService {
     private final ChatRoomRepository chatRoomRepository;
 
 
+    /**
+     * 내 그룹리스트 가져오기
+     */
     public Slice<GroupDto.SimpleRes> getMyGroupList(Long memberId, Pageable pageable) {
         Slice<MemberGroup> myGroupByMember = memberGroupRepository.findMyGroupByMemberId(memberId, pageable);
         return myGroupByMember
                 .map(GroupDto.SimpleRes::new);
     }
 
+    /**
+     * 새로운 그룹 생성
+     */
     @Transactional
     public GroupDto.SimpleRes createGroup(Long memberId, GroupDto.CreateReq createReq, MultipartFile multipartFile) {
         Member member = memberRepository.findById(memberId).orElseThrow(
@@ -61,6 +67,10 @@ public class GroupService {
         return new GroupDto.SimpleRes(group);
     }
 
+
+    /**
+     * 그룹 삭제
+     */
     @Transactional
     public void deleteGroup(Long memberId, Long groupId) {
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
@@ -74,6 +84,9 @@ public class GroupService {
         groupRepository.deleteById(memberGroup.getGroup().getId());
     }
 
+    /**
+     * 그룹 수정
+     */
     @Transactional
     public void patchGroup(Long memberId, Long groupId, GroupDto.CreateReq createReq, MultipartFile multipartFile) {
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
@@ -82,7 +95,6 @@ public class GroupService {
             log.debug("custom log:: patch group is required owner authority");
             throw new AuthorOwnerException();
         }
-        //fetch join 필요
         Group group = memberGroup.getGroup();
 
         s3Service.deleteFile(group.getImageUrl());
@@ -92,14 +104,11 @@ public class GroupService {
     }
 
 
-
-
-    //------------------------------------------------------------------------------------
-
-
-    //그룹 목록
+    /**
+     * 그룹 검색 리스트 가져오기
+     */
     @Transactional
-    public Slice<GroupDto.SimpleRes> getGroupList(GroupDto.SearchReq searchReq, Pageable pageable) {
+    public Slice<GroupDto.SimpleRes> getSearchGroupList(GroupDto.SearchReq searchReq, Pageable pageable) {
 
         Slice<Group> groups;
         if (searchReq == null){
@@ -117,7 +126,9 @@ public class GroupService {
     }
 
 
-    //특정 그룹 불러오기
+    /**
+     * 특정 그룹 불러오기
+     */
     @Transactional
     public GroupDto.SpecificRes groupView(Long groupId) {
         Group group = groupRepository.findById(groupId).orElseThrow(GroupNotExistException::new);

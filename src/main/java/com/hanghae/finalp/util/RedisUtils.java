@@ -3,23 +3,20 @@ package com.hanghae.finalp.util;
 import com.hanghae.finalp.entity.dto.MemberDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.time.Duration;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
 public class RedisUtils {
 
     public static final String ENTER_INFO = "ENTER_INFO"; // 채팅룸에 입장한 클라이언트의 sessionId와 채팅룸 id를 맵핑한 정보 저장
-
-
-//    @Resource(name = "redisTemplate")
-//    private SetOperations<String, String> roomMemberOps;
-//    @Resource(name = "redisTemplate")
-//    private HashOperations<String, String, MemberDto.RedisPrincipal> principalOps;
 
     private final StringRedisTemplate stringRedisTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -64,13 +61,14 @@ public class RedisUtils {
 
 
     public String getRefreshTokenData(String key) {
+        stringRedisTemplate.setKeySerializer(new StringRedisSerializer());
+        stringRedisTemplate.setValueSerializer(new StringRedisSerializer());
         ValueOperations<String,String> valueOperations = stringRedisTemplate.opsForValue();
         return valueOperations.get(key);
     }
     public void setRefreshTokenDataExpire(String key, String value, long duration) {
         ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
-        Duration expireDuration = Duration.ofSeconds(duration / 1000);
-        valueOperations.set(key, value, expireDuration);
+        valueOperations.set(key, value, duration, TimeUnit.SECONDS);
     }
     public void deleteRefreshTokenData(String key) {
         stringRedisTemplate.delete(key);

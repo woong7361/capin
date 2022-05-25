@@ -1,11 +1,11 @@
 package com.hanghae.finalp.service;
 
-import com.hanghae.finalp.config.exception.customexception.DuplicationRequestException;
+import com.hanghae.finalp.config.exception.customexception.etc.DuplicationRequestException;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorJoinException;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorOwnerException;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorWaitException;
 import com.hanghae.finalp.config.exception.customexception.entity.EntityNotExistException;
-import com.hanghae.finalp.config.exception.customexception.MaxNumberException;
+import com.hanghae.finalp.config.exception.customexception.etc.MaxNumberException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberGroupNotExistException;
 import com.hanghae.finalp.entity.*;
 import com.hanghae.finalp.entity.dto.MemberGroupDto;
@@ -29,7 +29,9 @@ public class MemberGroupService {
     private final ChatRoomRepository chatRoomRepository;
     private final NoticeRepository noticeRepository;
 
-    //그룹 참가 신청
+    /**
+     * 그룹 참가 신청
+     */
     @Transactional
     public void applyGroup(Long memberId, String username, Long groupId) {
         log.debug("custom log:: 이미 신청하거나 가입되어있는지 확인");
@@ -49,9 +51,9 @@ public class MemberGroupService {
         noticeRepository.save(notice);
     }
 
-
-
-    //그룹 참가자 승인
+    /**
+     * 그룹 참가자 승인
+     */
     @Transactional
     public void approveGroup(Long myMemberId, Long groupId, Long memberId) {
 
@@ -92,7 +94,9 @@ public class MemberGroupService {
         noticeRepository.save(notice);
     }
 
-    //그룹 참가자 거절
+    /**
+     * 그룹 참가자 거절
+     */
     @Transactional
     public void denyGroup(Long myMemberId, Long groupId, Long memberId) {
 
@@ -101,7 +105,6 @@ public class MemberGroupService {
         MemberGroup myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId).orElseThrow(
                 MemberGroupNotExistException::new);
 
-        //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너가 아니라면
         if(!Authority.OWNER.equals(myMemberGroup.getAuthority())){
             throw new AuthorOwnerException();
         }
@@ -110,7 +113,6 @@ public class MemberGroupService {
         MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
                 MemberGroupNotExistException::new);
 
-        //그사람의 auth 확인 ->그사람의 권한이 wait일 경우
         if(!Authority.WAIT.equals(yourMemberGroup.getAuthority())) {
             throw new AuthorOwnerException();
         }
@@ -122,9 +124,9 @@ public class MemberGroupService {
         memberGroupRepository.delete(yourMemberGroup);
     }
 
-
-
-    //그룹 참가자 추방
+    /**
+     * 그룹 참가자 추방
+     */
     @Transactional
     public void banGroup(Long myMemberId, Long groupId, Long memberId) {
         log.debug("custom log:: owner's memberGroup 확인");
@@ -168,6 +170,9 @@ public class MemberGroupService {
     }
 
 
+    /**
+     * 그룹 참가 취소
+     */
     @Transactional
     public void cancelApplyGroup(Long memberId, Long groupId) {
 
@@ -182,6 +187,9 @@ public class MemberGroupService {
         memberGroupRepository.delete(memberGroup);
     }
 
+    /**
+     * 그룹 나가기
+     */
     @Transactional
     public void exitGroup(Long memberId, Long groupId) {
         log.debug("custom log:: target's memberGroup 확인");

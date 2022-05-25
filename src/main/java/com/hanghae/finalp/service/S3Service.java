@@ -3,7 +3,7 @@ package com.hanghae.finalp.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.hanghae.finalp.config.exception.customexception.S3Exception;
+import com.hanghae.finalp.config.exception.customexception.etc.S3Exception;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 
 
 @Service
@@ -29,6 +30,9 @@ public class S3Service {
     private String CLOUD_FRONT_DOMAIN_NAME;
 
 
+    /**
+     * S3에 파일 업로드
+     */
     public String uploadFile(MultipartFile file) {
         if(file == null) return null;
         log.debug("custom log:: upload file to S3...");
@@ -45,7 +49,9 @@ public class S3Service {
     }
 
 
-
+    /**
+     * S3에서 파일 삭제
+     */
     public void deleteFile(String currentFilePath) {
         if (currentFilePath == null) return;
         if (currentFilePath.startsWith("http://k.kakaocdn.net")) return;
