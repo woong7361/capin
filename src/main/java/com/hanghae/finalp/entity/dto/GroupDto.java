@@ -53,6 +53,7 @@ public class GroupDto {
 
     @Data
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class SpecificRes {
         private Long groupId;
         private String imageUrl;

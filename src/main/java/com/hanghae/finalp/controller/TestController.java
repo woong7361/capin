@@ -2,6 +2,7 @@ package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.entity.Member;
+import com.hanghae.finalp.entity.dto.LoginDto;
 import com.hanghae.finalp.repository.MemberRepository;
 import com.hanghae.finalp.service.oauth.KakaoOauth;
 import com.hanghae.finalp.util.JwtTokenUtils;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Controller
@@ -62,12 +62,12 @@ public class TestController {
     }
 
 
-    @PostConstruct
+   /* @PostConstruct
     public void createDummyMember() {
         Member dummy = Member.createMember("1", "testUser", null);
         memberRepository.save(dummy);
     }
-
+*/
 
     @Data
     @AllArgsConstructor
