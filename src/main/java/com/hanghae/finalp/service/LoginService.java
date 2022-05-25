@@ -24,6 +24,9 @@ public class LoginService {
     private final RedisUtils redisUtils;
     private final MemberRepository memberRepository;
 
+    /**
+     * refreshToken으로 accessToken 발급
+     */
     public MemberDto.refreshTokenRes createAccessTokenByRefreshToken(String refreshToken) {
         Long memberId = jwtTokenUtils.verifyToken(refreshToken.replace(TOKEN_NAME_WITH_SPACE, ""))
                 .getClaim(CLAIM_ID).asLong();
@@ -39,6 +42,9 @@ public class LoginService {
         return new MemberDto.refreshTokenRes(accessToken, refreshToken);
     }
 
+    /**
+     * 로그아웃
+     */
     public void logout(Long memberId) {
         redisUtils.deleteRefreshTokenData(memberId.toString());
     }

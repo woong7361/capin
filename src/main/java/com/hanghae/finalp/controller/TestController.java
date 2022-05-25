@@ -37,7 +37,8 @@ public class TestController {
         memberRepository.save(member);
         String accessToken = jwtTokenUtils.createAccessToken(member.getId(), member.getUsername());
         String refreshToken = jwtTokenUtils.createRefreshToken(member.getId());
-        redisUtils.setRefreshTokenDataExpire(member.getId().toString(), refreshToken, 14 * JwtTokenUtils.DAY);
+        redisUtils.setRefreshTokenDataExpire(member.getId().toString(), refreshToken,
+                jwtTokenUtils.getRefreshTokenExpireTime(refreshToken));
         return new MemberDto.refreshTokenRes(accessToken, refreshToken);
     }
 
@@ -56,7 +57,6 @@ public class TestController {
     @GetMapping("/test5")
     @ResponseBody
     public Dto form(@RequestBody Dto dto) {
-        System.out.println("dto = " + dto);
         return dto;
 //        return "form.html";
     }

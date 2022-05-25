@@ -75,7 +75,7 @@ public class GroupController {
             @RequestBody(required = false) GroupDto.SearchReq searchReq,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) { //page=1상태로오면 1빼줘야함
-        return groupService.getGroupList(searchReq, pageable);
+        return groupService.getSearchGroupList(searchReq, pageable);
     }
 
 

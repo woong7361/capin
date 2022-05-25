@@ -31,8 +31,6 @@ public class RedisSubscriber implements MessageListener {
      */
     public void sendMessage(String publishMessage) {
 
-        System.out.println("publishMessage = " + publishMessage);
-
         try {
             MessageDto.SendRes message = objectMapper.readValue(publishMessage, MessageDto.SendRes.class);
             messagingTemplate.convertAndSend("/sub/channel/" + message.getChatroomId().toString(), message);
@@ -54,7 +52,6 @@ public class RedisSubscriber implements MessageListener {
             // Websocket 구독자에게 채팅 메시지 Send
             messagingTemplate.convertAndSend("/sub/channel/" + message1.getChatroomId(), message1);
         } catch (Exception e) {
-            System.out.println("e = " + e);
             log.error(e.getMessage());
         }
     }

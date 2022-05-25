@@ -103,4 +103,12 @@ public class JwtTokenUtils {
                 .sign(Algorithm.HMAC512(JWT_SECRET));   //secretkey
         return TOKEN_NAME_WITH_SPACE + token;
     }
+
+    public long getRefreshTokenExpireTime(String refreshToken) {
+        DecodedJWT decodedJWT = verifyToken(replaceBearer(refreshToken));
+        long tokenExpireTime = decodedJWT.getExpiresAt().getTime();
+        long currentTime = new Date().getTime();
+
+        return (tokenExpireTime - currentTime) / SEC;  //milli sec -> sec
+    }
 }
