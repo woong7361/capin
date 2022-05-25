@@ -35,7 +35,7 @@ public class GroupController {
     @PostMapping("/api/groups")
     public GroupDto.SimpleRes createGroup(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @Valid @RequestBody GroupDto.CreateReq createReq,
+            @Valid GroupDto.CreateReq createReq,
             @RequestPart(value = "image", required = false) MultipartFile multipartFile
     ) {
         return groupService.createGroup(principalDetails.getMemberId(), createReq, multipartFile);
@@ -59,7 +59,7 @@ public class GroupController {
     @PostMapping("/api/groups/{groupId}/patch")
     public ResultMsg patchReq(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @Valid @RequestBody GroupDto.CreateReq createReq,
+            @Valid GroupDto.CreateReq createReq,
             @RequestPart(value = "image", required = false) MultipartFile multipartFile,
             @PathVariable("groupId") Long groupId
     ) {
