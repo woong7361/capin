@@ -2,8 +2,7 @@ package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.GroupDto;
-import com.hanghae.finalp.entity.dto.ResultMsg;
-import com.hanghae.finalp.entity.dto.SearchWordDto;
+import com.hanghae.finalp.entity.dto.other.ResultMsg;
 import com.hanghae.finalp.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -27,14 +26,6 @@ public class GroupController {
     @GetMapping("/api/groups/my")
     public Slice<GroupDto.SimpleRes> myGroupList(@AuthenticationPrincipal PrincipalDetails principalDetails, Pageable pageable) {
         return groupService.getMyGroupList(principalDetails.getPrincipal().getMemberId(), pageable);
-    }
-
-    /**
-     * 특정 그룹 조회
-     */
-    @GetMapping("/api/groups/{groupId}")
-    public GroupDto.SimpleRes groupView(@PathVariable("groupId") Long groupId){
-        return groupService.groupView(groupId);
     }
 
     /**
@@ -81,10 +72,10 @@ public class GroupController {
      */
    @GetMapping("/api/groups/list")
     public Slice<GroupDto.SimpleRes> getGroupList(
-            @RequestBody(required = false) SearchWordDto searchWordDto,
+            @RequestBody(required = false) GroupDto.SearchReq searchReq,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) { //page=1상태로오면 1빼줘야함
-        return groupService.getGroupList(searchWordDto, pageable);
+        return groupService.getGroupList(searchReq, pageable);
     }
 
 
@@ -95,8 +86,5 @@ public class GroupController {
     public GroupDto.SpecificRes groupView(@PathVariable("groupId") Long groupId){
         return groupService.groupView(groupId);
     }
-
-
-    //---------------------------------------------------------------------------
 
 }

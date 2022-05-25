@@ -1,7 +1,7 @@
 package com.hanghae.finalp.config.security.exceptionhandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hanghae.finalp.entity.dto.ResultMsg;
+import com.hanghae.finalp.entity.dto.other.ResultMsg;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

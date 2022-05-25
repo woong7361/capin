@@ -27,15 +27,6 @@ public class MemberGroupDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Response {
-        private String startLocationX;
-        private String startLocationY;
-        private String startAddress;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class Location {
         private Double locationX = 0.0;
         private Double locationY = 0.0;

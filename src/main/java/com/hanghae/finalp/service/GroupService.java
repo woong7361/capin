@@ -10,7 +10,6 @@ import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.dto.GroupDto;
 import com.hanghae.finalp.entity.dto.MemberDto;
-import com.hanghae.finalp.entity.dto.SearchWordDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.repository.ChatRoomRepository;
 import com.hanghae.finalp.repository.GroupRepository;
@@ -100,19 +99,19 @@ public class GroupService {
 
     //그룹 목록
     @Transactional
-    public Slice<GroupDto.SimpleRes> getGroupList(SearchWordDto searchWordDto, Pageable pageable) {
+    public Slice<GroupDto.SimpleRes> getGroupList(GroupDto.SearchReq searchReq, Pageable pageable) {
 
         Slice<Group> groups;
-        if (searchWordDto == null){
+        if (searchReq == null){
             groups = groupRepository.findAll(pageable);
-        } else if (searchWordDto.getTitle() == null){
-            List<String> addressList = searchWordDto.getAddressList().stream().map(address -> address.getAddress()).collect(Collectors.toList());
+        } else if (searchReq.getTitle() == null){
+            List<String> addressList = searchReq.getAddressList().stream().map(address -> address.getAddress()).collect(Collectors.toList());
             groups = groupRepository.findAllByRoughAddressIn(addressList, pageable);
-        } else if (searchWordDto.getAddressList() == null) {
-            groups = groupRepository.findAllByGroupTitleContaining(searchWordDto.getTitle(), pageable);
+        } else if (searchReq.getAddressList() == null) {
+            groups = groupRepository.findAllByGroupTitleContaining(searchReq.getTitle(), pageable);
         }else {
-            List<String> addressList = searchWordDto.getAddressList().stream().map(address -> address.getAddress()).collect(Collectors.toList());
-            groups = groupRepository.findAllByGroupTitleContainingAndRoughAddressIn(searchWordDto.getTitle(), addressList, pageable);
+            List<String> addressList = searchReq.getAddressList().stream().map(address -> address.getAddress()).collect(Collectors.toList());
+            groups = groupRepository.findAllByGroupTitleContainingAndRoughAddressIn(searchReq.getTitle(), addressList, pageable);
         }
         return groups.map(GroupDto.SimpleRes::new);
     }

@@ -88,7 +88,7 @@ public class StompHandler implements ChannelInterceptor {
 
 
     private void sendMessage(String roomId, MessageType messageType, String username, Long memberId) {
-        MessageDto.Send sendMessage = new MessageDto.Send(roomId, memberId, username, messageType);
+        MessageDto.SendRes sendMessage = new MessageDto.SendRes(roomId, memberId, username, messageType);
         Set<String> roomMembers = redisUtils.getRoomMembers(roomId);
         chatService.sendChatMessage(sendMessage, roomMembers);
 

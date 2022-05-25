@@ -30,7 +30,7 @@ public class MessageController {
      * 메시지 보내기
      */
     @MessageMapping("/channel")
-    public void redisMessage(MessageDto.Reqeust message) {
+    public void redisMessage(MessageDto.SendReq message) {
         message.setMessageType(MessageType.TALK);
 
         chatService.saveMessage(message.getChatroomId(), message.getSenderId(),message.getSenderName(),
@@ -44,7 +44,7 @@ public class MessageController {
      * 채팅기록 가져오기
      */
     @GetMapping("/api/messages/{chatroomId}")
-    public Slice<MessageDto.Send> getPreviousMessage(@PathVariable("chatroomId") Long chatroomId, Pageable pageable) {
+    public Slice<MessageDto.SendRes> getPreviousMessage(@PathVariable("chatroomId") Long chatroomId, Pageable pageable) {
         return messageService.getPreviousMessage(chatroomId, pageable);
     }
 }

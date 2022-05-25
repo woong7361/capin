@@ -4,8 +4,8 @@ package com.hanghae.finalp.service.oauth;
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.config.security.kakao.KakaoProfile;
 import com.hanghae.finalp.config.security.kakao.OAuthToken;
+import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.util.JwtTokenUtils;
-import com.hanghae.finalp.entity.dto.LoginDto;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.repository.MemberRepository;
 import com.hanghae.finalp.util.RedisUtils;
@@ -56,12 +56,12 @@ public class KakaoOauth {
     private String userInfoUri;
 
     @Transactional
-    public LoginDto.Response login(String providerName, String code) {
+    public MemberDto.LoginRes login(String providerName, String code) {
 
         OAuthToken tokenResponse = getTokenFromKakao(code); //provider에 해당하는 카카오의 OAuthToken 얻어서
         KakaoProfile kakaoProfile = getUserProfileFromKakao(providerName, tokenResponse); //카카오 프로필 요청해서 얻고
 
-        LoginDto.Response response = saveMember(providerName, kakaoProfile);//멤버 저장
+        MemberDto.LoginRes response = saveMember(providerName, kakaoProfile);//멤버 저장
 
         String accessToken = jwtTokenUtils.
                 createAccessToken(response.getMember().getMemberId(), response.getMember().getUsername());
@@ -124,7 +124,7 @@ public class KakaoOauth {
                 .block();
     }
 
-    private LoginDto.Response saveMember(String providerName, KakaoProfile kakaoProfile) {
+    private MemberDto.LoginRes saveMember(String providerName, KakaoProfile kakaoProfile) {
         String kakaoId = kakaoProfile.getId() + "_" + providerName; //카카오에서 받아온 아이디를 kakaoId로.
         String username = kakaoProfile.getProperties().getNickname();  //카카오에서 받아온 nickname을 username으로.
         String imageUrl = kakaoProfile.getProperties().getProfile_image(); //카카오에서 받아온 Profile_image를 imageUrl로.
@@ -145,7 +145,7 @@ public class KakaoOauth {
         PrincipalDetails principalDetails = new PrincipalDetails(memberId, username); //principalDetails을 생성해줌
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(principalDetails, null, null);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new LoginDto.Response(new LoginDto.MemberRes(memberId, username, imageUrl), isFirst);
+        return new MemberDto.LoginRes(new MemberDto.MemberRes(memberId, username, imageUrl), isFirst);
     }
 
 }

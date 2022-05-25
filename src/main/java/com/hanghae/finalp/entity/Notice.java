@@ -50,7 +50,7 @@ public class Notice {
         return new Notice(message, member);
     }
 
-    public void read() {
+    public void readNotice() {
         this.isRead = true;
     }
 }

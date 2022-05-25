@@ -2,22 +2,19 @@ package com.hanghae.finalp.entity.dto;
 
 import com.hanghae.finalp.entity.Message;
 import com.hanghae.finalp.entity.mappedsuperclass.MessageType;
-import com.hanghae.finalp.entity.mappedsuperclass.RoomType;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class MessageDto {
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Reqeust {
+    public static class SendReq {
         Long chatroomId;
         Long senderId;
         String senderName;
@@ -26,8 +23,7 @@ public class MessageDto {
     }
     @Data
     @NoArgsConstructor
-
-    public static class Send {
+    public static class SendRes {
         String chatroomId;
         Long senderId;
         String senderName;
@@ -35,7 +31,7 @@ public class MessageDto {
         MessageType messageType;
         List<ChatMember> members = new ArrayList<>();
 
-        public Send(Message message) {
+        public SendRes(Message message) {
             this.chatroomId = message.getChatroom().getId().toString();
             this.senderId = message.getSenderId();
             this.senderName = message.getSenderName();
@@ -43,7 +39,7 @@ public class MessageDto {
             this.messageType = message.getMessageType();
         }
 
-        public Send(String roomId, Long memberId, String username, MessageType messageType) {
+        public SendRes(String roomId, Long memberId, String username, MessageType messageType) {
             this.chatroomId = roomId;
             this.senderId = memberId;
             this.senderName = username;

@@ -1,6 +1,6 @@
 package com.hanghae.finalp.entity.dto;
 
-import com.hanghae.finalp.entity.dto.scraping.KakaoApiDto;
+import com.hanghae.finalp.entity.dto.other.KakaoApiDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,8 +14,7 @@ public class CafeDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-//    @RequiredArgsConstructor
-    public static class Reqeust {
+    public static class CreateReq {
         //여기 무슨값 받는지 정해지면 밸리데이션 추가할것
         private String locationName;
 

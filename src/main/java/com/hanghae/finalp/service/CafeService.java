@@ -8,7 +8,7 @@ import com.hanghae.finalp.config.exception.customexception.entity.MemberGroupNot
 import com.hanghae.finalp.entity.Cafe;
 import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.dto.CafeDto;
-import com.hanghae.finalp.entity.dto.scraping.KakaoApiDto;
+import com.hanghae.finalp.entity.dto.other.KakaoApiDto;
 import com.hanghae.finalp.entity.dto.MemberGroupDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.repository.CafeRepository;
@@ -17,11 +17,6 @@ import com.hanghae.finalp.repository.MemberGroupRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -49,7 +44,7 @@ public class CafeService {
 
 
     @Transactional
-    public void selectCafe(Long memberId, CafeDto.Reqeust request, Long groupId){
+    public void selectCafe(Long memberId, CafeDto.CreateReq request, Long groupId){
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(memberId, groupId)
                 .orElseThrow(MemberGroupNotExistException::new);
         if(!memberGroup.getAuthority().equals(Authority.OWNER)) {

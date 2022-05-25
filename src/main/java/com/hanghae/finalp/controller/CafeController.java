@@ -3,6 +3,7 @@ package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.*;
+import com.hanghae.finalp.entity.dto.other.ResultMsg;
 import com.hanghae.finalp.service.CafeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,7 +24,7 @@ public class CafeController {
     @PostMapping("/api/groups/{groupId}/cafe")
     public ResultMsg cafeSelect(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                 @PathVariable("groupId") Long groupId,
-                                @Valid @RequestBody CafeDto.Reqeust request) {
+                                @Valid @RequestBody CafeDto.CreateReq request) {
         cafeService.selectCafe(principalDetails.getMemberId(), request, groupId);
         return new ResultMsg("success");
     }
