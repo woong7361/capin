@@ -11,7 +11,6 @@ import java.util.List;
 
 public interface GroupRepository extends JpaRepository<Group, Long> {
 
-    //제목과 지역으로 검색
     @Query("select g from Group g where g.groupTitle like CONCAT('%',:title,'%')")
     Slice<Group> findAllByGroupTitleContaining(@Param("title") String title, Pageable pageable);
 
