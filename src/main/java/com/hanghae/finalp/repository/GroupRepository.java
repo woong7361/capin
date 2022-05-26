@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface GroupRepository extends JpaRepository<Group, Long> {
 
@@ -17,11 +18,11 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     @Query("select g from Group g where g.roughAddress in (:addressList)")
     Slice<Group> findAllByRoughAddressIn(@Param("addressList") List<String> addressList, Pageable pageable);
 
-    @Query("select g from Group g where g.roughAddress like CONCAT('%',:title,'%') and g.roughAddress in (:addressList)")
+    @Query("select g from Group g where g.groupTitle like CONCAT('%',:title,'%') and g.roughAddress in (:addressList)")
     Slice<Group> findAllByGroupTitleContainingAndRoughAddressIn(@Param("title") String title, @Param("addressList") List<String> addressLIst, Pageable pageable);
 
     @Query("select distinct g from Group g join fetch g.memberGroups where g.id = :groupId")
-    Slice<Group> findMemberByGroupId(@Param("groupId") Long groupId);
+    Optional<Group> findMemberByGroupId(@Param("groupId") Long groupId);
 
 }
 
