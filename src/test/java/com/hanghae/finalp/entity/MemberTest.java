@@ -4,24 +4,22 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import javax.persistence.EntityManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.springframework.boot.jdbc.EmbeddedDatabaseConnection.H2;
 
-@AutoConfigureTestDatabase(connection = H2)
-@DataJpaTest //@DataJpaTest에는 기본적으로 @Transactional이 설정되어있다
+@DataJpaTest
 class MemberTest {
     @Autowired private EntityManager em;
 
-    public void clearContext(){
+    public void clearPersistenceContext(){
         em.flush();
         em.clear();
     }
+
 
     @Test
     @Order(1)
@@ -29,7 +27,7 @@ class MemberTest {
     public void memberCreateTest() throws Exception {
         Member member = Member.createMember("kakaoId", "홍길동", "https://d2yjfe20.cloudfront.net/img.png");
         em.persist(member);
-        clearContext();
+        clearPersistenceContext();
 
         assertEquals("kakaoId", member.getKakaoId());
         assertEquals("홍길동", member.getUsername());
@@ -43,7 +41,7 @@ class MemberTest {
     public void memberFindTest() throws Exception {
         Member member = Member.createMember("kakaoId", "홍길동", "https://d2yjfe20.cloudfront.net/img.png");
         em.persist(member);
-        clearContext();
+        clearPersistenceContext();
 
         Member findMember = em.find(Member.class, member.getId());
 
@@ -58,7 +56,7 @@ class MemberTest {
     public void memberUpdateTest() throws Exception {
         Member member = Member.createMember("kakaoId", "홍길동", "https://d2yjfe20.cloudfront.net/img.png");
         em.persist(member);
-        clearContext();
+        clearPersistenceContext();
 
         member.patchMember( "김철수", "https://d2yjfe20.cloudfront.net/ggg.png");
 
@@ -73,10 +71,11 @@ class MemberTest {
     public void memberDeleteTest() throws Exception {
         Member member = Member.createMember("kakaoId", "홍길동", "https://d2yjfe20.cloudfront.net/img.png");
         em.persist(member);
-        clearContext();
+        clearPersistenceContext();
 
         em.remove(em.find(Member.class, member.getId()));
-        clearContext();
+        clearPersistenceContext();
+
         Member findMember = em.find(Member.class, member.getId());
 
         assertNull(findMember);
