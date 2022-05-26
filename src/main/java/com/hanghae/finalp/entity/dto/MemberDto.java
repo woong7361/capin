@@ -1,6 +1,6 @@
 package com.hanghae.finalp.entity.dto;
 
-import com.hanghae.finalp.entity.Member;
+import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,13 +30,17 @@ public class MemberDto {
         private String username;
         private String imageUrl;
 
-        public ProfileRes(Member member){
-            this.username = member.getUsername();
-            this.imageUrl = member.getImageUrl();
-        }
-
     }
 
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SpecificRes {
+        private Long userId;
+        private String username;
+        private String imageUrl;
+        private Authority authority;
+    }
 
     @Data
     @AllArgsConstructor

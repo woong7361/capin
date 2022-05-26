@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -130,23 +131,30 @@ public class GroupService {
      */
     @Transactional
     public GroupDto.SpecificRes groupView(Long groupId) {
-
-        List<Member> memberList = memberGroupRepository.findAllByGroupId(groupId).stream()
+        List<MemberGroup> memberGroupList = memberGroupRepository.findAllByGroupId(groupId);
+        List<Member> memberList = memberGroupList.stream()
                 .filter(mg -> !mg.getAuthority().equals(Authority.WAIT))
                 .map(mg -> mg.getMember())
+//                .sorted(Comparator.comparing(Member::getUsername))
                 .collect(Collectors.toList());
 
-        List<MemberDto.ProfileRes> profileResList = memberList.stream()
-                .map(MemberDto.ProfileRes::new)
-                .collect(Collectors.toList());
+        List<MemberDto.SpecificRes> specificResList = new ArrayList<>();
+        for (Member member : memberList) {
+            MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(member.getId(), groupId)
+                    .orElseThrow(MemberGroupNotExistException::new);
 
+            if (!Authority.WAIT.equals(memberGroup.getAuthority())) {
+                MemberDto.SpecificRes specificRes = new MemberDto.SpecificRes();
+                specificRes.setUserId(member.getId());
+                specificRes.setUsername(member.getUsername());
+                specificRes.setImageUrl(member.getImageUrl());
+                specificRes.setAuthority(memberGroup.getAuthority());
+                specificResList.add(specificRes);
+            }
+        }
         Group group = groupRepository.findById(groupId).orElseThrow(GroupNotExistException::new);
-
-        return new GroupDto.SpecificRes(group, profileResList);
+        return new GroupDto.SpecificRes(group, specificResList);
     }
-
-
-
 
 
 }
