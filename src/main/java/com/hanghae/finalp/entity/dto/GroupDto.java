@@ -64,9 +64,9 @@ public class GroupDto {
         private String firstDay;
         private String lastDay;
         private String description;
-        private List<MemberDto.ProfileRes> memberList;
+        private List<MemberDto.SpecificRes> memberList;
 
-        public SpecificRes(Group group, List<MemberDto.ProfileRes> memberList) {
+        public SpecificRes(Group group, List<MemberDto.SpecificRes> memberList) {
             this.groupId = group.getId();
             this.imageUrl = group.getImageUrl();
             this.groupTitle = group.getGroupTitle();
