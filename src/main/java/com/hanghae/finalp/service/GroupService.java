@@ -112,7 +112,7 @@ public class GroupService {
 
         Slice<Group> groups;
         if (searchReq == null){
-            groups = groupRepository.findAll(pageable);
+            groups = groupRepository.findAllToSlice(pageable);
         } else if (searchReq.getTitle() == null){
             List<String> addressList = searchReq.getAddressList().stream().map(address -> address.getAddress()).collect(Collectors.toList());
             groups = groupRepository.findAllByRoughAddressIn(addressList, pageable);

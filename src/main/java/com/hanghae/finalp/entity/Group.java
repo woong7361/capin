@@ -101,6 +101,12 @@ public class Group extends TimeStamped {
     }
 
 
+    //=======================================for test==========================================//
+    public void setIdForTest(Long id) {
+        this.id = id;
+    }
+
+
 
 }
 

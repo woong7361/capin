@@ -1,5 +1,6 @@
 package com.hanghae.finalp.service;
 
+import com.hanghae.finalp.config.exception.customexception.entity.MemberNotExistException;
 import com.hanghae.finalp.config.exception.customexception.token.RefreshTokenException;
 import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.entity.Member;
@@ -36,7 +37,7 @@ public class LoginService {
         if(!refreshToken.equals(inRedisToken)) throw new RefreshTokenException();
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(RefreshTokenException::new);
+                .orElseThrow(MemberNotExistException::new);
         String accessToken = jwtTokenUtils.createAccessToken(memberId, member.getUsername());
 
         return new MemberDto.refreshTokenRes(accessToken, refreshToken);
