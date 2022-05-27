@@ -61,13 +61,6 @@ public class TestController {
 //        return "form.html";
     }
 
-
-    @PostConstruct
-    public void createDummyMember() {
-        Member dummy = Member.createMember("1", "testUser", null);
-        memberRepository.save(dummy);
-    }
-
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
