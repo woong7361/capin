@@ -20,11 +20,9 @@ public class MemberGroup extends TimeStamped {
 
     @Enumerated(EnumType.STRING)
     private Authority authority;
-
     private String startLocationX;
     private String startLocationY;
     private String startAddress;
-
     private Long chatroomId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,6 +42,12 @@ public class MemberGroup extends TimeStamped {
         this.chatroomId = chatroomId;
     }
 
+    private MemberGroup(Authority authority, Long memberId, Long groupId, Long chatroomId) {
+        this.authority = authority;
+        this.member = Member.createMappingMember(memberId);
+        this.group = Group.createMappingGroup(groupId);
+        this.chatroomId = chatroomId;
+    }
 
     //========================================생성 편의자=============================================//
 
@@ -51,17 +55,20 @@ public class MemberGroup extends TimeStamped {
         return new MemberGroup(authority, member, group, chatroomId);
     }
 
-    public void setAuthority(Authority authority) {
-        this.authority = authority;
+    public static MemberGroup createMemberGroup(Authority authority, Long memberId, Long groupId, Long chatroomId) {
+        return new MemberGroup(authority, memberId, groupId, chatroomId);
     }
 
-    public void setChatroomId(Long chatroomId) { this.chatroomId = chatroomId; }
+    public void joinGroup() {
+        this.authority = Authority.JOIN;
+    }
 
-    public void setLocation(String startLocationX, String startLocationY, String startAddress){
+    public void joinGroupChatRoom(Long chatroomId) { this.chatroomId = chatroomId; }
+
+    public void setStartLocation(String startLocationX, String startLocationY, String startAddress){
         this.startLocationX = startLocationX;
         this.startLocationY = startLocationY;
         this.startAddress = startAddress;
     }
-
 
 }

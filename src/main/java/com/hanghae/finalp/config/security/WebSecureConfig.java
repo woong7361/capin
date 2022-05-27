@@ -1,6 +1,5 @@
 package com.hanghae.finalp.config.security;
 
-import com.hanghae.finalp.config.security.exceptionhandler.CustomAccessDeniedHandler;
 import com.hanghae.finalp.config.security.exceptionhandler.CustomAuthenticationEntryPoint;
 import com.hanghae.finalp.config.security.filter.JwtAuthorizationFilter;
 import com.hanghae.finalp.util.JwtTokenUtils;
@@ -23,6 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class WebSecureConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final JwtTokenUtils jwtTokenUtils;
 
     //이걸로 안막으면 인증이 필요없는 부분도 필터를 탐 (forbidden으로 막히지는 않음)
     @Override
@@ -30,19 +30,14 @@ public class WebSecureConfig extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .antMatchers("/h2-console/**")
                 .antMatchers("/sub");
-//                .antMatchers("/api/login");
     }
-
-    private final JwtTokenUtils jwtTokenUtils;
-
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().configurationSource(corsConfigurationSource())
                 .and().csrf().disable()
                 .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .accessDeniedHandler(new CustomAccessDeniedHandler());
+                .authenticationEntryPoint(authenticationEntryPoint);
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()

@@ -3,6 +3,7 @@ package com.hanghae.finalp.socket.config;
 import com.hanghae.finalp.service.ChatService;
 import com.hanghae.finalp.socket.StompHandler;
 import com.hanghae.finalp.util.JwtTokenUtils;
+import com.hanghae.finalp.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,7 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //    private final StompHandler stompHandler;
     private final JwtTokenUtils jwtTokenUtils;
     private final ChatService chatService;
+    private final RedisUtils redisUtils;
 
     // sub, pub prefix 설정
     @Override
@@ -32,10 +34,6 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-//        registry
-//                .addEndpoint("/ws")
-//                .setAllowedOriginPatterns("*")
-//                .withSockJS();
         registry
                 .addEndpoint("/ws")
                 .setAllowedOriginPatterns("*");
@@ -49,9 +47,8 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     @Bean
-//    @Order(Ordered.HIGHEST_PRECEDENCE + 99)
     public ChannelInterceptor stompHandler() {
-        return new StompHandler(jwtTokenUtils, chatService);
+        return new StompHandler(jwtTokenUtils, chatService, redisUtils);
     }
 }
 

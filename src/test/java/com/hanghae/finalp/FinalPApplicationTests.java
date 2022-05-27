@@ -1,3 +1,4 @@
+/*
 package com.hanghae.finalp;
 
 import com.hanghae.finalp.entity.Chatroom;
@@ -12,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 //@DataJpaTest
 @Transactional
 class FinalPApplicationTests {
@@ -89,4 +89,4 @@ class FinalPApplicationTests {
         //then
     }
 
-}
+}*/

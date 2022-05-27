@@ -22,16 +22,12 @@ public class Member extends TimeStamped {
     @Column(columnDefinition = "TEXT")
     private String imageUrl;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<MemberGroup> memberGroups = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<ChatMember> chatMembers = new ArrayList<>();
 
 
-
     //========================================생성자=============================================//
-
 
     private Member(String kakaoId, String username, String imageUrl) {
         this.kakaoId = kakaoId;
@@ -39,16 +35,24 @@ public class Member extends TimeStamped {
         this.imageUrl = imageUrl;
     }
 
+    private Member(Long id) {
+        this.id = id;
+    }
+
     //========================================생성 편의자=============================================//
 
     public static Member createMember(String kakaoId, String username, String imageUrl) {
         return new Member(kakaoId, username, imageUrl);
     }
-    //========================================비즈니스 로직==============================================//
-    public void patchUsername(String username) {
-        this.username = username;
+
+    public static Member createMappingMember(Long memberId) {
+        return new Member(memberId);
     }
-    public void patchImageUrl(String imageUrl) {
+
+    //========================================비즈니스 로직==============================================//
+
+    public void patchMember(String username, String imageUrl) {
+        this.username = username;
         this.imageUrl = imageUrl;
     }
 

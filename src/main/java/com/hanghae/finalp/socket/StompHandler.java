@@ -7,6 +7,7 @@ import com.hanghae.finalp.entity.dto.MessageDto;
 import com.hanghae.finalp.entity.mappedsuperclass.MessageType;
 import com.hanghae.finalp.service.ChatService;
 import com.hanghae.finalp.util.JwtTokenUtils;
+import com.hanghae.finalp.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -27,6 +28,7 @@ public class StompHandler implements ChannelInterceptor {
 
     private final JwtTokenUtils jwtTokenUtils;
     private final ChatService chatService;
+    private final RedisUtils redisUtils;
 
     // websocket을 통해 들어온 요청이 처리 되기전 실행된다.
     @Override
@@ -34,20 +36,17 @@ public class StompHandler implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         if (StompCommand.CONNECT == accessor.getCommand()) { // websocket 연결요청
             // Header의 jwt token 검증 -> interceptor error -> controller advice -> refresh token request 가능
-            String accessToken = accessor.getFirstNativeHeader("Authorization").replace(TOKEN_NAME_WITH_SPACE, "");
+            String accessToken = accessor.getFirstNativeHeader("Authorization")
+                    .replace(TOKEN_NAME_WITH_SPACE, "");
             DecodedJWT decodedJWT = jwtTokenUtils.verifyToken(accessToken);
 
             Long memberId = jwtTokenUtils.getMemberIdFromClaim(decodedJWT);
             String username = jwtTokenUtils.getUsernameFromClaim(decodedJWT);
 
             String sessionId = getSessionIdFromHeader(message.getHeaders());
-            chatService.setUserEnterInfo(sessionId, memberId, username, -1L);
+            redisUtils.setUserEnterInfo(sessionId, memberId, username, -1L);
 
 //             simpUser헤더에 담기지가 않는다...
-//            PrincipalDetails principalDetails =
-//                    new PrincipalDetails(jwtTokenUtils.getMemberIdFromClaim(decodedJWT), jwtTokenUtils.getUsernameFromClaim(decodedJWT));
-//            UsernamePasswordAuthenticationToken principal =
-//                    new UsernamePasswordAuthenticationToken(accessor.getSessionId(), accessor.getSessionId(), null);
 //            accessor.setUser(principal);
         }
         return message;
@@ -61,22 +60,22 @@ public class StompHandler implements ChannelInterceptor {
             String sessionId = getSessionIdFromHeader(message.getHeaders());
             String roomId = getRoomIdFromheader(message.getHeaders());
 
-            MemberDto.RedisPrincipal principal = chatService.getUserEnterInfo(sessionId);
-            chatService.setUserEnterInfo(sessionId, principal.getMemberId(), principal.getUsername(), Long.valueOf(roomId));
-            chatService.addRoomMember(roomId, principal.getMemberId(), principal.getUsername());
+            MemberDto.RedisPrincipal principal = redisUtils.getUserEnterInfo(sessionId);
+            redisUtils.setUserEnterInfo(sessionId, principal.getMemberId(), principal.getUsername(), Long.valueOf(roomId));
+            redisUtils.addRoomMember(roomId, principal.getMemberId(), principal.getUsername());
 
             sendMessage(roomId, MessageType.ENTER, principal.getUsername(), principal.getMemberId());
         } else if (StompCommand.DISCONNECT == accessor.getCommand()) { // Websocket 연결 종료
 
             // 연결이 종료된 클라이언트 sesssionId로 채팅방 id를 얻는다.
             String sessionId = getSessionIdFromHeader(message.getHeaders());
-            MemberDto.RedisPrincipal redisPrincipal = chatService.getUserEnterInfo(sessionId);
+            MemberDto.RedisPrincipal redisPrincipal = redisUtils.getUserEnterInfo(sessionId);
             // socket disconnect시 disconnect로 2번 들어옴 이유가 뭘까요?
             if (redisPrincipal == null) return;
 
             // 퇴장한 클라이언트의 roomId 맵핑 정보를 삭제한다.
-            chatService.removeUserEnterInfo(sessionId);
-            chatService.removeRoomMember(redisPrincipal.getRoomId().toString(), redisPrincipal.getMemberId(), redisPrincipal.getUsername());
+            redisUtils.removeUserEnterInfo(sessionId);
+            redisUtils.removeRoomMember(redisPrincipal.getRoomId().toString(), redisPrincipal.getMemberId(), redisPrincipal.getUsername());
 
 
             // 클라이언트 퇴장 메시지를 채팅방에 발송한다.(redis publish)
@@ -89,15 +88,12 @@ public class StompHandler implements ChannelInterceptor {
 
 
     private void sendMessage(String roomId, MessageType messageType, String username, Long memberId) {
-        // 클라이언트 입장, 퇴장 메시지를 채팅방에 발송한다.(redis publish) - token에서 username, userId 추출
-//            String name = Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
-//            chatRoomRepository.findById(Long.valueOf(roomId)).map(Chatroom::getRoomType).orElseThrow(RuntimeException::new);
-        MessageDto.Send sendMessage = new MessageDto.Send(roomId, memberId, username, messageType);
-        Set<String> roomMembers = chatService.getRoomMembers(roomId);
+        MessageDto.SendRes sendMessage = new MessageDto.SendRes(roomId, memberId, username, messageType);
+        Set<String> roomMembers = redisUtils.getRoomMembers(roomId);
         chatService.sendChatMessage(sendMessage, roomMembers);
 
         log.info("Type: {}, roomId: {}, username: {}",messageType, roomId, username);
-        log.info("count: {} , members: {}", chatService.getRoomMembers(roomId).size(), chatService.getRoomMembers(roomId));
+        log.info("count: {} , members: {}", redisUtils.getRoomMembers(roomId).size(), redisUtils.getRoomMembers(roomId));
     }
 
     private String getSessionIdFromHeader(MessageHeaders headers) {

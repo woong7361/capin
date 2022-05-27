@@ -2,19 +2,18 @@ package com.hanghae.finalp.controller;
 
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.GroupDto;
-import com.hanghae.finalp.entity.dto.MemberGroupDto;
-import com.hanghae.finalp.entity.dto.ResultMsg;
+import com.hanghae.finalp.entity.dto.other.ResultMsg;
 import com.hanghae.finalp.service.GroupService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,7 +34,7 @@ public class GroupController {
     @PostMapping("/api/groups")
     public GroupDto.SimpleRes createGroup(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            GroupDto.CreateReq createReq,
+            @Valid GroupDto.CreateReq createReq,
             @RequestPart(value = "image", required = false) MultipartFile multipartFile
     ) {
         return groupService.createGroup(principalDetails.getMemberId(), createReq, multipartFile);
@@ -59,7 +58,7 @@ public class GroupController {
     @PostMapping("/api/groups/{groupId}/patch")
     public ResultMsg patchReq(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            GroupDto.CreateReq createReq,
+            @Valid GroupDto.CreateReq createReq,
             @RequestPart(value = "image", required = false) MultipartFile multipartFile,
             @PathVariable("groupId") Long groupId
     ) {
@@ -68,109 +67,24 @@ public class GroupController {
     }
 
 
-    //--------------------------------------------------------------------------------------
-
-    //그룹 리스트 페이징, 검색
-    @GetMapping("/api/groups/list")
-    public String GroupList(Model model, @PageableDefault(size = 20, sort = "groupId", direction = Sort.Direction.DESC) Pageable pageable,
-                            String searchKeyword) {
-
-        Page<GroupDto.SimpleRes> list = null;
-
-        if(searchKeyword == null) {
-            list = groupService.getGroupList(pageable);
-        } else {
-            list = groupService.groupSearch(searchKeyword, pageable);
-        }
-
-        int nowPage = list.getPageable().getPageNumber() + 1; //페이지는 0부터 시작하므로 +1
-        int startPage = Math.max(0,nowPage - 4);
-        int endPage = Math.min(list.getTotalPages(), nowPage + 5);
-
-        model.addAttribute("list", list);
-        model.addAttribute("startPage", startPage);
-        model.addAttribute("nowPage", nowPage);
-        model.addAttribute("endPage", endPage);
-
-        return "GroupList";
+    /**
+     * 스터디 그룹 검색
+     */
+   @GetMapping("/api/groups/list")
+    public Slice<GroupDto.SimpleRes> getGroupList(
+            @RequestBody(required = false) GroupDto.SearchReq searchReq,
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
+    ) { //page=1상태로오면 1빼줘야함
+        return groupService.getSearchGroupList(searchReq, pageable);
     }
 
-    //특정 그룹
+
+    /**
+    * 특정 그룹
+    */
     @GetMapping("/api/groups/{groupId}")
-    public String groupView(Model model, @PathVariable("groupId") Long groupId) {
-        model.addAttribute("group", groupService.groupView(groupId));
-
-        return "groupID";
+    public GroupDto.SpecificRes groupView(@PathVariable("groupId") Long groupId){
+        return groupService.groupView(groupId);
     }
-
-    //그룹 참가 신청
-    @PostMapping("/api/groups/{groupId}/apply")
-    public ResultMsg GroupApply(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable("groupId") Long groupId
-    ){
-        Long memberId = principalDetails.getMemberId();
-        groupService.applyGroup(memberId, groupId);
-        return new ResultMsg("success");
-    }
-
-
-    //그룹 참가자 승인
-    @PostMapping("/api/groups/{groupId}/approval/{memberId}")
-    public ResultMsg GroupApproval(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable("groupId") Long groupId,
-            @PathVariable("memberId") Long memberId //참가자 승인은 관리자가 하기때문에 memberId가 필요함
-    ){
-        Long myMemberId = principalDetails.getMemberId();
-        groupService.approveGroup(myMemberId, groupId, memberId);
-        return new ResultMsg("success");
-    }
-
-    //그룹 참가자 거절
-    @PostMapping("/api/groups/{groupId}/denial/{memberId}")
-    public ResultMsg GroupDenial(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable("groupId") Long groupId,
-            @PathVariable("memberId") Long memberId
-    ){
-        Long myMemberId = principalDetails.getMemberId();
-        groupService.denyGroup(myMemberId, groupId, memberId);
-        return new ResultMsg("success");
-    }
-
-
-   //그룹 참가자 추방
-    @PostMapping("/api/groups/{groupId}/ban/{memberId}")
-    public ResultMsg GroupBan(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable("groupId") Long groupId,
-            @PathVariable("memberId") Long memberId
-    ){
-        Long myMemberId = principalDetails.getMemberId();
-        groupService.banGroup(myMemberId, groupId, memberId);
-        return new ResultMsg("success");
-    }
-
-    //---------------------------------------------------------------------------
-
-    //그룹 내 개인의 세부주소 작성
-    @PostMapping("/api/groups/{groupId}/location")
-    public ResultMsg locationSet(
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable("groupId") Long groupId,
-            MemberGroupDto.Request request
-    ){
-        Long memberId = principalDetails.getMemberId();
-        groupService.setlocation(memberId, groupId, request);
-        return new ResultMsg("success");
-    }
-
-    //스터디 카페 추천
-    @GetMapping("/api/groups/{groupId}/cafe-recommendation")
-    public MemberGroupDto.Response locationRecommend(@PathVariable("groupId") Long groupId){
-        return groupService.recommendLocation(groupId);
-    }
-
 
 }
