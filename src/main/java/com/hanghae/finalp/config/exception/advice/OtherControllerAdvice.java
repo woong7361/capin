@@ -31,6 +31,7 @@ public class OtherControllerAdvice {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse authorityException(AuthorityException e) {
         log.info("권한관련 에러 발생 {}", e.getErrorCode().getMessage());
+        e.printStackTrace();
         return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 
@@ -60,6 +61,7 @@ public class OtherControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse maxNumberException(MaxNumberException e) {
         log.info("최대 인원수 에러입니다  {}", e.getErrorCode().getMessage());
+        e.printStackTrace();
         return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 
@@ -67,6 +69,7 @@ public class OtherControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse duplicationRequestException(DuplicationRequestException e) {
         log.info("중복된 요청 오류입니다.{}, field: {}", e.getErrorCode().getMessage(), e.getField());
+        e.printStackTrace();
         return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 
