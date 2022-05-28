@@ -25,7 +25,7 @@ public class MemberService {
     public MemberDto.ProfileRes getMyProfile(Long memberId) {
        Member member = memberRepository.findById(memberId).orElseThrow(
                MemberNotExistException::new);
-        return new MemberDto.ProfileRes(member.getUsername(), member.getImageUrl());
+        return new MemberDto.ProfileRes(member.getId(), member.getUsername(), member.getImageUrl());
     }
 
     /**
@@ -42,7 +42,7 @@ public class MemberService {
         member.patchMember(username, fullFilePath);
         s3Service.deleteFile(currentFilePath);
 
-        return new MemberDto.ProfileRes(member.getUsername(), member.getImageUrl());
+        return new MemberDto.ProfileRes(member.getId(), member.getUsername(), member.getImageUrl());
     }
 
     /**
