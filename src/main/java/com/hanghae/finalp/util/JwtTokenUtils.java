@@ -87,7 +87,7 @@ public class JwtTokenUtils {
 
     public String createAccessToken(Long memberId, String username) {
         String token = JWT.create()
-                .withSubject("accessToken")
+                .withSubject("capin")
                 .withExpiresAt(new Date(System.currentTimeMillis() + (7 * DAY) ))
                 .withClaim(CLAIM_ID, memberId)
                 .withClaim(CLAIM_USERNAME, username)
@@ -97,7 +97,7 @@ public class JwtTokenUtils {
 
     public String createRefreshToken(Long memberId) {
         String token = JWT.create()
-                .withSubject("refreshToken")
+                .withSubject("capin")
                 .withExpiresAt(new Date(System.currentTimeMillis() + (14 * DAY) ))
                 .withClaim(CLAIM_ID, memberId)
                 .sign(Algorithm.HMAC512(JWT_SECRET));   //secretkey
