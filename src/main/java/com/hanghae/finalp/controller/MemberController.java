@@ -4,6 +4,7 @@ import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.entity.dto.other.ResultMsg;
 import com.hanghae.finalp.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ public class MemberController {
     /**
      * 내 프로필 조회
      */
+    @Operation(summary = "내 프로필 조회", description = "내 프로필 조회")
     @GetMapping("/api/profile")
     public MemberDto.ProfileRes memberGet(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return memberService.getMyProfile(principalDetails.getMemberId());
@@ -29,6 +31,7 @@ public class MemberController {
     /**
      * 내 프로필 수정
      */
+    @Operation(summary = "내 프로필 수정", description = "내 프로필 수정")
     @PostMapping("/api/profile/edit")
     public MemberDto.ProfileRes memberEdit(@NotBlank @RequestPart("username") String username,
                              @RequestPart(value = "image", required = false) MultipartFile file,
@@ -41,6 +44,7 @@ public class MemberController {
     /**
      * 회원 탈퇴
      */
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴")
     @GetMapping("/api/withdraw")
     public ResultMsg memberDelete(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         memberService.deleteMember(principalDetails.getMemberId());

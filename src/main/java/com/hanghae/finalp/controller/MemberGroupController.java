@@ -4,6 +4,7 @@ import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.MemberGroupDto;
 import com.hanghae.finalp.entity.dto.other.ResultMsg;
 import com.hanghae.finalp.service.MemberGroupService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,7 @@ public class MemberGroupController {
     /**
      * 그룹 참가 신청
      */
+    @Operation(summary = "그룹 참가 신청", description = "그룹 참가 신청")
     @PostMapping("/api/groups/{groupId}/apply")
     public ResultMsg GroupApply(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -35,6 +37,7 @@ public class MemberGroupController {
     /**
      * 그룹 참가자 승인
      */
+    @Operation(summary = "그룹 참가자 승인", description = "그룹 참가자 승인")
     @PostMapping("/api/groups/{groupId}/approval/{memberId}")
     public ResultMsg GroupApproval(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -50,6 +53,7 @@ public class MemberGroupController {
     /**
      * 그룹 참가자 거절
      */
+    @Operation(summary = "그룹 참가자 거절", description = "그룹 참가자 거절")
     @PostMapping("/api/groups/{groupId}/denial/{memberId}")
     public ResultMsg GroupDenial(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -65,6 +69,7 @@ public class MemberGroupController {
     /**
      * 그룹 참가자 추방
      */
+    @Operation(summary = "그룹 참가자 추방", description = "그룹 참가자 추방")
     @PostMapping("/api/groups/{groupId}/ban/{memberId}")
     public ResultMsg GroupBan(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -79,6 +84,7 @@ public class MemberGroupController {
     /**
      * 신청한 그룹 참가신청 취소
      */
+    @Operation(summary = "신청한 그룹 참가신청 취소", description = "신청한 그룹 참가신청 취소")
     @PostMapping("/api/groups/{groupId}/cancel")
     public ResultMsg cancelApply(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -92,6 +98,7 @@ public class MemberGroupController {
     /**
      * 그룹 나가기
      */
+    @Operation(summary = "그룹 나가기", description = "그룹 나가기")
     @PostMapping("/api/groups/{groupId}/exit")
     public ResultMsg exitGroup(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -105,6 +112,7 @@ public class MemberGroupController {
     /**
      * 그룹내 개인의 세부 주소 작성
      */
+    @Operation(summary = "그룹내 개인의 세부 주소 작성", description = "그룹내 개인의 세부 주소 작성")
     @PostMapping("/api/groups/{groupId}/location")
     public ResultMsg locationSet(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
