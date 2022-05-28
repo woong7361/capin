@@ -260,64 +260,66 @@ class GroupServiceTest {
         }
     }
 
-    @Nested
-    class getSearchGroupList {
-        @Test
-        public void 키워드X_지역필터X_성공() throws Exception{
-            //given
-            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
-            given(groupRepository.findAllToSlice(any(Pageable.class))).willReturn(slice);
-            //when
-            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList(null, PageRequest.of(0, 6));
-            //then
-            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
-        }
 
-        @Test
-        public void 키워드O_지역필터X_성공() throws Exception{
-            //given
-            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
-            GroupDto.SearchReq searchReq = new GroupDto.SearchReq();
-            searchReq.setTitle("title");
-            given(groupRepository.findAllByGroupTitleContaining(anyString(), any(Pageable.class))).willReturn(slice);
-            //when
-            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList(searchReq, PageRequest.of(0, 6));
-            //then
-            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
-        }
-
-        @Test
-        public void 키워드X_지역필터O_성공() throws Exception{
-            //given
-            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
-            GroupDto.SearchReq searchReq = new GroupDto.SearchReq();
-            List<GroupDto.SearchReq.Address> addressList = List.of(new GroupDto.SearchReq.Address("서초"));
-            searchReq.setAddressList(addressList);
-            given(groupRepository.findAllByRoughAddressIn(anyList(), any(Pageable.class))).willReturn(slice);
-            //when
-            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList(searchReq, PageRequest.of(0, 6));
-            //then
-            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
-        }
-
-        @Test
-        public void 키워드O_지역필터O_성공() throws Exception{
-            //given
-            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
-            GroupDto.SearchReq searchReq = new GroupDto.SearchReq();
-            List<GroupDto.SearchReq.Address> addressList = List.of(new GroupDto.SearchReq.Address("서초"));
-            searchReq.setAddressList(addressList);
-            searchReq.setTitle("title");
-
-            given(groupRepository.findAllByGroupTitleContainingAndRoughAddressIn(anyString(), anyList(), any(Pageable.class)))
-                    .willReturn(slice);
-            //when
-            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList(searchReq, PageRequest.of(0, 6));
-            //then
-            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
-        }
-
-    }
+//
+//    @Nested
+//    class getSearchGroupList {
+//        @Test
+//        public void 키워드X_지역필터X_성공() throws Exception{
+//            //given
+//            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
+//            given(groupRepository.findAllToSlice(any(Pageable.class))).willReturn(slice);
+//            //when
+//            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList(null, PageRequest.of(0, 6));
+//            //then
+//            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
+//        }
+//
+//        @Test
+//        public void 키워드O_지역필터X_성공() throws Exception{
+//            //given
+//            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
+//            GroupDto.SearchReq searchReq = new GroupDto.SearchReq();
+//            searchReq.setTitle("title");
+//            given(groupRepository.findAllByGroupTitleContaining(anyString(), any(Pageable.class))).willReturn(slice);
+//            //when
+//            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList(searchReq, PageRequest.of(0, 6));
+//            //then
+//            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
+//        }
+//
+//        @Test
+//        public void 키워드X_지역필터O_성공() throws Exception{
+//            //given
+//            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
+//            GroupDto.SearchReq searchReq = new GroupDto.SearchReq();
+//            List<GroupDto.SearchReq.Address> addressList = List.of(new GroupDto.SearchReq.Address("서초"));
+//            searchReq.setAddressList(addressList);
+//            given(groupRepository.findAllByRoughAddressIn(anyList(), any(Pageable.class))).willReturn(slice);
+//            //when
+//            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList(searchReq, PageRequest.of(0, 6));
+//            //then
+//            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
+//        }
+//
+//        @Test
+//        public void 키워드O_지역필터O_성공() throws Exception{
+//            //given
+//            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
+//            GroupDto.SearchReq searchReq = new GroupDto.SearchReq();
+//            List<GroupDto.SearchReq.Address> addressList = List.of(new GroupDto.SearchReq.Address("서초"));
+//            searchReq.setAddressList(addressList);
+//            searchReq.setTitle("title");
+//
+//            given(groupRepository.findAllByGroupTitleContainingAndRoughAddressIn(anyString(), anyList(), any(Pageable.class)))
+//                    .willReturn(slice);
+//            //when
+//            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList(searchReq, PageRequest.of(0, 6));
+//            //then
+//            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
+//        }
+//
+//    }
 
 
 
