@@ -27,9 +27,9 @@ public class MemberDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ProfileRes {
+        private Long memberId;
         private String username;
         private String imageUrl;
-
     }
 
     @Data

@@ -108,19 +108,17 @@ public class GroupService {
      * 그룹 검색 리스트 가져오기
      */
     @Transactional
-    public Slice<GroupDto.SimpleRes> getSearchGroupList(GroupDto.SearchReq searchReq, Pageable pageable) {
+    public Slice<GroupDto.SimpleRes> getSearchGroupList(String title, List<String> addressList, Pageable pageable) {
 
         Slice<Group> groups;
-        if (searchReq == null){
+        if (title == null && addressList == null){
             groups = groupRepository.findAllToSlice(pageable);
-        } else if (searchReq.getTitle() == null){
-            List<String> addressList = searchReq.getAddressList().stream().map(address -> address.getAddress()).collect(Collectors.toList());
+        } else if (title == null){
             groups = groupRepository.findAllByRoughAddressIn(addressList, pageable);
-        } else if (searchReq.getAddressList() == null) {
-            groups = groupRepository.findAllByGroupTitleContaining(searchReq.getTitle(), pageable);
+        } else if (addressList == null) {
+            groups = groupRepository.findAllByGroupTitleContaining(title, pageable);
         }else {
-            List<String> addressList = searchReq.getAddressList().stream().map(address -> address.getAddress()).collect(Collectors.toList());
-            groups = groupRepository.findAllByGroupTitleContainingAndRoughAddressIn(searchReq.getTitle(), addressList, pageable);
+            groups = groupRepository.findAllByGroupTitleContainingAndRoughAddressIn(title, addressList, pageable);
         }
         return groups.map(GroupDto.SimpleRes::new);
     }
