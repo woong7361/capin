@@ -24,7 +24,8 @@ public interface MemberGroupRepository extends JpaRepository<MemberGroup, Long> 
     @Query("select gm from MemberGroup gm join fetch gm.group where gm.member.id = :memberId and gm.group.id = :groupId")
     Optional<MemberGroup> findByMemberIdAndGroupIdFetchGroup(@Param("memberId") Long memberId, @Param("groupId") Long groupId);
 
-    List<MemberGroup> findAllByGroupId(Long groupId);
+    @Query("select gm from MemberGroup gm join fetch gm.group where gm.group.id = :groupId")
+    List<MemberGroup> findAllByGroupId(@Param("groupId") Long groupId);
 
     @Query("select gm from MemberGroup gm join fetch gm.group where gm.group.id = :groupId and gm.authority = 'OWNER'")
     Optional<MemberGroup> findGroupOwnerByGroupId(@Param("groupId") Long groupId);

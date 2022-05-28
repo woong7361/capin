@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Optional;
 
 
 @Service
@@ -54,6 +53,8 @@ public class S3Service {
      */
     public void deleteFile(String currentFilePath) {
         if (currentFilePath == null) return;
+        if (currentFilePath.equals("https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/memberDefaultImg.png")) return;
+        if (currentFilePath.equals("https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/groupDefaultImg.png")) return;
         if (currentFilePath.startsWith("http://k.kakaocdn.net")) return;
 
         String filePath = currentFilePath.substring(currentFilePath.lastIndexOf("/") + 1);

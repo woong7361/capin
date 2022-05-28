@@ -12,6 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+
 public class Member extends TimeStamped {
 
     @Id @GeneratedValue
@@ -28,7 +29,6 @@ public class Member extends TimeStamped {
 
 
     //========================================생성자=============================================//
-
     private Member(String kakaoId, String username, String imageUrl) {
         this.kakaoId = kakaoId;
         this.username = username;

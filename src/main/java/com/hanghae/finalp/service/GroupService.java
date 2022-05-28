@@ -24,8 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -57,7 +59,7 @@ public class GroupService {
         Member member = memberRepository.findById(memberId).orElseThrow(
                 MemberNotExistException::new);
         String imageUrl = s3Service.uploadFile(multipartFile);
-
+        if(imageUrl == null) imageUrl = "https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/groupDefaultImg.png";
         log.debug("custom log:: create group chatroom...");
         Chatroom groupChatroom = Chatroom.createChatroomByGroup(createReq.getGroupTitle(), member);
         chatRoomRepository.save(groupChatroom);
@@ -99,6 +101,7 @@ public class GroupService {
 
         s3Service.deleteFile(group.getImageUrl());
         String imageUrl = s3Service.uploadFile(multipartFile);
+        if(imageUrl == null) imageUrl = "https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/groupDefaultImg.png";
 
         group.patch(createReq, imageUrl);
     }
@@ -130,25 +133,31 @@ public class GroupService {
     @Transactional
     public GroupDto.SpecificRes groupView(Long groupId) {
         List<MemberGroup> memberGroupList = memberGroupRepository.findAllByGroupId(groupId);
-        List<Member> memberList = memberGroupList.stream()
-                .filter(mg -> !mg.getAuthority().equals(Authority.WAIT))
+
+        Stream<Member> ownerStream = memberGroupList.stream()
+                .filter(mg -> mg.getAuthority().equals(Authority.OWNER))
+                .map(mg -> mg.getMember());
+
+        Stream<Member> joinStream = memberGroupList.stream()
+                .filter(mg -> mg.getAuthority().equals(Authority.JOIN))
                 .map(mg -> mg.getMember())
-//                .sorted(Comparator.comparing(Member::getUsername))
+                .sorted(Comparator.comparing(Member::getUsername));
+
+        List<Member> memberList = Stream.concat(ownerStream, joinStream)
                 .collect(Collectors.toList());
 
         List<MemberDto.SpecificRes> specificResList = new ArrayList<>();
         for (Member member : memberList) {
-            MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(member.getId(), groupId)
+            MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(member.getId(), groupId)
                     .orElseThrow(MemberGroupNotExistException::new);
 
-            if (!Authority.WAIT.equals(memberGroup.getAuthority())) {
-                MemberDto.SpecificRes specificRes = new MemberDto.SpecificRes();
-                specificRes.setMemberId(member.getId());
-                specificRes.setUsername(member.getUsername());
-                specificRes.setImageUrl(member.getImageUrl());
-                specificRes.setAuthority(memberGroup.getAuthority());
-                specificResList.add(specificRes);
-            }
+            MemberDto.SpecificRes specificRes = new MemberDto.SpecificRes();
+            specificRes.setUserId(member.getId());
+            specificRes.setUsername(member.getUsername());
+            specificRes.setImageUrl(member.getImageUrl());
+            specificRes.setAuthority(memberGroup.getAuthority());
+            specificResList.add(specificRes);
+
         }
         Group group = groupRepository.findById(groupId).orElseThrow(GroupNotExistException::new);
         return new GroupDto.SpecificRes(group, specificResList);

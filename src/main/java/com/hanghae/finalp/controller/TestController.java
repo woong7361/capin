@@ -29,7 +29,8 @@ public class TestController {
     @ResponseBody
     @PostMapping("/dummy-user")
     public MemberDto.refreshTokenRes test(@RequestBody MemberCreateReq memberCreateReq) {
-        Member member = Member.createMember("kakaoId", memberCreateReq.getUsername(), null);
+        Member member = Member.createMember("kakaoId", memberCreateReq.getUsername(),
+                "https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/memberDefaultImg.png");
         memberRepository.save(member);
         String accessToken = jwtTokenUtils.createAccessToken(member.getId(), member.getUsername());
         String refreshToken = jwtTokenUtils.createRefreshToken(member.getId());

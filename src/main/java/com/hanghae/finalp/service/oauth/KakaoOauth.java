@@ -4,10 +4,10 @@ package com.hanghae.finalp.service.oauth;
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.config.security.kakao.KakaoProfile;
 import com.hanghae.finalp.config.security.kakao.OAuthToken;
-import com.hanghae.finalp.entity.dto.MemberDto;
-import com.hanghae.finalp.util.JwtTokenUtils;
 import com.hanghae.finalp.entity.Member;
+import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.repository.MemberRepository;
+import com.hanghae.finalp.util.JwtTokenUtils;
 import com.hanghae.finalp.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -134,6 +134,7 @@ public class KakaoOauth {
             memberId = member.get().getId();
             isFirst = false;
         } else{ //db에 카카오아이디가 없으면 member을 만들어준다.
+            if(imageUrl == null) imageUrl = "https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/memberDefaultImg.png";
             Member newMember = memberRepository.save(Member.createMember(kakaoId, username, imageUrl));
             memberId = newMember.getId();
             isFirst = true;
