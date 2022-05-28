@@ -164,7 +164,7 @@ class GroupServiceTest {
 
             //then
             GroupDto.SimpleRes result = groupService.createGroup(1L, createReq, null);
-            assertThat(result.getImageUrl()).isEqualTo(null);
+            assertThat(result.getImageUrl()).isEqualTo("https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/groupDefaultImg.png");
         }
     }
 

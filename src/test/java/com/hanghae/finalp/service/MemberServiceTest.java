@@ -4,7 +4,6 @@ import com.hanghae.finalp.config.exception.customexception.entity.MemberNotExist
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.repository.MemberRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
@@ -88,9 +86,9 @@ class MemberServiceTest {
             MemberDto.ProfileRes profile = memberService.editMyProfile("editName", null, 1L);
             //then
             assertThat(profile.getUsername()).isEqualTo("editName");
-            assertThat(profile.getImageUrl()).isEqualTo(null);
+            assertThat(profile.getImageUrl()).isEqualTo("https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/memberDefaultImg.png");
             assertThat(member1.getUsername()).isEqualTo("editName");
-            assertThat(member1.getImageUrl()).isEqualTo(null);
+            assertThat(member1.getImageUrl()).isEqualTo("https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/memberDefaultImg.png");
         }
 
         @Test
