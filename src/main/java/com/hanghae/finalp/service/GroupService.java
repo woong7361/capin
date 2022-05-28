@@ -143,7 +143,7 @@ public class GroupService {
 
             if (!Authority.WAIT.equals(memberGroup.getAuthority())) {
                 MemberDto.SpecificRes specificRes = new MemberDto.SpecificRes();
-                specificRes.setUserId(member.getId());
+                specificRes.setMemberId(member.getId());
                 specificRes.setUsername(member.getUsername());
                 specificRes.setImageUrl(member.getImageUrl());
                 specificRes.setAuthority(memberGroup.getAuthority());
