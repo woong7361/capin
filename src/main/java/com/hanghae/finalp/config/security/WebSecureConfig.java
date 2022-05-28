@@ -20,7 +20,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configurable
 @RequiredArgsConstructor
 public class WebSecureConfig extends WebSecurityConfigurerAdapter {
-
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final JwtTokenUtils jwtTokenUtils;
 

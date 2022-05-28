@@ -20,6 +20,9 @@ public class RedisConfig {
     @Value("${spring.redis.port}")
     private int port;
 
+    @Value("${spring.redis.password}")
+    private String redisPassword;
+
     /**
      * redis를 연결
      */

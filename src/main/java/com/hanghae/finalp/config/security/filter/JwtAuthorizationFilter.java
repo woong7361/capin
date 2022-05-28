@@ -29,7 +29,6 @@ import static com.hanghae.finalp.util.JwtTokenUtils.*;
 //만약 권한이나 인증이 필요한 주소가 아니라면 이 필터를 타지 않는다.
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
-
     private final JwtTokenUtils jwtTokenUtils;
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager,

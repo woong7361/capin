@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -72,10 +73,12 @@ public class GroupController {
      */
    @GetMapping("/api/groups/list")
     public Slice<GroupDto.SimpleRes> getGroupList(
-            @RequestBody(required = false) GroupDto.SearchReq searchReq,
+//            @RequestBody(required = false) GroupDto.SearchReq searchReq,
+            @RequestParam(value = "address", required = false) List<String> address,
+            @RequestParam(value = "title", required = false) String title,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) { //page=1상태로오면 1빼줘야함
-        return groupService.getSearchGroupList(searchReq, pageable);
+        return groupService.getSearchGroupList(address, title, pageable);
     }
 
 

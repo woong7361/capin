@@ -109,7 +109,7 @@ public class GroupDto {
     }
 
 
-    @Data
+/*    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SearchReq {
@@ -122,5 +122,5 @@ public class GroupDto {
         public static class Address {
             private String address;
         }
-    }
+    }*/
 }
