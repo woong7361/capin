@@ -4,6 +4,7 @@ import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.GroupDto;
 import com.hanghae.finalp.entity.dto.other.ResultMsg;
 import com.hanghae.finalp.service.GroupService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -23,6 +24,7 @@ public class GroupController {
     /**
      * 내 그룹리스트 받아오기
      */
+    @Operation(summary = "내 그룹리스트 받아오기", description = "내 그룹리스트 받아오기")
     @GetMapping("/api/groups/my")
     public Slice<GroupDto.SimpleRes> myGroupList(@AuthenticationPrincipal PrincipalDetails principalDetails, Pageable pageable) {
         return groupService.getMyGroupList(principalDetails.getPrincipal().getMemberId(), pageable);
@@ -31,6 +33,7 @@ public class GroupController {
     /**
      * 스터디 그룹 생성
      */
+    @Operation(summary = "스터디 그룹 생성", description = "스터디 그룹 생성")
     @PostMapping("/api/groups")
     public GroupDto.SimpleRes createGroup(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -43,6 +46,7 @@ public class GroupController {
     /**
      * 스터디 그룹 삭제
      */
+    @Operation(summary = "스터디 그룹 삭제", description = "스터디 그룹 삭제")
     @PostMapping("/api/groups/{groupId}/delete")
     public ResultMsg deleteGroup(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -55,6 +59,7 @@ public class GroupController {
     /**
      * 스터디 그룹 수정
      */
+    @Operation(summary = "스터디 그룹 수정", description = "스터디 그룹 수정")
     @PostMapping("/api/groups/{groupId}/patch")
     public ResultMsg patchReq(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -70,7 +75,8 @@ public class GroupController {
     /**
      * 스터디 그룹 검색
      */
-   @GetMapping("/api/groups/list")
+    @Operation(summary = "스터디 그룹 검색", description = "스터디 그룹 검색")
+    @GetMapping("/api/groups/list")
     public Slice<GroupDto.SimpleRes> getGroupList(
             @RequestBody(required = false) GroupDto.SearchReq searchReq,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
@@ -82,6 +88,7 @@ public class GroupController {
     /**
     * 특정 그룹
     */
+    @Operation(summary = "특정 그룹 보기", description = "특정 그룹 보기")
     @GetMapping("/api/groups/{groupId}")
     public GroupDto.SpecificRes groupView(@PathVariable("groupId") Long groupId){
         return groupService.groupView(groupId);

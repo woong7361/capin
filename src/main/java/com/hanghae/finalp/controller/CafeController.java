@@ -5,6 +5,7 @@ import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.*;
 import com.hanghae.finalp.entity.dto.other.ResultMsg;
 import com.hanghae.finalp.service.CafeService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ public class CafeController {
     /**
      /* 카페 선택
      */
+    @Operation(summary = "카페 선택", description = "그룹에서 카페 선택")
     @PostMapping("/api/groups/{groupId}/cafe")
     public ResultMsg cafeSelect(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                 @PathVariable("groupId") Long groupId,
@@ -33,6 +35,7 @@ public class CafeController {
     /**
      * 카페 삭제
      */
+    @Operation(summary = "카페 삭제", description = "그룹에서 카페 삭제")
     @PostMapping("/api/groups/{groupId}/cafe/delete")
     public ResultMsg cafeDelete(@AuthenticationPrincipal PrincipalDetails principalDetails,
                            @PathVariable("groupId") Long groupId) {
@@ -44,6 +47,7 @@ public class CafeController {
     /**
      * 스터디 카페 추천
      */
+    @Operation(summary = "스터디 카페 추천", description = "그룹에서 스터디 카페 추천")
     @GetMapping("/api/groups/{groupId}/cafe-recommendation")
     public CafeDto.RecoRes locationRecommend(@PathVariable("groupId") Long groupId) {
         return cafeService.getRecoCafe(groupId);

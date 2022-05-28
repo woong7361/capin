@@ -3,6 +3,7 @@ package com.hanghae.finalp.controller;
 import com.hanghae.finalp.config.security.PrincipalDetails;
 import com.hanghae.finalp.entity.dto.ChatroomDto;
 import com.hanghae.finalp.service.ChatroomService;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Hidden
 public class ChatroomController {
 
     private final ChatroomService chatroomService;
