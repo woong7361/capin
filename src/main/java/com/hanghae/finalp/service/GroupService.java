@@ -59,7 +59,7 @@ public class GroupService {
         Member member = memberRepository.findById(memberId).orElseThrow(
                 MemberNotExistException::new);
         String imageUrl = s3Service.uploadFile(multipartFile);
-        if(multipartFile == null) imageUrl = "https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/groupDefaultImg.png";
+        if(imageUrl == null) imageUrl = "https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/groupDefaultImg.png";
         log.debug("custom log:: create group chatroom...");
         Chatroom groupChatroom = Chatroom.createChatroomByGroup(createReq.getGroupTitle(), member);
         chatRoomRepository.save(groupChatroom);
@@ -101,7 +101,7 @@ public class GroupService {
 
         s3Service.deleteFile(group.getImageUrl());
         String imageUrl = s3Service.uploadFile(multipartFile);
-        if(multipartFile == null) imageUrl = "https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/groupDefaultImg.png";
+        if(imageUrl == null) imageUrl = "https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/groupDefaultImg.png";
 
         group.patch(createReq, imageUrl);
     }

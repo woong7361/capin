@@ -33,7 +33,7 @@ public class MemberService {
         Member member = memberRepository.findById(memberId).orElseThrow(MemberNotExistException::new);
 
         String fullFilePath = s3Service.uploadFile(file);
-        if(file == null) fullFilePath = "https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/memberDefaultImg.png";
+        if(fullFilePath == null) fullFilePath = "https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/memberDefaultImg.png";
         member.patchMember(username, fullFilePath);
 
         String currentFilePath = member.getImageUrl();
