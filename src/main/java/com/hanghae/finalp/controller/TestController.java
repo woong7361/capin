@@ -25,7 +25,6 @@ import java.util.List;
 public class TestController {
 
     private final MemberRepository memberRepository;
-    private final KakaoOauth kakaoOauth;
     private final JwtTokenUtils jwtTokenUtils;
     private final RedisUtils redisUtils;
 
@@ -50,16 +49,6 @@ public class TestController {
         return "form.html";
     }
 
-
-
-
-
-    @GetMapping("/test5")
-    @ResponseBody
-    public Dto form(@RequestBody Dto dto) {
-        return dto;
-//        return "form.html";
-    }
 
     @Data
     @AllArgsConstructor
