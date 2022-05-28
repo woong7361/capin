@@ -4,7 +4,6 @@ import com.hanghae.finalp.config.exception.customexception.entity.EntityNotExist
 import com.hanghae.finalp.entity.Group;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.Notice;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

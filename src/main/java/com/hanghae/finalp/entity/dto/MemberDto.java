@@ -27,16 +27,16 @@ public class MemberDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ProfileRes {
+        private Long memberId;
         private String username;
         private String imageUrl;
-
     }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     public static class SpecificRes {
-        private Long userId;
+        private Long memberId;
         private String username;
         private String imageUrl;
         private Authority authority;

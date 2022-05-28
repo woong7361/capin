@@ -12,10 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -25,7 +22,6 @@ import java.util.List;
 public class TestController {
 
     private final MemberRepository memberRepository;
-    private final KakaoOauth kakaoOauth;
     private final JwtTokenUtils jwtTokenUtils;
     private final RedisUtils redisUtils;
 
@@ -51,23 +47,6 @@ public class TestController {
         return "form.html";
     }
 
-
-
-
-
-    @GetMapping("/test5")
-    @ResponseBody
-    public Dto form(@RequestBody Dto dto) {
-        return dto;
-//        return "form.html";
-    }
-
-
-    @PostConstruct
-    public void createDummyMember() {
-        Member dummy = Member.createMember("1", "testUser", null);
-        memberRepository.save(dummy);
-    }
 
     @Data
     @AllArgsConstructor

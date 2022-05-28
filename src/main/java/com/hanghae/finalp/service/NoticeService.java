@@ -48,4 +48,5 @@ public class NoticeService {
                 .orElseThrow(AuthorOwnerException::new);
         noticeRepository.deleteById(noticeId);
     }
+
 }

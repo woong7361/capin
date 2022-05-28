@@ -24,6 +24,7 @@ public class S3ControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     public ErrorResponse S3Exception(S3Exception e) {
         log.info("S3Exception - S3 업로딩/ 다운로딩 에러 -> {}", e.getErrorCode().getMessage());
+        e.printStackTrace();
         return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 

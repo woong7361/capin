@@ -55,42 +55,42 @@ public class MemberGroupService {
      * 그룹 참가자 승인
      */
     @Transactional
-    public void approveGroup(Long myMemberId, Long groupId, Long memberId) {
+    public void approveGroup(Long ownerMemberId, Long groupId, Long targetMemberId) {
 
         log.debug("custom log:: owner's memberGroup 확인");
         //내가 속했으며, 승인을 요청한 멤버그룹을 찾는다
-        MemberGroup myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId)
+        MemberGroup ownerMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(ownerMemberId, groupId)
                 .orElseThrow(MemberGroupNotExistException::new);
 
         //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너가 아니라면
-        if(!Authority.OWNER.equals(myMemberGroup.getAuthority())) throw new AuthorOwnerException();
+        if(!Authority.OWNER.equals(ownerMemberGroup.getAuthority())) throw new AuthorOwnerException();
 
         log.debug("custom log:: target's memberGroup 확인");
         //그사람도 같은 멤버그룹에서 대기중인지 확인 & 권한 확인
-        MemberGroup yourMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
+        MemberGroup targetMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(targetMemberId, groupId)
                 .orElseThrow(MemberGroupNotExistException::new);
 
-        if(!Authority.WAIT.equals(yourMemberGroup.getAuthority())) throw new AuthorOwnerException();
+        if(!Authority.WAIT.equals(targetMemberGroup.getAuthority())) throw new AuthorWaitException();
 
         log.debug("custom log:: 그룹의 최대 인원수 확인");
-        if (!(yourMemberGroup.getGroup().getMemberCount() < yourMemberGroup.getGroup().getMaxMemberCount())) {
+        if (!(targetMemberGroup.getGroup().getMemberCount() < targetMemberGroup.getGroup().getMaxMemberCount())) {
             throw new MaxNumberException();
         }
 
-        yourMemberGroup.joinGroup(); //wait일 경우 join으로 바꿔줌
-        yourMemberGroup.getGroup().plusMemberCount();
+        targetMemberGroup.joinGroup(); //wait일 경우 join으로 바꿔줌
+        targetMemberGroup.getGroup().plusMemberCount();
 
         log.debug("custom log:: chatroom 관련 logic");
         //승인 전에 안넣어줬던 챗룸아이디를 멤버그룹에 넣어준 후
-        yourMemberGroup.joinGroupChatRoom(myMemberGroup.getChatroomId());
+        targetMemberGroup.joinGroupChatRoom(ownerMemberGroup.getChatroomId());
         //조인이 되는 순간 채팅방도 가입시켜줘야 된다 => 챗멤버 생성필요
-        Chatroom chatroom = chatRoomRepository.findById(myMemberGroup.getChatroomId()).orElseThrow(
+        Chatroom chatroom = chatRoomRepository.findById(ownerMemberGroup.getChatroomId()).orElseThrow(
                 EntityNotExistException::new);
-        ChatMember chatMember = ChatMember.createChatMember(yourMemberGroup.getMember(), chatroom);
+        ChatMember chatMember = ChatMember.createChatMember(targetMemberGroup.getMember(), chatroom);
         chatroom.getChatMembers().add(chatMember);
 
         log.debug("custom log:: create notice for target");
-        Notice notice = Notice.createGroupApproveNotice(yourMemberGroup.getGroup().getGroupTitle(), yourMemberGroup.getMember());
+        Notice notice = Notice.createGroupApproveNotice(targetMemberGroup.getGroup().getGroupTitle(), targetMemberGroup.getMember());
         noticeRepository.save(notice);
     }
 
@@ -98,74 +98,74 @@ public class MemberGroupService {
      * 그룹 참가자 거절
      */
     @Transactional
-    public void denyGroup(Long myMemberId, Long groupId, Long memberId) {
+    public void denyGroup(Long ownerMemberId, Long groupId, Long targetMemberId) {
 
         log.debug("custom log:: owner's memberGroup 확인");
         //내가 속했으며, 승인을 요청한 멤버그룹을 찾는다
-        MemberGroup myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId).orElseThrow(
+        MemberGroup ownerMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(ownerMemberId, groupId).orElseThrow(
                 MemberGroupNotExistException::new);
 
-        if(!Authority.OWNER.equals(myMemberGroup.getAuthority())){
+        if(!Authority.OWNER.equals(ownerMemberGroup.getAuthority())){
             throw new AuthorOwnerException();
         }
 
         log.debug("custom log:: target's memberGroup 확인");
-        MemberGroup yourMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
+        MemberGroup targetMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(targetMemberId, groupId).orElseThrow(
                 MemberGroupNotExistException::new);
 
-        if(!Authority.WAIT.equals(yourMemberGroup.getAuthority())) {
-            throw new AuthorOwnerException();
+        if(!Authority.WAIT.equals(targetMemberGroup.getAuthority())) {
+            throw new AuthorWaitException();
         }
 
         log.debug("custom log:: create notice for target");
-        Notice notice = Notice.createGroupDenyNotice(yourMemberGroup.getGroup().getGroupTitle(), yourMemberGroup.getMember());
+        Notice notice = Notice.createGroupDenyNotice(targetMemberGroup.getGroup().getGroupTitle(), targetMemberGroup.getMember());
         noticeRepository.save(notice);
 
-        memberGroupRepository.delete(yourMemberGroup);
+        memberGroupRepository.delete(targetMemberGroup);
     }
 
     /**
      * 그룹 참가자 추방
      */
     @Transactional
-    public void banGroup(Long myMemberId, Long groupId, Long memberId) {
+    public void banGroup(Long ownerMemberId, Long groupId, Long targetMemberId) {
         log.debug("custom log:: owner's memberGroup 확인");
         //내가 속했으며, 추방할 멤버그룹을 찾는다
-        MemberGroup myMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(myMemberId, groupId)
+        MemberGroup ownerMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(ownerMemberId, groupId)
                 .orElseThrow(MemberGroupNotExistException::new);
 
         //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너가 아니라면
-        if (!Authority.OWNER.equals(myMemberGroup.getAuthority())) {
+        if (!Authority.OWNER.equals(ownerMemberGroup.getAuthority())) {
             throw new AuthorOwnerException();
         }
 
         log.debug("custom log:: target's memberGroup 확인");
         //그사람도 같은 멤버그룹에 속했는지 확인
-        MemberGroup yourMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
+        MemberGroup targetMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(targetMemberId, groupId)
                 .orElseThrow(MemberGroupNotExistException::new);
 
         //그사람의 auth 확인 ->그사람의 권한이 join일 경우
-        if (!Authority.JOIN.equals(yourMemberGroup.getAuthority())) {
-            throw new AuthorOwnerException();
+        if (!Authority.JOIN.equals(targetMemberGroup.getAuthority())) {
+            throw new AuthorJoinException();
         }
 
         log.debug("custom log:: chatroom 관련 logic");
         //1.채팅룸에서 드랍 => 1-1.챗멤버를 없애줘야함
-        ChatMember chatMember = chatMemberRepository.findByMemberIdAndChatroomId(memberId, yourMemberGroup.getChatroomId())
+        ChatMember chatMember = chatMemberRepository.findByMemberIdAndChatroomId(targetMemberId, targetMemberGroup.getChatroomId())
                 .orElseThrow(EntityNotExistException::new);
         chatMemberRepository.delete(chatMember);
         //1-2. 채팅룸에서도 챗멤버를 없애 줘야함.
-        Chatroom chatroom = chatRoomRepository.findById(yourMemberGroup.getChatroomId())
+        Chatroom chatroom = chatRoomRepository.findById(targetMemberGroup.getChatroomId())
                 .orElseThrow(EntityNotExistException::new);
         chatroom.getChatMembers().remove(chatMember);
 
         log.debug("custom log:: create notice for target");
-        Notice notice = Notice.createGroupBanNotice(yourMemberGroup.getGroup().getGroupTitle(), yourMemberGroup.getMember());
+        Notice notice = Notice.createGroupBanNotice(targetMemberGroup.getGroup().getGroupTitle(), targetMemberGroup.getMember());
         noticeRepository.save(notice);
 
         //2.멤버그룹 삭제
-        yourMemberGroup.getGroup().minusMemberCount();
-        memberGroupRepository.delete(yourMemberGroup);
+        targetMemberGroup.getGroup().minusMemberCount();
+        memberGroupRepository.delete(targetMemberGroup);
 
     }
 

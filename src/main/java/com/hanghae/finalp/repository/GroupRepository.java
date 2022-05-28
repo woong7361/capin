@@ -24,5 +24,8 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     @Query("select distinct g from Group g join fetch g.memberGroups where g.id = :groupId")
     Optional<Group> findMemberByGroupId(@Param("groupId") Long groupId);
 
+    @Query("select g from Group g")
+    Slice<Group> findAllToSlice(Pageable pageable);
+
 }
 

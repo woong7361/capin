@@ -111,10 +111,11 @@ public class GroupService {
      * 그룹 검색 리스트 가져오기
      */
     @Transactional
-    public Slice<GroupDto.SimpleRes> getSearchGroupList(List<String> addressList, String title, Pageable pageable) {
+    public Slice<GroupDto.SimpleRes> getSearchGroupList(String title, List<String> addressList, Pageable pageable) {
+
         Slice<Group> groups;
-        if (addressList == null && title == null){
-            groups = groupRepository.findAll(pageable);
+        if (title == null && addressList == null){
+            groups = groupRepository.findAllToSlice(pageable);
         } else if (title == null){
             groups = groupRepository.findAllByRoughAddressIn(addressList, pageable);
         } else if (addressList == null) {
@@ -156,6 +157,7 @@ public class GroupService {
             specificRes.setImageUrl(member.getImageUrl());
             specificRes.setAuthority(memberGroup.getAuthority());
             specificResList.add(specificRes);
+
         }
         Group group = groupRepository.findById(groupId).orElseThrow(GroupNotExistException::new);
         return new GroupDto.SpecificRes(group, specificResList);

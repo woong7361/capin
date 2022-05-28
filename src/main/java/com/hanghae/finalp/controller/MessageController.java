@@ -4,6 +4,7 @@ import com.hanghae.finalp.entity.dto.MessageDto;
 import com.hanghae.finalp.entity.mappedsuperclass.MessageType;
 import com.hanghae.finalp.service.ChatService;
 import com.hanghae.finalp.service.MessageService;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Hidden
 public class MessageController {
 
     private final RedisTemplate<String, Object> redisTemplate;

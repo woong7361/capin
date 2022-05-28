@@ -21,9 +21,10 @@ public class RepositoryControllerAdvice {
     private final MessageSource ms;
 
     @ExceptionHandler(EntityNotExistException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
     public ErrorResponse entityNotExistException(EntityNotExistException e) {
         log.info("entityNotExistException - DB에서 조회 에러 -> {}", e.getErrorCode().getMessage());
+        e.printStackTrace();
         return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 

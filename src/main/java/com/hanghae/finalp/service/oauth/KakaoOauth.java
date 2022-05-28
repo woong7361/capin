@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -33,7 +32,6 @@ import java.util.Optional;
 @Slf4j
 public class KakaoOauth {
 
-    private final InMemoryClientRegistrationRepository inMemoryRepository;
     private final MemberRepository memberRepository;
     private final RedisUtils redisUtils;
     private final JwtTokenUtils jwtTokenUtils;

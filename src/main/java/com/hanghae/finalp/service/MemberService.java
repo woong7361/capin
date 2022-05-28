@@ -39,7 +39,7 @@ public class MemberService {
         String currentFilePath = member.getImageUrl();
         s3Service.deleteFile(currentFilePath);
 
-        return new MemberDto.ProfileRes(member.getUsername(), member.getImageUrl());
+        return new MemberDto.ProfileRes(member.getId(), member.getUsername(), member.getImageUrl());
     }
 
     /**
