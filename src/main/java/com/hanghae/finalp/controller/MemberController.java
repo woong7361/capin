@@ -6,6 +6,7 @@ import com.hanghae.finalp.entity.dto.other.ResultMsg;
 import com.hanghae.finalp.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import javax.validation.constraints.NotBlank;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
     private final MemberService memberService;
 
@@ -37,6 +39,7 @@ public class MemberController {
                              @RequestPart(value = "image", required = false) MultipartFile file,
                              @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
+        System.out.println("file = " + file);
         return memberService.editMyProfile(username, file, principalDetails.getMemberId());
     }
 
