@@ -61,7 +61,7 @@ public class OtherControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse maxNumberException(MaxNumberException e) {
         log.info("최대 인원수 에러입니다  {}", e.getErrorCode().getMessage());
-        e.printStackTrace();
+        log.info("stack Trace", e);
         return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 
@@ -69,7 +69,7 @@ public class OtherControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse duplicationRequestException(DuplicationRequestException e) {
         log.info("중복된 요청 오류입니다.{}, field: {}", e.getErrorCode().getMessage(), e.getField());
-        e.printStackTrace();
+        log.info("stack Trace", e);
         return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 
@@ -80,7 +80,7 @@ public class OtherControllerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse exception(Exception e) {
         log.info("예상치 못한 에러 발생!!! {}", e.getMessage());
-        e.printStackTrace();
+        log.info("stack Trace", e);
         return new ErrorResponse(ms.getMessage("error.response", null, null));
     }
 
