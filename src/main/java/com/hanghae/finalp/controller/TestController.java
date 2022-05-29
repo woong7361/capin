@@ -50,7 +50,7 @@ public class TestController {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    private static class MemberCreateReq {
+    public static class MemberCreateReq {
         private String username;
     }
 
