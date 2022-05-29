@@ -35,7 +35,7 @@ public class S3Service {
      */
     public String uploadFile(MultipartFile file) {
         if(file == null) return null;
-        log.debug("custom log:: upload file to S3...");
+        log.info("custom log:: upload file to S3...");
         SimpleDateFormat date = new SimpleDateFormat("yyyymmddHHmmss");
         String fileName = file.getOriginalFilename() + "-" + date.format(new Date());
 
