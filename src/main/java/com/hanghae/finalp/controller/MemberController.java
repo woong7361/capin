@@ -39,7 +39,9 @@ public class MemberController {
                              @RequestPart(value = "image", required = false) MultipartFile file,
                              @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        System.out.println("file = " + file);
+        log.info(file.toString());
+        log.info(file.getOriginalFilename());
+        log.info(file.getName());
         return memberService.editMyProfile(username, file, principalDetails.getMemberId());
     }
 
