@@ -1,5 +1,6 @@
 package com.hanghae.finalp.controller;
 
+import com.hanghae.finalp.config.exception.customexception.entity.MemberNotExistException;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.repository.MemberRepository;
@@ -29,6 +30,7 @@ public class TestController {
     @ResponseBody
     @PostMapping("/dummy-user")
     public MemberDto.refreshTokenRes test(@RequestBody MemberCreateReq memberCreateReq) {
+        if(true) throw new MemberNotExistException();
         Member member = Member.createMember("kakaoId", memberCreateReq.getUsername(), null);
         memberRepository.save(member);
         String accessToken = jwtTokenUtils.createAccessToken(member.getId(), member.getUsername());

@@ -24,7 +24,7 @@ public class RepositoryControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     public ErrorResponse entityNotExistException(EntityNotExistException e) {
         log.info("entityNotExistException - DB에서 조회 에러 -> {}", e.getErrorCode().getMessage());
-        e.printStackTrace();
+        log.info("print stack Trace", e);
         return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 
