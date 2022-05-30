@@ -1,5 +1,6 @@
 package com.hanghae.finalp.controller;
 
+import com.hanghae.finalp.config.exception.customexception.entity.MemberNotExistException;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.repository.MemberRepository;
@@ -51,19 +52,8 @@ public class TestController {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    private static class MemberCreateReq {
+    public static class MemberCreateReq {
         private String username;
     }
-
-    @Data
-    public static class Dto {
-        public List<Username> username;
-
-        @Data
-        public static class Username {
-            String a;
-        }
-    }
-
 }
 
