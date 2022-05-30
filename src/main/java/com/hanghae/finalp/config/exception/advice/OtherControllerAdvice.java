@@ -31,7 +31,7 @@ public class OtherControllerAdvice {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse authorityException(AuthorityException e) {
         log.info("권한관련 에러 발생 {}", e.getErrorCode().getMessage());
-        e.printStackTrace();
+        log.info("!!!!!!!!!!!Stack Trace", e);
         return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 
@@ -40,7 +40,7 @@ public class OtherControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse httpRequestMethodNotSupportedException(Exception e) {
         log.info("서버에서 지원하지 않는 http 메서드 입니다. {}", e.getMessage());
-        e.printStackTrace();
+        log.info("!!!!!!!!!!!Stack Trace", e);
         return new ErrorResponse(ms.getMessage("error.notSupport", null, null));
     }
 
@@ -61,7 +61,7 @@ public class OtherControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse maxNumberException(MaxNumberException e) {
         log.info("최대 인원수 에러입니다  {}", e.getErrorCode().getMessage());
-        e.printStackTrace();
+        log.info("!!!!!!!!!!!Stack Trace", e);
         return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 
@@ -69,7 +69,7 @@ public class OtherControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse duplicationRequestException(DuplicationRequestException e) {
         log.info("중복된 요청 오류입니다.{}, field: {}", e.getErrorCode().getMessage(), e.getField());
-        e.printStackTrace();
+        log.info("!!!!!!!!!!!Stack Trace", e);
         return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 
@@ -80,7 +80,7 @@ public class OtherControllerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse exception(Exception e) {
         log.info("예상치 못한 에러 발생!!! {}", e.getMessage());
-        e.printStackTrace();
+        log.info("!!!!!!!!!!!Stack Trace", e);
         return new ErrorResponse(ms.getMessage("error.response", null, null));
     }
 

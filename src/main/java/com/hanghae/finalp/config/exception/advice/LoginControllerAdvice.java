@@ -44,7 +44,7 @@ public class LoginControllerAdvice {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse refreshTokenException(RefreshTokenException e) {
         log.info("refresh token Exception! {}", e.getErrorCode().getMessage());
-        log.info("print", e);
+        log.info("!!!!!!!!!!!Stack Trace", e);
         return new ErrorResponse(ms.getMessage(e.getErrorCode().getCode(), null, null));
     }
 }

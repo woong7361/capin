@@ -30,7 +30,6 @@ public class TestController {
     @ResponseBody
     @PostMapping("/dummy-user")
     public MemberDto.refreshTokenRes test(@RequestBody MemberCreateReq memberCreateReq) {
-        if(true) throw new MemberNotExistException();
         Member member = Member.createMember("kakaoId", memberCreateReq.getUsername(), null);
         memberRepository.save(member);
         String accessToken = jwtTokenUtils.createAccessToken(member.getId(), member.getUsername());
@@ -55,16 +54,5 @@ public class TestController {
     public static class MemberCreateReq {
         private String username;
     }
-
-    @Data
-    public static class Dto {
-        public List<Username> username;
-
-        @Data
-        public static class Username {
-            String a;
-        }
-    }
-
 }
 
