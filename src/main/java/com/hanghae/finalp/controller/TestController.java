@@ -1,5 +1,6 @@
 package com.hanghae.finalp.controller;
 
+import com.hanghae.finalp.config.exception.customexception.entity.MemberNotExistException;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.repository.MemberRepository;
@@ -36,6 +37,13 @@ public class TestController {
         redisUtils.setRefreshTokenDataExpire(member.getId().toString(), refreshToken,
                 jwtTokenUtils.getRefreshTokenExpireTime(refreshToken));
         return new MemberDto.refreshTokenRes(accessToken, refreshToken);
+    }
+
+    @GetMapping("/test5")
+    @ResponseBody
+    public void test5() {
+
+        if(true) throw new MemberNotExistException();
     }
 
     /**
