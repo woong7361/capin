@@ -80,7 +80,7 @@ public class GroupService {
 
         s3Service.deleteFile(memberGroup.getGroup().getImageUrl());
         groupRepository.deleteById(memberGroup.getGroup().getId());
-        
+
         log.debug("custom log:: chatroom 관련 logic");
         Long chatroomId = memberGroup.getChatroomId();
         chatMemberRepository.deleteAllByChatroomId(chatroomId);
