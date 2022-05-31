@@ -279,10 +279,10 @@ class GroupServiceTest {
         public void 키워드O_지역필터X_성공() throws Exception{
             //given
             SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
-            GroupDto.SearchReq searchReq = new GroupDto.SearchReq();
             given(groupRepository.findAllByGroupTitleContaining(anyString(), any(Pageable.class))).willReturn(slice);
             //when
-            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList("title", null, PageRequest.of(0, 6));
+            Slice<GroupDto.SimpleRes> searchGroupList
+                    = groupService.getSearchGroupList("title", null, PageRequest.of(0, 6));
             //then
             assertThat(searchGroupList.getContent().size()).isEqualTo(2);
         }
