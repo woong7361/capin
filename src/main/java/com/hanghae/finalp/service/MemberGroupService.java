@@ -1,5 +1,6 @@
 package com.hanghae.finalp.service;
 
+import com.hanghae.finalp.config.exception.customexception.authority.AuthorityException;
 import com.hanghae.finalp.config.exception.customexception.etc.DuplicationRequestException;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorJoinException;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorOwnerException;
@@ -218,6 +219,11 @@ public class MemberGroupService {
         //해당하는 멤버그룹에 받아온 값을 넣어준다
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
                 .orElseThrow(() -> new MemberGroupNotExistException());
+
+        if (memberGroup.getAuthority().equals(Authority.WAIT)) {
+            throw new AuthorityException();
+        }
+
         memberGroup.setStartLocation(locationReq.getStartLocationX(), locationReq.getStartLocationY(), locationReq.getStartAddress());
     }
 
