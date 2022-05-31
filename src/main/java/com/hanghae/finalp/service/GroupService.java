@@ -4,17 +4,11 @@ import com.hanghae.finalp.config.exception.customexception.authority.AuthorOwner
 import com.hanghae.finalp.config.exception.customexception.entity.GroupNotExistException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberGroupNotExistException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberNotExistException;
-import com.hanghae.finalp.entity.Chatroom;
-import com.hanghae.finalp.entity.Group;
-import com.hanghae.finalp.entity.Member;
-import com.hanghae.finalp.entity.MemberGroup;
+import com.hanghae.finalp.entity.*;
 import com.hanghae.finalp.entity.dto.GroupDto;
 import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
-import com.hanghae.finalp.repository.ChatRoomRepository;
-import com.hanghae.finalp.repository.GroupRepository;
-import com.hanghae.finalp.repository.MemberGroupRepository;
-import com.hanghae.finalp.repository.MemberRepository;
+import com.hanghae.finalp.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +34,8 @@ public class GroupService {
     private final MemberRepository memberRepository;
     private final S3Service s3Service;
     private final ChatRoomRepository chatRoomRepository;
+
+    private final ChatMemberRepository chatMemberRepository;
 
 
     /**
@@ -84,6 +80,11 @@ public class GroupService {
 
         s3Service.deleteFile(memberGroup.getGroup().getImageUrl());
         groupRepository.deleteById(memberGroup.getGroup().getId());
+        
+        log.debug("custom log:: chatroom 관련 logic");
+        Long chatroomId = memberGroup.getChatroomId();
+        chatMemberRepository.deleteAllByChatroomId(chatroomId);
+        chatRoomRepository.deleteById(chatroomId);
     }
 
     /**
