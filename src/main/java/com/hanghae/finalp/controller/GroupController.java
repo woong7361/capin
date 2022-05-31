@@ -51,8 +51,7 @@ public class GroupController {
     @PostMapping("/api/groups/{groupId}/delete")
     public ResultMsg deleteGroup(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable("groupId") Long groupId
-    ) {
+            @PathVariable("groupId") Long groupId) {
         groupService.deleteGroup(principalDetails.getMemberId(), groupId);
         return new ResultMsg("success");
     }
