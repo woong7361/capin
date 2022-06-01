@@ -33,6 +33,7 @@ import static org.springframework.boot.jdbc.EmbeddedDatabaseConnection.H2;
 @AutoConfigureMockMvc
 @Transactional
 @AutoConfigureTestDatabase(connection = H2)
+@Disabled
 public class MemberIntegrationTest {
     @Autowired MemberRepository memberRepository;
     @Autowired JwtTokenUtils jwtTokenUtils;
