@@ -4,7 +4,6 @@ import com.hanghae.finalp.config.exception.customexception.entity.MemberNotExist
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.repository.MemberRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
@@ -81,16 +79,15 @@ class MemberServiceTest {
         @Test
         public void multipartFile이_null일때() throws Exception{
             //given
-            MultipartFile mockFile = Mockito.mock(MultipartFile.class);
             given(memberRepository.findById(anyLong())).willReturn(Optional.of(member1));
-            given(s3Service.uploadFile(null)).willReturn(null);
+//            given(s3Service.uploadFile(null)).willReturn("image1");
             //when
             MemberDto.ProfileRes profile = memberService.editMyProfile("editName", null, 1L);
             //then
             assertThat(profile.getUsername()).isEqualTo("editName");
-            assertThat(profile.getImageUrl()).isEqualTo(null);
+            assertThat(profile.getImageUrl()).isEqualTo("image1");
             assertThat(member1.getUsername()).isEqualTo("editName");
-            assertThat(member1.getImageUrl()).isEqualTo(null);
+            assertThat(member1.getImageUrl()).isEqualTo("image1");
         }
 
         @Test

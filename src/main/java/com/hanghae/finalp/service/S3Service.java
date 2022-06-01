@@ -2,7 +2,9 @@ package com.hanghae.finalp.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.util.IOUtils;
 import com.hanghae.finalp.config.exception.customexception.etc.S3Exception;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Optional;
 
 
 @Service
@@ -40,7 +42,13 @@ public class S3Service {
         String fileName = file.getOriginalFilename() + "-" + date.format(new Date());
 
         try {
-            amazonS3.putObject(new PutObjectRequest(bucket, fileName, file.getInputStream(), null)
+            byte[] bytes = IOUtils.toByteArray(file.getInputStream());
+            ObjectMetadata metaData = new ObjectMetadata();
+            metaData.setContentLength(bytes.length);
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+
+            amazonS3.putObject(new PutObjectRequest(bucket, fileName, byteArrayInputStream, metaData)
+//            amazonS3.putObject(new PutObjectRequest(bucket, fileName, file.getInputStream(), null)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (IOException e) {
             throw new S3Exception();
@@ -54,6 +62,7 @@ public class S3Service {
      */
     public void deleteFile(String currentFilePath) {
         if (currentFilePath == null) return;
+        if (currentFilePath.equals("https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/groupDefaultImg.png")) return;
         if (currentFilePath.startsWith("http://k.kakaocdn.net")) return;
 
         String filePath = currentFilePath.substring(currentFilePath.lastIndexOf("/") + 1);

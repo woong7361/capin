@@ -1,5 +1,6 @@
 package com.hanghae.finalp.controller;
 
+import com.hanghae.finalp.config.exception.customexception.entity.MemberNotExistException;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.repository.MemberRepository;
@@ -29,7 +30,8 @@ public class TestController {
     @ResponseBody
     @PostMapping("/dummy-user")
     public MemberDto.refreshTokenRes test(@RequestBody MemberCreateReq memberCreateReq) {
-        Member member = Member.createMember("kakaoId", memberCreateReq.getUsername(), null);
+        Member member = Member.createMember("kakaoId", memberCreateReq.getUsername(),
+                "https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/memberDefaultImg.png");
         memberRepository.save(member);
         String accessToken = jwtTokenUtils.createAccessToken(member.getId(), member.getUsername());
         String refreshToken = jwtTokenUtils.createRefreshToken(member.getId());
@@ -50,19 +52,8 @@ public class TestController {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    private static class MemberCreateReq {
+    public static class MemberCreateReq {
         private String username;
     }
-
-    @Data
-    public static class Dto {
-        public List<Username> username;
-
-        @Data
-        public static class Username {
-            String a;
-        }
-    }
-
 }
 

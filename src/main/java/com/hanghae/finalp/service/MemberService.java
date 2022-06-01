@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.util.Optional;
 
 
 @Service
@@ -23,8 +23,7 @@ public class MemberService {
      * 내 프로필 조회
      */
     public MemberDto.ProfileRes getMyProfile(Long memberId) {
-       Member member = memberRepository.findById(memberId).orElseThrow(
-               MemberNotExistException::new);
+       Member member = memberRepository.findById(memberId).orElseThrow(MemberNotExistException::new);
         return new MemberDto.ProfileRes(member.getId(), member.getUsername(), member.getImageUrl());
     }
 
@@ -32,15 +31,15 @@ public class MemberService {
      * 프로필 수정
      */
     @Transactional()
-    public MemberDto.ProfileRes editMyProfile(String username, MultipartFile file, Long memberId){
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                MemberNotExistException::new);
+    public MemberDto.ProfileRes editMyProfile(String username, MultipartFile multipartFile, Long memberId){
+        Member member = memberRepository.findById(memberId).orElseThrow(MemberNotExistException::new);
 
-        String currentFilePath = member.getImageUrl();
-        String fullFilePath = s3Service.uploadFile(file);
-
-        member.patchMember(username, fullFilePath);
-        s3Service.deleteFile(currentFilePath);
+        String imageUrl = member.getImageUrl();
+        if(multipartFile != null) {
+            s3Service.deleteFile(imageUrl);
+            imageUrl = s3Service.uploadFile(multipartFile);
+        }
+        member.patchMember(username, imageUrl);
 
         return new MemberDto.ProfileRes(member.getId(), member.getUsername(), member.getImageUrl());
     }

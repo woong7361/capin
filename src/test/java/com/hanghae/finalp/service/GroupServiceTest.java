@@ -164,7 +164,7 @@ class GroupServiceTest {
 
             //then
             GroupDto.SimpleRes result = groupService.createGroup(1L, createReq, null);
-            assertThat(result.getImageUrl()).isEqualTo(null);
+            assertThat(result.getImageUrl()).isEqualTo("https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/groupDefaultImg.png");
         }
     }
 
@@ -173,7 +173,7 @@ class GroupServiceTest {
         @Test
         public void 성공() throws Exception{
             //given
-            given(memberGroupRepository.findByMemberIdAndGroupId(anyLong(), anyLong()))
+            given(memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(anyLong(), anyLong()))
                     .willReturn(Optional.of(memberGroupOWNER));
             //when //then
             groupService.deleteGroup(1L, 2L);
@@ -182,7 +182,7 @@ class GroupServiceTest {
         @Test
         public void AUTHORITY_JOIN_실패() throws Exception{
             //given
-            given(memberGroupRepository.findByMemberIdAndGroupId(anyLong(), anyLong()))
+            given(memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(anyLong(), anyLong()))
                     .willReturn(Optional.of(memberGroupJOIN));
             //when //then
             assertThatThrownBy(() -> groupService.deleteGroup(1L, 2L))
@@ -192,7 +192,7 @@ class GroupServiceTest {
         @Test
         public void AUTHORITY_WAIT_실패() throws Exception{
             //given
-            given(memberGroupRepository.findByMemberIdAndGroupId(anyLong(), anyLong()))
+            given(memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(anyLong(), anyLong()))
                     .willReturn(Optional.of(memberGroupWAIT));
             //when //then
             assertThatThrownBy(() -> groupService.deleteGroup(1L, 2L))
@@ -208,7 +208,7 @@ class GroupServiceTest {
             MultipartFile mockFile = Mockito.mock(MultipartFile.class);
             GroupDto.CreateReq createReq = new GroupDto.CreateReq("title", "desc",
                     10, "서초", "1988.01.07", "1988.08.01");
-            given(memberGroupRepository.findByMemberIdAndGroupId(anyLong(), anyLong()))
+            given(memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(anyLong(), anyLong()))
                     .willReturn(Optional.of(memberGroupOWNER));
             given(s3Service.uploadFile(any(MultipartFile.class)))
                     .willReturn("imageUri");
@@ -226,7 +226,7 @@ class GroupServiceTest {
             MultipartFile mockFile = Mockito.mock(MultipartFile.class);
             GroupDto.CreateReq createReq = new GroupDto.CreateReq("title", "desc",
                     10, "서초", "1988.01.07", "1988.08.01");
-            given(memberGroupRepository.findByMemberIdAndGroupId(anyLong(), anyLong()))
+            given(memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(anyLong(), anyLong()))
                     .willReturn(Optional.empty());
             //when //then
             assertThatThrownBy(() -> groupService.patchGroup(1L, 2L, createReq, mockFile))
@@ -239,7 +239,7 @@ class GroupServiceTest {
             MultipartFile mockFile = Mockito.mock(MultipartFile.class);
             GroupDto.CreateReq createReq = new GroupDto.CreateReq("title", "desc",
                     10, "서초", "1988.01.07", "1988.08.01");
-            given(memberGroupRepository.findByMemberIdAndGroupId(anyLong(), anyLong()))
+            given(memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(anyLong(), anyLong()))
                     .willReturn(Optional.of(memberGroupJOIN));
             //when //then
             assertThatThrownBy(() -> groupService.patchGroup(1L, 2L, createReq, mockFile))
@@ -252,7 +252,7 @@ class GroupServiceTest {
             MultipartFile mockFile = Mockito.mock(MultipartFile.class);
             GroupDto.CreateReq createReq = new GroupDto.CreateReq("title", "desc",
                     10, "서초", "1988.01.07", "1988.08.01");
-            given(memberGroupRepository.findByMemberIdAndGroupId(anyLong(), anyLong()))
+            given(memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(anyLong(), anyLong()))
                     .willReturn(Optional.of(memberGroupWAIT));
             //when //then
             assertThatThrownBy(() -> groupService.patchGroup(1L, 2L, createReq, mockFile))
@@ -261,65 +261,60 @@ class GroupServiceTest {
     }
 
 
-//
-//    @Nested
-//    class getSearchGroupList {
-//        @Test
-//        public void 키워드X_지역필터X_성공() throws Exception{
-//            //given
-//            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
-//            given(groupRepository.findAllToSlice(any(Pageable.class))).willReturn(slice);
-//            //when
-//            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList(null, PageRequest.of(0, 6));
-//            //then
-//            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
-//        }
-//
-//        @Test
-//        public void 키워드O_지역필터X_성공() throws Exception{
-//            //given
-//            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
-//            GroupDto.SearchReq searchReq = new GroupDto.SearchReq();
-//            searchReq.setTitle("title");
-//            given(groupRepository.findAllByGroupTitleContaining(anyString(), any(Pageable.class))).willReturn(slice);
-//            //when
-//            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList(searchReq, PageRequest.of(0, 6));
-//            //then
-//            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
-//        }
-//
-//        @Test
-//        public void 키워드X_지역필터O_성공() throws Exception{
-//            //given
-//            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
-//            GroupDto.SearchReq searchReq = new GroupDto.SearchReq();
-//            List<GroupDto.SearchReq.Address> addressList = List.of(new GroupDto.SearchReq.Address("서초"));
-//            searchReq.setAddressList(addressList);
-//            given(groupRepository.findAllByRoughAddressIn(anyList(), any(Pageable.class))).willReturn(slice);
-//            //when
-//            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList(searchReq, PageRequest.of(0, 6));
-//            //then
-//            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
-//        }
-//
-//        @Test
-//        public void 키워드O_지역필터O_성공() throws Exception{
-//            //given
-//            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
-//            GroupDto.SearchReq searchReq = new GroupDto.SearchReq();
-//            List<GroupDto.SearchReq.Address> addressList = List.of(new GroupDto.SearchReq.Address("서초"));
-//            searchReq.setAddressList(addressList);
-//            searchReq.setTitle("title");
-//
-//            given(groupRepository.findAllByGroupTitleContainingAndRoughAddressIn(anyString(), anyList(), any(Pageable.class)))
-//                    .willReturn(slice);
-//            //when
-//            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList(searchReq, PageRequest.of(0, 6));
-//            //then
-//            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
-//        }
-//
-//    }
+
+    @Nested
+    class getSearchGroupList {
+        @Test
+        public void 키워드X_지역필터X_성공() throws Exception{
+            //given
+            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
+            given(groupRepository.findAllToSlice(any(Pageable.class))).willReturn(slice);
+            //when
+            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList(null, null, PageRequest.of(0, 6));
+            //then
+            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
+        }
+
+        @Test
+        public void 키워드O_지역필터X_성공() throws Exception{
+            //given
+            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
+            given(groupRepository.findAllByGroupTitleContaining(anyString(), any(Pageable.class))).willReturn(slice);
+            //when
+            Slice<GroupDto.SimpleRes> searchGroupList
+                    = groupService.getSearchGroupList("title", null, PageRequest.of(0, 6));
+            //then
+            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
+        }
+
+        @Test
+        public void 키워드X_지역필터O_성공() throws Exception{
+            //given
+            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
+            List<String> addressList = List.of("서초");
+            given(groupRepository.findAllByRoughAddressIn(anyList(), any(Pageable.class))).willReturn(slice);
+            //when
+            Slice<GroupDto.SimpleRes> searchGroupList = groupService.getSearchGroupList(null, addressList, PageRequest.of(0, 6));
+            //then
+            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
+        }
+
+        @Test
+        public void 키워드O_지역필터O_성공() throws Exception{
+            //given
+            SliceImpl slice = new SliceImpl<>(List.of(group1, group2));
+            List<String> addressList = List.of("서초");
+
+            given(groupRepository.findAllByGroupTitleContainingAndRoughAddressIn(anyString(), anyList(), any(Pageable.class)))
+                    .willReturn(slice);
+            //when
+            Slice<GroupDto.SimpleRes> searchGroupList =
+                    groupService.getSearchGroupList("title", addressList, PageRequest.of(0, 6));
+            //then
+            assertThat(searchGroupList.getContent().size()).isEqualTo(2);
+        }
+
+    }
 
 
 
