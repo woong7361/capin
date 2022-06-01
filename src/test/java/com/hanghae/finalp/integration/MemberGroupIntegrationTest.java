@@ -8,6 +8,7 @@ import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.repository.*;
 import com.hanghae.finalp.util.JwtTokenUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ import static org.springframework.boot.jdbc.EmbeddedDatabaseConnection.H2;
 @AutoConfigureMockMvc
 @Transactional
 @AutoConfigureTestDatabase(connection = H2)
+@Disabled
 public class MemberGroupIntegrationTest {
 
     @Autowired ChatRoomRepository chatRoomRepository;
