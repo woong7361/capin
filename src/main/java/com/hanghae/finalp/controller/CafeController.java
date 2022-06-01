@@ -7,6 +7,7 @@ import com.hanghae.finalp.entity.dto.other.ResultMsg;
 import com.hanghae.finalp.service.CafeService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,6 +52,15 @@ public class CafeController {
     @GetMapping("/api/groups/{groupId}/cafe-recommendation")
     public CafeDto.RecoRes locationRecommend(@PathVariable("groupId") Long groupId) {
         return cafeService.getRecoCafe(groupId);
+    }
+
+    /**
+     * 스터디 카페 추천
+     */
+    @Operation(summary = "스터디 카페 추천 - 메인페이지", description = "그룹에서 스터디 카페 추천")
+    @GetMapping("/api/cafe-reco")
+    public CafeDto.RecoRes locationRecommend(@Param("locationX") Double locationX, @Param("locationY") Double locationY) {
+        return cafeService.getRecoCafeForMain(locationX, locationY);
     }
 
 }
