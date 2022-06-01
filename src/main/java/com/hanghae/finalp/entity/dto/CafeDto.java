@@ -52,5 +52,16 @@ public class CafeDto {
     }
 
 
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public class RecoReq {
+        @NotBlank
+        @Pattern(regexp="^[0-9]\\d*\\.?\\d*[0-9]", message="숫자만 입력가능합니다.")
+        private String locationX;
 
+        @NotBlank
+        @Pattern(regexp="^[0-9]\\d*\\.?\\d*[0-9]", message="숫자만 입력가능합니다.")
+        private String locationY;
+    }
 }
