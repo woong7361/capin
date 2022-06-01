@@ -1,20 +1,19 @@
 package com.hanghae.finalp.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hanghae.finalp.entity.Chatroom;
 import com.hanghae.finalp.entity.Group;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.dto.GroupDto;
-import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
+import com.hanghae.finalp.repository.ChatRoomRepository;
 import com.hanghae.finalp.repository.GroupRepository;
 import com.hanghae.finalp.repository.MemberGroupRepository;
 import com.hanghae.finalp.repository.MemberRepository;
 import com.hanghae.finalp.util.JwtTokenUtils;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -25,11 +24,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.result.RequestResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,6 +41,8 @@ public class GroupIntegrationTest {
     @Autowired MemberRepository memberRepository;
     @Autowired MemberGroupRepository memberGroupRepository;
     @Autowired GroupRepository groupRepository;
+
+    @Autowired ChatRoomRepository chatRoomRepository;
     @Autowired JwtTokenUtils jwtTokenUtils;
 
     @Autowired MockMvc mockMvc;
@@ -52,6 +51,8 @@ public class GroupIntegrationTest {
 
     Member member;
     Group group;
+
+    Chatroom chatroom;
     String accessToken;
 
     private Member member1;
@@ -67,8 +68,11 @@ public class GroupIntegrationTest {
         memberRepository.save(member);
         accessToken = jwtTokenUtils.createAccessToken(member.getId(), member.getUsername());
 
+        chatroom = Chatroom.createChatroomByGroup("chatrooomTitle", member);
+        chatRoomRepository.save(chatroom);
+
         group = Group.createGroup("title", "desc", 5, "addr",
-                "imageUrl", member, 888888L, "2022.07.13", "2022.08.23");
+                "imageUrl", member, chatroom.getId(), "2022.07.13", "2022.08.23");
         groupRepository.save(group);
 
         member1 = Member.createMember("kakaoId1", "userA", "image1");

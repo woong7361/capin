@@ -1,5 +1,6 @@
 package com.hanghae.finalp.entity.dto;
 
+import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,6 +33,7 @@ public class MemberDto {
         private String imageUrl;
     }
 
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -40,6 +42,52 @@ public class MemberDto {
         private String username;
         private String imageUrl;
         private Authority authority;
+
+        public SpecificRes(OwnerSpecificRes ownerSpecificRes) {
+            this.memberId = ownerSpecificRes.getMemberId();
+            this.username = ownerSpecificRes.getUsername();
+            this.imageUrl = ownerSpecificRes.getImageUrl();
+            this.authority = ownerSpecificRes.getAuthority();
+        }
+        public SpecificRes(JoinSpecificRes joinSpecificRes) {
+            this.memberId = joinSpecificRes.getMemberId();
+            this.username = joinSpecificRes.getUsername();
+            this.imageUrl = joinSpecificRes.getImageUrl();
+            this.authority = joinSpecificRes.getAuthority();
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class OwnerSpecificRes {
+        private Long memberId;
+        private String username;
+        private String imageUrl;
+        private Authority authority;
+
+        public OwnerSpecificRes(Member member) {
+            this.memberId = member.getId();
+            this.username = member.getUsername();
+            this.imageUrl = member.getImageUrl();
+            this.authority = Authority.OWNER;
+        }
+    }
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class JoinSpecificRes {
+        private Long memberId;
+        private String username;
+        private String imageUrl;
+        private Authority authority;
+
+        public JoinSpecificRes(Member member) {
+            this.memberId = member.getId();
+            this.username = member.getUsername();
+            this.imageUrl = member.getImageUrl();
+            this.authority = Authority.JOIN;
+        }
     }
 
     @Data
