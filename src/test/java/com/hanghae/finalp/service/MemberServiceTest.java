@@ -79,16 +79,15 @@ class MemberServiceTest {
         @Test
         public void multipartFile이_null일때() throws Exception{
             //given
-            MultipartFile mockFile = Mockito.mock(MultipartFile.class);
             given(memberRepository.findById(anyLong())).willReturn(Optional.of(member1));
-            given(s3Service.uploadFile(null)).willReturn(null);
+//            given(s3Service.uploadFile(null)).willReturn("image1");
             //when
             MemberDto.ProfileRes profile = memberService.editMyProfile("editName", null, 1L);
             //then
             assertThat(profile.getUsername()).isEqualTo("editName");
-            assertThat(profile.getImageUrl()).isEqualTo("https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/memberDefaultImg.png");
+            assertThat(profile.getImageUrl()).isEqualTo("image1");
             assertThat(member1.getUsername()).isEqualTo("editName");
-            assertThat(member1.getImageUrl()).isEqualTo("https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/memberDefaultImg.png");
+            assertThat(member1.getImageUrl()).isEqualTo("image1");
         }
 
         @Test
