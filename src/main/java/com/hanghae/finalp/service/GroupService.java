@@ -4,7 +4,10 @@ import com.hanghae.finalp.config.exception.customexception.authority.AuthorOwner
 import com.hanghae.finalp.config.exception.customexception.entity.GroupNotExistException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberGroupNotExistException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberNotExistException;
-import com.hanghae.finalp.entity.*;
+import com.hanghae.finalp.entity.Chatroom;
+import com.hanghae.finalp.entity.Group;
+import com.hanghae.finalp.entity.Member;
+import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.dto.GroupDto;
 import com.hanghae.finalp.entity.dto.MemberDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
@@ -17,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +36,6 @@ public class GroupService {
     private final MemberRepository memberRepository;
     private final S3Service s3Service;
     private final ChatRoomRepository chatRoomRepository;
-
     private final ChatMemberRepository chatMemberRepository;
 
 
@@ -71,19 +72,17 @@ public class GroupService {
      */
     @Transactional
     public void deleteGroup(Long memberId, Long groupId) {
-        MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
+        MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(memberId, groupId).orElseThrow(
                 MemberGroupNotExistException::new);
         if(!memberGroup.getAuthority().equals(Authority.OWNER)){
             log.debug("custom log:: delete group is required owner authority");
             throw new AuthorOwnerException();
         }
-
         s3Service.deleteFile(memberGroup.getGroup().getImageUrl());
         groupRepository.deleteById(memberGroup.getGroup().getId());
 
         log.debug("custom log:: chatroom 관련 logic");
         Long chatroomId = memberGroup.getChatroomId();
-        chatMemberRepository.deleteAllByChatroomId(chatroomId);
         chatRoomRepository.deleteById(chatroomId);
     }
 
@@ -92,7 +91,7 @@ public class GroupService {
      */
     @Transactional
     public void patchGroup(Long memberId, Long groupId, GroupDto.CreateReq createReq, MultipartFile multipartFile) {
-        MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId).orElseThrow(
+        MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupIdFetchGroup(memberId, groupId).orElseThrow(
                 MemberGroupNotExistException::new);
         if(!memberGroup.getAuthority().equals(Authority.OWNER)){
             log.debug("custom log:: patch group is required owner authority");
@@ -135,31 +134,22 @@ public class GroupService {
     public GroupDto.SpecificRes groupView(Long groupId) {
         List<MemberGroup> memberGroupList = memberGroupRepository.findAllByGroupId(groupId);
 
-        Stream<Member> ownerStream = memberGroupList.stream()
+        Stream<MemberDto.SpecificRes> ownerStream = memberGroupList.stream()
                 .filter(mg -> mg.getAuthority().equals(Authority.OWNER))
-                .map(mg -> mg.getMember());
+                .map(mg -> mg.getMember())
+                .map(MemberDto.OwnerSpecificRes::new)
+                .map(MemberDto.SpecificRes::new);
 
-        Stream<Member> joinStream = memberGroupList.stream()
+        Stream<MemberDto.SpecificRes> joinStream = memberGroupList.stream()
                 .filter(mg -> mg.getAuthority().equals(Authority.JOIN))
                 .map(mg -> mg.getMember())
-                .sorted(Comparator.comparing(Member::getUsername));
+                .sorted(Comparator.comparing(Member::getUsername))
+                .map(MemberDto.JoinSpecificRes::new)
+                .map(MemberDto.SpecificRes::new);
 
-        List<Member> memberList = Stream.concat(ownerStream, joinStream)
+        List<MemberDto.SpecificRes> specificResList = Stream.concat(ownerStream, joinStream)
                 .collect(Collectors.toList());
 
-        List<MemberDto.SpecificRes> specificResList = new ArrayList<>();
-        for (Member member : memberList) {
-            MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(member.getId(), groupId)
-                    .orElseThrow(MemberGroupNotExistException::new);
-
-            MemberDto.SpecificRes specificRes = new MemberDto.SpecificRes();
-            specificRes.setMemberId(member.getId());
-            specificRes.setUsername(member.getUsername());
-            specificRes.setImageUrl(member.getImageUrl());
-            specificRes.setAuthority(memberGroup.getAuthority());
-            specificResList.add(specificRes);
-
-        }
         Group group = groupRepository.findById(groupId).orElseThrow(GroupNotExistException::new);
         return new GroupDto.SpecificRes(group, specificResList);
     }

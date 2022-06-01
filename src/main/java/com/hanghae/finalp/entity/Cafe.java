@@ -16,7 +16,6 @@ public class Cafe extends TimeStamped {
     @GeneratedValue
     @Column(name = "cafe_id")
     private Long id;
-
     private String locationName;
     private String locationX;
     private String locationY;
