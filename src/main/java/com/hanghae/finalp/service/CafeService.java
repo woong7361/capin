@@ -91,6 +91,17 @@ public class CafeService {
     }
 
 
+    /**
+     * 카페 추천 - 메인
+     */
+    public CafeDto.RecoRes getRecoCafeForMain(Double locationX, Double locationY) {
+        MemberGroupDto.Location location = new MemberGroupDto.Location(locationX, locationY);
+        KakaoApiDto kakaoApiDto = getKakaoKeywordLocalApi(location);
+
+        CafeDto.RecoRes cafeScrapInfo = getCafeScrapInfo(kakaoApiDto);
+        return cafeScrapInfo;
+    }
+
 
     //===================================================================================================//
 
@@ -117,11 +128,11 @@ public class CafeService {
         KakaoApiDto kakaoApiDto = kakaoWebClient.get()
                 .uri(builder -> builder.path("/v2/local/search/keyword.json") //카카오 로컬- "키워드로 검색하기
 //                        .queryParam("category_group_code", "CE7") //카테고리 그룹 코드
-                                .queryParam("x", location.getLocationX()) //longitude
-                                .queryParam("y", location.getLocationY()) //latitude
+                                .queryParam("x", location.getLocationX().toString()) //longitude
+                                .queryParam("y", location.getLocationY().toString()) //latitude
                                 .queryParam("radius", 20000) //반경 단위(m) 최대 20000
-                                .queryParam("size", 4) //추천 카페 수
-                                .queryParam("query", URLEncoder.encode("cafe", StandardCharsets.UTF_8))
+                                .queryParam("size", 5) //추천 카페 수
+                                .queryParam("query", "스터디 카페")
                         .queryParam("sort", "distance")
                         .build()
                 )
@@ -190,4 +201,6 @@ public class CafeService {
             throw new RuntimeException(e);
         }
     }
+
+
 }
