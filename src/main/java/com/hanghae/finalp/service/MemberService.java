@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -29,15 +31,15 @@ public class MemberService {
      * 프로필 수정
      */
     @Transactional()
-    public MemberDto.ProfileRes editMyProfile(String username, MultipartFile file, Long memberId){
+    public MemberDto.ProfileRes editMyProfile(String username, MultipartFile multipartFile, Long memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(MemberNotExistException::new);
 
-        String fullFilePath = s3Service.uploadFile(file);
-        if(fullFilePath == null) fullFilePath = "https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/memberDefaultImg.png";
-        member.patchMember(username, fullFilePath);
-
-        String currentFilePath = member.getImageUrl();
-        s3Service.deleteFile(currentFilePath);
+        String imageUrl = member.getImageUrl();
+        if(multipartFile != null) {
+            s3Service.deleteFile(imageUrl);
+            imageUrl = s3Service.uploadFile(multipartFile);
+        }
+        member.patchMember(username, imageUrl);
 
         return new MemberDto.ProfileRes(member.getId(), member.getUsername(), member.getImageUrl());
     }

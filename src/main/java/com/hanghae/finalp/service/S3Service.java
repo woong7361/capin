@@ -62,7 +62,6 @@ public class S3Service {
      */
     public void deleteFile(String currentFilePath) {
         if (currentFilePath == null) return;
-        if (currentFilePath.equals("https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/memberDefaultImg.png")) return;
         if (currentFilePath.equals("https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/groupDefaultImg.png")) return;
         if (currentFilePath.startsWith("http://k.kakaocdn.net")) return;
 

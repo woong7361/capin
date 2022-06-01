@@ -134,7 +134,6 @@ public class KakaoOauth {
             memberId = member.get().getId();
             isFirst = false;
         } else{ //db에 카카오아이디가 없으면 member을 만들어준다.
-            if(imageUrl == null) imageUrl = "https://mj-file-bucket.s3.ap-northeast-2.amazonaws.com/memberDefaultImg.png";
             Member newMember = memberRepository.save(Member.createMember(kakaoId, username, imageUrl));
             memberId = newMember.getId();
             isFirst = true;
