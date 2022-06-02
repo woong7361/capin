@@ -1,6 +1,7 @@
 package com.hanghae.finalp.entity.dto;
 
 import com.hanghae.finalp.entity.Member;
+import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -87,6 +88,13 @@ public class MemberDto {
             this.username = member.getUsername();
             this.imageUrl = member.getImageUrl();
             this.authority = Authority.JOIN;
+        }
+
+        public JoinSpecificRes(MemberGroup memberGroup) {
+            this.memberId = memberGroup.getMember().getId();
+            this.username = memberGroup.getMember().getUsername();
+            this.imageUrl = memberGroup.getMember().getImageUrl();
+            this.authority = memberGroup.getAuthority();
         }
     }
 
