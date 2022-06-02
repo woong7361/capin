@@ -142,9 +142,7 @@ public class GroupService {
                 .map(MemberDto.SpecificRes::new);
 
         Stream<MemberDto.SpecificRes> joinStream = memberGroupList.stream()
-                .filter(mg -> mg.getAuthority().equals(Authority.JOIN))
-                .map(mg -> mg.getMember())
-                .sorted(Comparator.comparing(Member::getUsername))
+                .filter(mg -> !(mg.getAuthority().equals(Authority.OWNER)))
                 .map(MemberDto.JoinSpecificRes::new)
                 .map(MemberDto.SpecificRes::new);
 
