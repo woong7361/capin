@@ -62,15 +62,12 @@ public class MemberGroupService {
     public void approveGroup(Long ownerMemberId, Long groupId, Long targetMemberId) {
 
         log.debug("custom log:: owner's memberGroup 확인");
-        //내가 속했으며, 승인을 요청한 멤버그룹을 찾는다
         MemberGroup ownerMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(ownerMemberId, groupId)
                 .orElseThrow(MemberGroupNotExistException::new);
 
-        //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너가 아니라면
         if(!Authority.OWNER.equals(ownerMemberGroup.getAuthority())) throw new AuthorOwnerException();
 
         log.debug("custom log:: target's memberGroup 확인");
-        //그사람도 같은 멤버그룹에서 대기중인지 확인 & 권한 확인
         MemberGroup targetMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(targetMemberId, groupId)
                 .orElseThrow(MemberGroupNotExistException::new);
 
@@ -105,21 +102,16 @@ public class MemberGroupService {
     public void denyGroup(Long ownerMemberId, Long groupId, Long targetMemberId) {
 
         log.debug("custom log:: owner's memberGroup 확인");
-        //내가 속했으며, 승인을 요청한 멤버그룹을 찾는다
         MemberGroup ownerMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(ownerMemberId, groupId).orElseThrow(
                 MemberGroupNotExistException::new);
 
-        if(!Authority.OWNER.equals(ownerMemberGroup.getAuthority())){
-            throw new AuthorOwnerException();
-        }
+        if(!Authority.OWNER.equals(ownerMemberGroup.getAuthority())) throw new AuthorOwnerException();
 
         log.debug("custom log:: target's memberGroup 확인");
         MemberGroup targetMemberGroup= memberGroupRepository.findByMemberIdAndGroupId(targetMemberId, groupId).orElseThrow(
                 MemberGroupNotExistException::new);
 
-        if(!Authority.WAIT.equals(targetMemberGroup.getAuthority())) {
-            throw new AuthorWaitException();
-        }
+        if(!Authority.WAIT.equals(targetMemberGroup.getAuthority())) throw new AuthorWaitException();
 
         log.debug("custom log:: create notice for target");
         Notice notice = Notice.createGroupDenyNotice(targetMemberGroup.getGroup().getGroupTitle(), targetMemberGroup.getMember());
@@ -134,24 +126,16 @@ public class MemberGroupService {
     @Transactional
     public void banGroup(Long ownerMemberId, Long groupId, Long targetMemberId) {
         log.debug("custom log:: owner's memberGroup 확인");
-        //내가 속했으며, 추방할 멤버그룹을 찾는다
         MemberGroup ownerMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(ownerMemberId, groupId)
                 .orElseThrow(MemberGroupNotExistException::new);
 
-        //그리고 내 auth를 확인 -> 만약 내가 그 멤버그룹의 오너가 아니라면
-        if (!Authority.OWNER.equals(ownerMemberGroup.getAuthority())) {
-            throw new AuthorOwnerException();
-        }
+        if (!Authority.OWNER.equals(ownerMemberGroup.getAuthority())) throw new AuthorOwnerException();
 
         log.debug("custom log:: target's memberGroup 확인");
-        //그사람도 같은 멤버그룹에 속했는지 확인
         MemberGroup targetMemberGroup = memberGroupRepository.findByMemberIdAndGroupId(targetMemberId, groupId)
                 .orElseThrow(MemberGroupNotExistException::new);
 
-        //그사람의 auth 확인 ->그사람의 권한이 join일 경우
-        if (!Authority.JOIN.equals(targetMemberGroup.getAuthority())) {
-            throw new AuthorJoinException();
-        }
+        if (!Authority.JOIN.equals(targetMemberGroup.getAuthority())) throw new AuthorJoinException();
 
         log.debug("custom log:: chatroom 관련 logic");
         //1.채팅룸에서 드랍 => 1-1.챗멤버를 없애줘야함
@@ -200,9 +184,7 @@ public class MemberGroupService {
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
                 .orElseThrow(MemberGroupNotExistException::new);
 
-        if (!memberGroup.getAuthority().equals(Authority.JOIN)) {
-            throw new AuthorJoinException();
-        }
+        if (!memberGroup.getAuthority().equals(Authority.JOIN)) throw new AuthorJoinException();
 
         log.debug("custom log:: chatroom 관련 logic");
         ChatMember chatMember = chatMemberRepository.findByMemberIdAndChatroomId(memberId, memberGroup.getChatroomId())
@@ -223,9 +205,7 @@ public class MemberGroupService {
         MemberGroup memberGroup = memberGroupRepository.findByMemberIdAndGroupId(memberId, groupId)
                 .orElseThrow(() -> new MemberGroupNotExistException());
 
-        if (memberGroup.getAuthority().equals(Authority.WAIT)) {
-            throw new AuthorityException();
-        }
+        if (memberGroup.getAuthority().equals(Authority.WAIT)) throw new AuthorityException();
 
         memberGroup.setStartLocation(locationReq.getStartLocationX(), locationReq.getStartLocationY(), locationReq.getStartAddress());
     }

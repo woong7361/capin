@@ -26,11 +26,7 @@ public class NoticeService {
     @Transactional
     public Slice<NoticeDto.MessageRes> getNotice(Long memberId, Pageable pageable) {
         Slice<Notice> notices = noticeRepository.findByMemberId(memberId, pageable);
-        Slice<NoticeDto.MessageRes> noticeSlice = notices.map(NoticeDto.MessageRes::new);
-        for (Notice notice : notices) {
-            notice.readNotice();
-        }
-        return noticeSlice;
+         return notices.map(NoticeDto.MessageRes::new);
     }
 
     /**

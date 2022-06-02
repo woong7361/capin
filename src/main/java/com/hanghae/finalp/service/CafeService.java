@@ -9,15 +9,13 @@ import com.hanghae.finalp.config.exception.customexception.etc.WebClientExceptio
 import com.hanghae.finalp.entity.Cafe;
 import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.dto.CafeDto;
-import com.hanghae.finalp.entity.dto.other.KakaoApiDto;
 import com.hanghae.finalp.entity.dto.MemberGroupDto;
+import com.hanghae.finalp.entity.dto.other.KakaoApiDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.repository.CafeRepository;
 import com.hanghae.finalp.repository.MemberGroupRepository;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -25,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
@@ -55,7 +52,7 @@ public class CafeService {
             throw new AuthorOwnerException();
         }
         //이전의 카페 삭제
-        cafeRepository.deleteByGroupId(memberGroup.getGroup().getId());
+        cafeRepository.deleteByGroupId(groupId);
 
         //group의 변경감지 - 이상하지만 일단 남겨두기
         Cafe cafe = Cafe.createCafe(request.getLocationName(), request.getLocationX(), request.getLocationY(),
@@ -113,6 +110,7 @@ public class CafeService {
         List<MemberGroup> memberGroupList = memberGroupRepository.findJoinMemberByGroupId(groupId)
                 .stream().filter(mg -> Optional.ofNullable(mg.getStartLocationX()).isPresent())
                 .collect(Collectors.toList());
+
         MemberGroupDto.Location location = new MemberGroupDto.Location();
 
         memberGroupList.forEach((mg) -> location.addLocation(mg.getStartLocationX(), mg.getStartLocationY()));
@@ -155,7 +153,7 @@ public class CafeService {
      * 출처 - https://place.map.kakao.com/main/v/{id}
      */
     private CafeDto.RecoRes getCafeScrapInfo(KakaoApiDto kakaoApiDto) {
-        CafeDto.RecoRes recoRes = new CafeDto.RecoRes();
+        CafeDto.RecoRes recoRes = new CafeDto.RecoRes(); //kakaoApiDto 정보 + 추가 정보 담음
         for (KakaoApiDto.Document doc  : kakaoApiDto.getDocuments()) {
 
             String block = WebClient.create()

@@ -35,7 +35,7 @@ public class Group extends TimeStamped {
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<MemberGroup> memberGroups = new ArrayList<>();
 
-    @OneToOne(mappedBy = "group", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Cafe cafe;
 
 
