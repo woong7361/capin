@@ -149,9 +149,9 @@ public class MockData {
 
         MemberGroup memberGroupA = MemberGroup.createMemberGroup(Authority.JOIN, memberD, groupA, groupChatroom1.getId());
         MemberGroup memberGroupB = MemberGroup.createMemberGroup(Authority.JOIN, memberE, groupA, groupChatroom1.getId());
-        MemberGroup memberGroupC = MemberGroup.createMemberGroup(Authority.WAIT, memberF, groupA, groupChatroom1.getId());
-        MemberGroup memberGroupX = MemberGroup.createMemberGroup(Authority.WAIT, memberB, groupA, groupChatroom1.getId());
-        MemberGroup memberGroupY = MemberGroup.createMemberGroup(Authority.WAIT, memberC, groupA, groupChatroom1.getId());
+//        MemberGroup memberGroupC = MemberGroup.createMemberGroup(Authority.WAIT, memberF, groupA, groupChatroom1.getId());
+//        MemberGroup memberGroupX = MemberGroup.createMemberGroup(Authority.WAIT, memberB, groupA, groupChatroom1.getId());
+//        MemberGroup memberGroupY = MemberGroup.createMemberGroup(Authority.WAIT, memberC, groupA, groupChatroom1.getId());
         for (int i = 0; i <2; i++) groupA.plusMemberCount();
         groupRepository.save(groupA);
         MemberGroup memberGroupD = MemberGroup.createMemberGroup(Authority.JOIN, memberB, groupB, groupChatroom2.getId());
@@ -169,15 +169,15 @@ public class MockData {
 
         memberGroupRepository.save(memberGroupA);
         memberGroupRepository.save(memberGroupB);
-        memberGroupRepository.save(memberGroupC);
+//        memberGroupRepository.save(memberGroupC);
         memberGroupRepository.save(memberGroupD);
         memberGroupRepository.save(memberGroupE);
         memberGroupRepository.save(memberGroupF);
         memberGroupRepository.save(memberGroupG);
         memberGroupRepository.save(memberGroupH);
         memberGroupRepository.save(memberGroupI);
-        memberGroupRepository.save(memberGroupX);
-        memberGroupRepository.save(memberGroupY);
+//        memberGroupRepository.save(memberGroupX);
+//        memberGroupRepository.save(memberGroupY);
 
 
         Cafe cafe = Cafe.createCafe("열공카페", "127.26883192249932", "37.454322572335935",
