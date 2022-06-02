@@ -87,6 +87,7 @@ public class CafeService {
         KakaoApiDto kakaoApiDto = getKakaoKeywordLocalApi(location);
 
         CafeDto.RecoRes cafeScrapInfo = getCafeScrapInfo(kakaoApiDto);
+        cafeScrapInfo.setMidLocation(location.getLocationX(), location.getLocationY());
         return cafeScrapInfo;
     }
 
@@ -99,6 +100,7 @@ public class CafeService {
         KakaoApiDto kakaoApiDto = getKakaoKeywordLocalApi(location);
 
         CafeDto.RecoRes cafeScrapInfo = getCafeScrapInfo(kakaoApiDto);
+        cafeScrapInfo.setMidLocation(location.getLocationX(), location.getLocationY());
         return cafeScrapInfo;
     }
 

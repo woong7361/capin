@@ -137,7 +137,6 @@ public class GroupService {
 
         Stream<MemberDto.SpecificRes> ownerStream = memberGroupList.stream()
                 .filter(mg -> mg.getAuthority().equals(Authority.OWNER))
-                .map(mg -> mg.getMember())
                 .map(MemberDto.OwnerSpecificRes::new)
                 .map(MemberDto.SpecificRes::new);
 

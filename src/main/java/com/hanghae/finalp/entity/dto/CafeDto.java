@@ -32,14 +32,20 @@ public class CafeDto {
 
     @Data
     public static class RecoRes {
-        List<CafeInfo> cafes = new ArrayList<>();
+        private List<CafeInfo> cafes = new ArrayList<>();
+        private LocationRes midLocation;
+
+        public void setMidLocation(Double locationX, Double locationY) {
+            this.midLocation = new LocationRes(locationX.toString(), locationY.toString());
+        }
+
 
         @Data
         public static class CafeInfo extends KakaoApiDto.Document {
-            String mainphotourl;
-            int comntcnt;
-            int scoresum;
-            int scorecnt;
+            private String mainphotourl;
+            private int comntcnt;
+            private int scoresum;
+            private int scorecnt;
 
             public CafeInfo(String mainphotourl, int comntcnt, int scoresum, int scorecnt, KakaoApiDto.Document doc) {
                 super(doc);
@@ -55,7 +61,7 @@ public class CafeDto {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public class RecoReq {
+    public static class RecoReq {
         @NotBlank
         @Pattern(regexp="^[0-9]\\d*\\.?\\d*[0-9]", message="숫자만 입력가능합니다.")
         private String locationX;
@@ -64,4 +70,15 @@ public class CafeDto {
         @Pattern(regexp="^[0-9]\\d*\\.?\\d*[0-9]", message="숫자만 입력가능합니다.")
         private String locationY;
     }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class LocationRes {
+        private String locationX;
+        private String locationY;
+    }
+
+
+
 }
