@@ -71,13 +71,11 @@
 
 ## 🏛 프로젝트 구조
 
-<details markdown="1">
   <summary>Service Architecture</summary>
   <br>
   <img width="70%" src="https://user-images.githubusercontent.com/100892492/172302213-51b9b148-0649-4225-9635-39f8b40572b6.png">
-</details>
 
-<details markdown="2">
+<details markdown="1">
   <summary>API 명세서</summary>
   <br>
   <img width="650px" alt="스크린샷 2022-04-05 오후 9 34 44" src="https://user-images.githubusercontent.com/97425636/161757957-d4122d8f-7117-41ec-88e3-b70a6f86bd68.png">
@@ -88,15 +86,15 @@
 
 <br>
 
-##  Front-End Tech Stack
+##  Back-End Tech Stack
 <p align="center">
 <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> 
 <br>
-<img src="https://img.shields.io/badge/html-E34F26?style=for-the-badge&logo=html5&logoColor=white">
-<img src="https://img.shields.io/badge/css-1572B6?style=for-the-badge&logo=css3&logoColor=white">
-<img src="https://img.shields.io/badge/typescript-3178C6?style=for-the-badge&logo=typescript&logoColor=black">
-<img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=black">
-<img src="https://img.shields.io/badge/RTK-764ABC?style=for-the-badge&logo=Redux&logoColor=white">
+<img src="https://img.shields.io/badge/docker-E34F26?style=for-the-badge&logo=html5&logoColor=white">
+<img src="https://img.shields.io/badge/redis-1572B6?style=for-the-badge&logo=css3&logoColor=white">
+<img src="https://img.shields.io/badge/jenkins-3178C6?style=for-the-badge&logo=typescript&logoColor=black">
+<img src="https://img.shields.io/badge/MySQL-61DAFB?style=for-the-badge&logo=React&logoColor=black">
+<img src="https://img.shields.io/badge/amazon EC2-764ABC?style=for-the-badge&logo=Redux&logoColor=white">
 <br>
 <img src="https://img.shields.io/badge/S3-569A31?style=for-the-badge&logo=S3&logoColor=white">
 <img src="https://img.shields.io/badge/CloudFront-D05C4B?style=for-the-badge&logo=CloudFront&logoColor=white">
