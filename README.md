@@ -3,7 +3,7 @@
 <p align='center'>
   <img width='70%' src='https://user-images.githubusercontent.com/100892492/172284953-1e994f7f-655f-42cb-babd-29d6ca932fdd.png'>
 </p>
-<p align='center'>
+<!-- <p align='center'>
   <img src='https://img.shields.io/badge/React-v18.1.0-blue?logo=React'/>
    <img src='https://img.shields.io/badge/ReactRouter-v6.3.0-pink?logo=React Router'/>
   <img src='https://img.shields.io/badge/TypeScript-v4.4.2-blue?logo=TypeScript'/>
@@ -15,7 +15,7 @@
   <img src='https://img.shields.io/badge/CloudFront-red?'/>
   
   
-</p>
+</p> -->
 <br>
 
 
@@ -92,16 +92,16 @@
 <br>
 <img src="https://img.shields.io/badge/docker-E34F26?style=for-the-badge&logo=html5&logoColor=white">
 <img src="https://img.shields.io/badge/redis-1572B6?style=for-the-badge&logo=css3&logoColor=white">
-<img src="https://img.shields.io/badge/jenkins-3178C6?style=for-the-badge&logo=typescript&logoColor=black">
+<img src="https://img.shields.io/badge/jenkins-E891E9?style=for-the-badge&logo=typescript&logoColor=black">
 <img src="https://img.shields.io/badge/MySQL-61DAFB?style=for-the-badge&logo=React&logoColor=black">
 <img src="https://img.shields.io/badge/amazon EC2-764ABC?style=for-the-badge&logo=Redux&logoColor=white">
 <br>
 <img src="https://img.shields.io/badge/S3-569A31?style=for-the-badge&logo=S3&logoColor=white">
 <img src="https://img.shields.io/badge/CloudFront-D05C4B?style=for-the-badge&logo=CloudFront&logoColor=white">
-<img src="https://img.shields.io/badge/Spring Boot-E68B49?style=for-the-badge&logo=Route53s&logoColor=white">
-<img src="https://img.shields.io/badge/JWT-E68B49?style=for-the-badge&logo=Route53s&logoColor=white">
-<img src="https://img.shields.io/badge/OAuth 2.0-E68B49?style=for-the-badge&logo=Route53s&logoColor=white">
-<img src="https://img.shields.io/badge/Nginx-E68B49?style=for-the-badge&logo=Route53s&logoColor=white">
+<img src="https://img.shields.io/badge/Spring Boot-AFE1C8?style=for-the-badge&logo=Route53s&logoColor=white">
+<img src="https://img.shields.io/badge/JWT-473472?style=for-the-badge&logo=Route53s&logoColor=white">
+<img src="https://img.shields.io/badge/OAuth 2.0-CDE85E?style=for-the-badge&logo=Route53s&logoColor=white">
+<img src="https://img.shields.io/badge/Nginx-EB903C?style=for-the-badge&logo=Route53s&logoColor=white">
 <br>
 <br>
   
