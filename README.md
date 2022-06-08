@@ -108,11 +108,14 @@
   
 ## 🚨 트러블 슈팅  
 <details markdown="1">
-  <img width="70%" src="https://user-images.githubusercontent.com/91243121/172524213-a8b26799-9468-4c6d-85d6-fbbe286dfee2.PNG">
+  <summary>redis message-broker</summary>
   <br>
-  <img width="70%" src="https://user-images.githubusercontent.com/91243121/172524224-94f11065-d1c9-4cd4-8b05-da6ba0309dcd.PNG">   
+  <img width="70%" src="https://user-images.githubusercontent.com/91243121/172524224-94f11065-d1c9-4cd4-8b05-da6ba0309dcd.PNG">  
   <br>
+   <summary>selenium scraping</summary>
   <img width="70%" src="https://user-images.githubusercontent.com/91243121/172524226-671b20ab-69c1-4d54-869f-630f579b71b2.PNG">
+  <br>
+  <img width="70%" src="https://user-images.githubusercontent.com/91243121/172524776-37e5e255-d397-4961-8679-6da55c40fa88.PNG">
 </details>
 <br>
 <br>
