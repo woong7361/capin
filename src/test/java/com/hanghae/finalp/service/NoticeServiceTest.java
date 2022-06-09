@@ -6,12 +6,10 @@ import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.Notice;
 import com.hanghae.finalp.entity.dto.NoticeDto;
 import com.hanghae.finalp.repository.NoticeRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,7 +23,6 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -79,7 +76,7 @@ class NoticeServiceTest {
             assertThat(notices.getContent().stream()
                     .filter(m -> m.getIsRead().equals(true))
                     .collect(Collectors.toList()).size())
-                    .isEqualTo(0);
+                    .isEqualTo(3);
             assertThat(notice1.getIsRead()).isTrue();
             assertThat(notice2.getIsRead()).isTrue();
             assertThat(notice3.getIsRead()).isTrue();

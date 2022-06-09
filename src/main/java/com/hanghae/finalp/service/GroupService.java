@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -137,11 +136,14 @@ public class GroupService {
 
         Stream<MemberDto.SpecificRes> ownerStream = memberGroupList.stream()
                 .filter(mg -> mg.getAuthority().equals(Authority.OWNER))
+                .map(mg -> mg.getMember())
                 .map(MemberDto.OwnerSpecificRes::new)
                 .map(MemberDto.SpecificRes::new);
 
         Stream<MemberDto.SpecificRes> joinStream = memberGroupList.stream()
-                .filter(mg -> !(mg.getAuthority().equals(Authority.OWNER)))
+                .filter(mg -> mg.getAuthority().equals(Authority.JOIN))
+                .map(mg -> mg.getMember())
+                .sorted(Comparator.comparing(Member::getUsername))
                 .map(MemberDto.JoinSpecificRes::new)
                 .map(MemberDto.SpecificRes::new);
 

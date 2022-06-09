@@ -49,7 +49,6 @@ public class Notice {
         String message = member.getUsername() + "님이 " + groupTitle + "그룹에서 퇴장당하셨습니다.";
         return new Notice(message, member);
     }
-
     public void readNotice() {
         this.isRead = true;
     }

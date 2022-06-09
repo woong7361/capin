@@ -16,7 +16,7 @@ public class NoticeDto {
         public MessageRes(Notice notice) {
             this.noticeId = notice.getId();
             this.message = notice.getMessage();
-            this.isRead = notice.getIsRead();
+            this.isRead = true;
         }
     }
 

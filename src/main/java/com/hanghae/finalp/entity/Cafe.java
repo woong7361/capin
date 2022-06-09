@@ -4,7 +4,7 @@ import com.hanghae.finalp.entity.mappedsuperclass.TimeStamped;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
+import javax.persistence.Id;
 import javax.persistence.*;
 
 @Entity
@@ -13,17 +13,19 @@ import javax.persistence.*;
 public class Cafe extends TimeStamped {
 
     @Id
-    @GeneratedValue
-    @Column(name = "cafe_id")
+//    @GeneratedValue
+    @Column(name = "study_group_id")
     private Long id;
     private String locationName;
     private String locationX;
     private String locationY;
     private String address;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
+    @MapsId
     @JoinColumn(name = "study_group_id")
     private Group group;
+
 
     //========================================생성자=============================================//
 
@@ -41,5 +43,13 @@ public class Cafe extends TimeStamped {
         Cafe cafe = new Cafe(locationName, locationX, locationY, address, group);
         group.setGroupCafe(cafe);
         return cafe;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
     }
 }
