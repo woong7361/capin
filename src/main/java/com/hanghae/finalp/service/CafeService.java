@@ -4,15 +4,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hanghae.finalp.config.exception.customexception.authority.AuthorOwnerException;
+import com.hanghae.finalp.config.exception.customexception.entity.GroupNotExistException;
 import com.hanghae.finalp.config.exception.customexception.entity.MemberGroupNotExistException;
 import com.hanghae.finalp.config.exception.customexception.etc.WebClientException;
 import com.hanghae.finalp.entity.Cafe;
+import com.hanghae.finalp.entity.Group;
 import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.dto.CafeDto;
 import com.hanghae.finalp.entity.dto.MemberGroupDto;
 import com.hanghae.finalp.entity.dto.other.KakaoApiDto;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.repository.CafeRepository;
+import com.hanghae.finalp.repository.GroupRepository;
 import com.hanghae.finalp.repository.MemberGroupRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +40,7 @@ import java.util.stream.Collectors;
 public class CafeService {
 
     private final CafeRepository cafeRepository;
+    private final GroupRepository groupRepository;
     private final MemberGroupRepository memberGroupRepository;
     private final WebClient kakaoWebClient;
 
@@ -52,9 +56,11 @@ public class CafeService {
             throw new AuthorOwnerException();
         }
         //이전의 카페 삭제
+        Group group = groupRepository.findById(groupId).orElseThrow(GroupNotExistException::new);
+        group.setGroupCafe(null);
         cafeRepository.deleteByGroupId(groupId);
+        cafeRepository.flush();
 
-        //group의 변경감지 - 이상하지만 일단 남겨두기
         Cafe cafe = Cafe.createCafe(request.getLocationName(), request.getLocationX(), request.getLocationY(),
                 request.getAddress(), memberGroup.getGroup());
     }
@@ -69,6 +75,9 @@ public class CafeService {
         if(!memberGroup.getAuthority().equals(Authority.OWNER)){
             throw new AuthorOwnerException();
         }
+
+        Group group = groupRepository.findById(groupId).orElseThrow(GroupNotExistException::new);
+        group.setGroupCafe(null);
         cafeRepository.deleteByGroupId(groupId);
     }
 
@@ -199,6 +208,5 @@ public class CafeService {
             throw new RuntimeException(e);
         }
     }
-
 
 }

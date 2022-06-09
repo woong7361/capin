@@ -1,6 +1,5 @@
 package com.hanghae.finalp.repository;
 
-import com.hanghae.finalp.config.exception.customexception.entity.EntityNotExistException;
 import com.hanghae.finalp.entity.Group;
 import com.hanghae.finalp.entity.Member;
 import com.hanghae.finalp.entity.Notice;
@@ -15,7 +14,6 @@ import org.springframework.data.domain.Slice;
 import javax.persistence.EntityManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.boot.jdbc.EmbeddedDatabaseConnection.H2;
 
 @DataJpaTest
@@ -75,7 +73,7 @@ class NoticeRepositoryTest {
         assertThat(member2Notices.getContent().size()).isEqualTo(2);
     }
 
-    @Test
+  /*  @Test
     public void findNonReadCountById_쿼리_테스트() throws Exception{
         //given //when
         long beforeReadCount = noticeRepository.findNonReadCountById(member1.getId());
@@ -90,5 +88,5 @@ class NoticeRepositoryTest {
         //then
         assertThat(beforeReadCount).isEqualTo(2);
         assertThat(afterReadCount).isEqualTo(1);
-    }
+    }*/
 }

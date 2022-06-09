@@ -1,17 +1,11 @@
 package com.hanghae.finalp.mockdata;
 
-import com.hanghae.finalp.entity.*;
-import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import com.hanghae.finalp.repository.*;
 import com.hanghae.finalp.service.*;
 import com.hanghae.finalp.util.JwtTokenUtils;
 import com.hanghae.finalp.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.PostConstruct;
-import java.util.stream.IntStream;
 
 @Component
 @RequiredArgsConstructor
@@ -25,7 +19,6 @@ public class MockData {
     private final ChatRoomRepository chatRoomRepository;
     private final JwtTokenUtils jwtTokenUtils;
     private final RedisUtils redisUtils;
-
     private final MemberRepository memberRepository;
     private final GroupRepository groupRepository;
     private final MemberGroupRepository memberGroupRepository;
@@ -33,7 +26,7 @@ public class MockData {
     private final NoticeRepository noticeRepository;
 
 
-    @PostConstruct
+   /* @PostConstruct
     @Transactional
     public void init() {
         Member memberA = Member.createMember("Kakao_A", "userA",
@@ -116,8 +109,6 @@ public class MockData {
         memberGroupRepository.save(memberGroupI);
         memberGroupRepository.save(memberGroupX);
         memberGroupRepository.save(memberGroupY);
-
-
         Cafe cafe = Cafe.createCafe("열공카페", "127.26883192249932", "37.454322572335935",
                 "영등포구 마포대로 3길 22번지", groupA);
         cafeRepository.save(cafe);
@@ -131,7 +122,7 @@ public class MockData {
         noticeRepository.save(noticeC);
 
 
-    }
+    }*/
 
 
 }

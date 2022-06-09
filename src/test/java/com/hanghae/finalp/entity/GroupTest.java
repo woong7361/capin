@@ -87,6 +87,7 @@ class GroupTest {
         Member member = Member.createMember("kakaoId", "홍길동", "https://d2yjfe20.cloudfront.net/img.png");
         Group group = Group.createGroup("groupTitle", "desc", 10, "address",
                 "https://d2yjfe20.cloudfront.net/groupImg.png", member, 1L, "2022.02.02", "2022.05.05");
+        Cafe cafe = Cafe.createCafe("locationName", "127.0000", "37.0000", "addredss", group);
 
         em.persist(member);
         em.persist(group);

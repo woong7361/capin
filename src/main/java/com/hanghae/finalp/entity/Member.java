@@ -56,4 +56,8 @@ public class Member extends TimeStamped {
         this.imageUrl = imageUrl;
     }
 
+    public void setIdForTest(Long id) {
+        this.id = id;
+    }
+
 }

@@ -54,6 +54,7 @@ public class CafeController {
         return cafeService.getRecoCafe(groupId);
     }
 
+
     /**
      * 스터디 카페 추천
      */
