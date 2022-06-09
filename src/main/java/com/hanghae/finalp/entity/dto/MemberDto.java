@@ -1,6 +1,7 @@
 package com.hanghae.finalp.entity.dto;
 
 import com.hanghae.finalp.entity.Member;
+import com.hanghae.finalp.entity.MemberGroup;
 import com.hanghae.finalp.entity.mappedsuperclass.Authority;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,18 +43,21 @@ public class MemberDto {
         private String username;
         private String imageUrl;
         private Authority authority;
+        private String address;
 
         public SpecificRes(OwnerSpecificRes ownerSpecificRes) {
             this.memberId = ownerSpecificRes.getMemberId();
             this.username = ownerSpecificRes.getUsername();
             this.imageUrl = ownerSpecificRes.getImageUrl();
             this.authority = ownerSpecificRes.getAuthority();
+            this.address = ownerSpecificRes.getAddress();
         }
         public SpecificRes(JoinSpecificRes joinSpecificRes) {
             this.memberId = joinSpecificRes.getMemberId();
             this.username = joinSpecificRes.getUsername();
             this.imageUrl = joinSpecificRes.getImageUrl();
             this.authority = joinSpecificRes.getAuthority();
+            this.address = joinSpecificRes.getAddress();
         }
     }
 
@@ -65,12 +69,20 @@ public class MemberDto {
         private String username;
         private String imageUrl;
         private Authority authority;
+        private String address;
 
         public OwnerSpecificRes(Member member) {
             this.memberId = member.getId();
             this.username = member.getUsername();
             this.imageUrl = member.getImageUrl();
             this.authority = Authority.OWNER;
+        }
+        public OwnerSpecificRes(MemberGroup memberGroup) {
+            this.memberId = memberGroup.getMember().getId();
+            this.username = memberGroup.getMember().getUsername();
+            this.imageUrl = memberGroup.getMember().getImageUrl();
+            this.authority = memberGroup.getAuthority();
+            this.address = memberGroup.getStartAddress();
         }
     }
     @Data
@@ -81,12 +93,21 @@ public class MemberDto {
         private String username;
         private String imageUrl;
         private Authority authority;
+        private String address;
 
         public JoinSpecificRes(Member member) {
             this.memberId = member.getId();
             this.username = member.getUsername();
             this.imageUrl = member.getImageUrl();
             this.authority = Authority.JOIN;
+        }
+
+        public JoinSpecificRes(MemberGroup memberGroup) {
+            this.memberId = memberGroup.getMember().getId();
+            this.username = memberGroup.getMember().getUsername();
+            this.imageUrl = memberGroup.getMember().getImageUrl();
+            this.authority = memberGroup.getAuthority();
+            this.address = memberGroup.getStartAddress();
         }
     }
 
