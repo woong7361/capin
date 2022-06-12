@@ -1,3 +1,4 @@
+/*
 package com.hanghae.finalp.mockdata;
 
 import com.hanghae.finalp.entity.*;
@@ -179,6 +180,10 @@ public class MockData {
 //        memberGroupRepository.save(memberGroupY);
 
 
+        groupA.setGroupCafe(null);
+        cafeRepository.deleteByGroupId(groupA.getId());
+        cafeRepository.flush();
+
         Cafe cafe = Cafe.createCafe("열공카페", "127.26883192249932", "37.454322572335935",
                 "영등포구 마포대로 3길 22번지", groupA);
         cafeRepository.save(cafe);
@@ -196,3 +201,4 @@ public class MockData {
 
 
 }
+*/
