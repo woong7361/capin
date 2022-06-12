@@ -5,14 +5,14 @@ sudo docker ps -a -q --filter "name=finalp" | grep -q . && docker stop finalp &&
 
 # 기존 이미지 삭제
 #sudo docker rmi woong7361/finalp:1.0
-sudo docker rmi chrysan5/finalp:1.0
+sudo docker rmi chrys5/finalp:1.0
 
 # 도커허브 이미지 pull
 #sudo docker pull woong7361/finalp:1.0
-sudo docker pull chrysan5/finalp:1.0
+sudo docker pull chrys5/finalp:1.0
 
 # 도커 run
-docker run -d -p 8080:8080 -v /home/ec2-user:/config --name finalp chrysan5/finalp:1.0
+docker run -d -p 8080:8080 -v /home/ec2-user:/config --name finalp chrys5/finalp:1.0
 #이거 나중에 엔진엑스하면 주석처리됨
 
 
